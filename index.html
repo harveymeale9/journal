@@ -440,7 +440,9 @@ function startRecording() {
   };
 
   recognition.onend = () => {
-    if (isRecording) recognition.start();
+    if (isRecording) {
+      try { recognition.start(); } catch(e) {}
+    }
   };
 
   recognition.start();
