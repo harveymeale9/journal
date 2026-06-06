@@ -448,7 +448,6 @@ function startRecording() {
   recognition.start();
   isRecording = true;
 
-  // Update UI
   document.getElementById('micBtn').classList.add('recording');
   document.getElementById('micIcon').style.display = 'none';
   document.getElementById('stopIcon').style.display = 'block';
@@ -458,15 +457,24 @@ function startRecording() {
 }
 
 function stopRecording() {
+  if (!isRecording) return;
   isRecording = false;
-  if (recognition) { recognition.stop(); recognition = null; }
 
-  if (!transcript.trim()) {
+  if (recognition) {
+    recognition.onend = null;
+    recognition.onresult = null;
+    recognition.onerror = null;
+    recognition.stop();
+    recognition = null;
+  }
+
+  const captured = transcript.trim();
+
+  if (!captured) {
     resetMic();
     return;
   }
 
-  // Show processing state
   document.getElementById('micBtn').classList.remove('recording');
   document.getElementById('micBtn').classList.add('processing');
   document.getElementById('stopIcon').style.display = 'none';
@@ -474,7 +482,7 @@ function stopRecording() {
   document.getElementById('statusText').textContent = 'claude is thinking...';
   document.getElementById('statusText').className = 'status-text processing';
 
-  processEntry(transcript.trim());
+  processEntry(captured);
 }
 
 function resetMic() {
