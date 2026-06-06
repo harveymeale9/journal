@@ -436,7 +436,10 @@ function startRecording() {
   };
 
   recognition.onerror = e => {
-    if (e.error !== 'aborted') stopRecording();
+    if (e.error === 'aborted' || e.error === 'no-speech') return;
+    isRecording = false;
+    recognition = null;
+    resetMic();
   };
 
   recognition.onend = () => {
