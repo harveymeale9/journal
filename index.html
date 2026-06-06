@@ -16,7 +16,6 @@
     --bg2: #10101c;
     --bg3: #16162a;
     --gold: #c8a96e;
-    --gold2: #e8c98e;
     --text: #f0ece4;
     --text2: #a09880;
     --text3: #504840;
@@ -33,196 +32,140 @@
     font-family: 'DM Mono', monospace;
     min-height: 100dvh;
     overflow-x: hidden;
+    user-select: none;
   }
 
-  /* ─── SCREENS ─── */
   .screen { display: none; min-height: 100dvh; flex-direction: column; }
   .screen.active { display: flex; }
 
-  /* ─── HOME ─── */
+  /* ─── HOME / RECORD ─── */
   #home {
     align-items: center;
-    justify-content: space-between;
-    padding: 60px 24px 40px;
+    justify-content: center;
+    padding: 40px 24px;
+    gap: 32px;
     position: relative;
   }
 
-  .grain {
-    position: fixed; inset: 0; pointer-events: none; z-index: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-    opacity: 0.4;
-  }
-
-  .home-header { text-align: center; z-index: 1; animation: fadeUp 1s ease both; }
+  .home-header { text-align: center; }
   .home-title {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 48px; font-weight: 700; letter-spacing: 8px;
+    font-size: 42px; font-weight: 700; letter-spacing: 8px;
     color: var(--text); text-transform: uppercase;
   }
   .home-subtitle {
-    font-size: 10px; letter-spacing: 14px; color: var(--gold);
-    text-transform: uppercase; margin-top: 2px; font-weight: 300;
+    font-size: 9px; letter-spacing: 14px; color: var(--gold);
+    text-transform: uppercase; margin-top: 2px;
   }
-  .home-line { width: 40px; height: 1px; background: var(--gold); margin: 16px auto 0; opacity: 0.5; }
+  .home-line { width: 40px; height: 1px; background: var(--gold); margin: 12px auto 0; opacity: 0.4; }
 
-  .last-entry {
-    width: 100%; background: var(--bg2); border-radius: 14px;
-    padding: 16px 18px; border-left: 2px solid var(--gold);
-    z-index: 1; animation: fadeUp 1s ease 0.2s both; cursor: pointer;
+  /* Big mic button */
+  .mic-wrap {
+    position: relative;
+    width: 220px; height: 220px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
   }
-  .last-entry-label { font-size: 9px; color: var(--gold); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 6px; }
-  .last-entry-text { font-size: 13px; color: var(--text3); font-style: italic; line-height: 20px; font-family: 'Cormorant Garamond', serif; }
-  .last-entry.hidden { display: none; }
 
-  .record-section { display: flex; flex-direction: column; align-items: center; gap: 16px; z-index: 1; animation: fadeUp 1s ease 0.1s both; }
-
-  .record-ring {
-    position: absolute; width: 170px; height: 170px; border-radius: 50%;
-    border: 1px solid var(--gold); opacity: 0.2;
+  .ring {
+    position: absolute; border-radius: 50%; border: 1px solid var(--gold);
     animation: ringPulse 3s ease-in-out infinite;
   }
-  .record-ring-2 {
-    position: absolute; width: 200px; height: 200px; border-radius: 50%;
-    border: 1px solid var(--gold); opacity: 0.1;
-    animation: ringPulse 3s ease-in-out infinite 0.5s;
-  }
+  .ring-1 { width: 185px; height: 185px; opacity: 0.2; }
+  .ring-2 { width: 210px; height: 210px; opacity: 0.1; animation-delay: 0.4s; }
 
-  .record-btn-wrap { position: relative; width: 200px; height: 200px; display: flex; align-items: center; justify-content: center; }
-
-  .record-btn {
-    width: 140px; height: 140px; border-radius: 50%;
+  .mic-btn {
+    width: 155px; height: 155px; border-radius: 50%;
     background: var(--gold); border: none; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    box-shadow: 0 0 40px rgba(200, 169, 110, 0.3);
+    box-shadow: 0 0 50px rgba(200,169,110,0.25);
+    transition: transform 0.15s ease;
     position: relative; z-index: 1;
+    -webkit-tap-highlight-color: transparent;
   }
-  .record-btn:active { transform: scale(0.94); }
-  .record-btn svg { width: 52px; height: 52px; fill: var(--bg); }
+  .mic-btn:active { transform: scale(0.93); }
+  .mic-btn svg { width: 56px; height: 56px; }
 
-  .record-hint { font-size: 10px; color: var(--text3); letter-spacing: 4px; text-transform: uppercase; }
+  .mic-btn.recording {
+    background: var(--red);
+    box-shadow: 0 0 50px rgba(224,82,82,0.35);
+    animation: recPulse 1.2s ease-in-out infinite;
+  }
+  .mic-btn.recording .ring-1 { border-color: var(--red); }
+
+  .mic-btn.processing {
+    background: var(--bg2);
+    box-shadow: none;
+  }
+
+  .status-text {
+    font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--text3); text-align: center; min-height: 16px;
+    transition: color 0.3s;
+  }
+  .status-text.recording { color: var(--red); }
+  .status-text.processing { color: var(--gold); }
+
+  .transcript-preview {
+    width: 100%; background: var(--bg2); border-radius: 14px;
+    padding: 16px 18px; min-height: 80px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px; line-height: 28px; color: var(--text2);
+    font-style: italic; display: none;
+    border-left: 2px solid var(--gold);
+  }
+  .transcript-preview.visible { display: block; }
+
+  .last-entry-hint {
+    width: 100%; text-align: center; cursor: pointer;
+  }
+  .last-entry-label { font-size: 9px; color: var(--text3); letter-spacing: 3px; text-transform: uppercase; }
+  .last-entry-ago { font-size: 12px; color: var(--text3); margin-top: 4px; font-family: 'Cormorant Garamond', serif; font-style: italic; }
 
   .nav {
     display: flex; width: 100%; justify-content: space-around;
-    border-top: 1px solid var(--bg3); padding-top: 20px; z-index: 1;
-    animation: fadeUp 1s ease 0.3s both;
+    border-top: 1px solid var(--bg3); padding-top: 20px;
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--bg); padding-bottom: max(20px, env(safe-area-inset-bottom));
+    padding-top: 16px;
   }
-  .nav-btn { display: flex; flex-direction: column; align-items: center; gap: 5px; background: none; border: none; cursor: pointer; padding: 4px 12px; }
-  .nav-btn svg { width: 22px; height: 22px; stroke: var(--text3); fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; transition: stroke 0.2s; }
+  .nav-btn { display: flex; flex-direction: column; align-items: center; gap: 5px; background: none; border: none; cursor: pointer; padding: 4px 16px; }
+  .nav-btn svg { width: 20px; height: 20px; stroke: var(--text3); fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; transition: stroke 0.2s; }
   .nav-btn span { font-size: 9px; color: var(--text3); letter-spacing: 1px; transition: color 0.2s; }
-  .nav-btn:hover svg, .nav-btn:hover span { stroke: var(--gold); color: var(--gold); }
+  .nav-btn:hover svg, .nav-btn:hover span,
+  .nav-btn.active svg, .nav-btn.active span { stroke: var(--gold); color: var(--gold); }
 
-  /* ─── RECORD SCREEN ─── */
-  #record { padding: 0; }
+  /* ─── INNER SCREENS ─── */
   .screen-header {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 56px 20px 16px; background: var(--bg);
-    position: sticky; top: 0; z-index: 10;
+    padding: 56px 20px 16px;
+    position: sticky; top: 0; background: var(--bg); z-index: 10;
   }
   .back-btn { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: none; border: none; cursor: pointer; }
   .back-btn svg { width: 24px; height: 24px; stroke: var(--text2); fill: none; stroke-width: 2; stroke-linecap: round; }
   .screen-title { font-size: 11px; color: var(--text2); letter-spacing: 3px; text-transform: uppercase; }
 
-  .type-toggle { display: flex; margin: 0 24px 20px; background: var(--bg2); border-radius: 10px; padding: 4px; }
-  .type-btn { flex: 1; padding: 9px; text-align: center; border-radius: 7px; border: none; cursor: pointer; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text3); background: none; transition: all 0.2s; letter-spacing: 1px; }
-  .type-btn.active { background: var(--gold); color: var(--bg); }
-
-  .record-content { padding: 0 24px 40px; flex: 1; display: flex; flex-direction: column; gap: 20px; }
-
-  .voice-hint { text-align: center; font-size: 12px; color: var(--text3); padding: 8px 0; line-height: 20px; }
-
-  .listening-indicator {
-    display: none; align-items: center; justify-content: center; gap: 8px;
-    padding: 14px; background: rgba(224, 82, 82, 0.08); border-radius: 12px;
-    border: 1px solid rgba(224, 82, 82, 0.2);
-  }
-  .listening-indicator.active { display: flex; }
-  .listening-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--red); animation: blink 1s ease-in-out infinite; }
-  .listening-text { font-size: 11px; color: var(--red); letter-spacing: 2px; }
-
-  .mic-record-btn {
-    width: 100%; padding: 16px; border-radius: 14px; border: none; cursor: pointer;
-    background: var(--bg2); color: var(--text); font-family: 'DM Mono', monospace;
-    font-size: 12px; letter-spacing: 2px; display: flex; align-items: center;
-    justify-content: center; gap: 10px; transition: all 0.2s;
-    border: 1px solid var(--bg3);
-  }
-  .mic-record-btn svg { width: 20px; height: 20px; fill: var(--gold); }
-  .mic-record-btn.recording { background: rgba(224,82,82,0.1); border-color: var(--red); color: var(--red); }
-  .mic-record-btn.recording svg { fill: var(--red); }
-
-  .divider { display: flex; align-items: center; gap: 12px; }
-  .divider-line { flex: 1; height: 1px; background: var(--bg3); }
-  .divider-text { font-size: 10px; color: var(--text3); letter-spacing: 2px; }
-
-  textarea {
-    width: 100%; min-height: 180px; background: var(--bg2); border-radius: 12px;
-    padding: 16px; color: var(--text); font-family: 'Cormorant Garamond', serif;
-    font-size: 18px; line-height: 28px; border: 1px solid var(--bg3); resize: none;
-    outline: none; transition: border-color 0.2s;
-  }
-  textarea:focus { border-color: rgba(200, 169, 110, 0.3); }
-  textarea::placeholder { color: var(--text3); }
-
-  .claude-btn {
-    align-self: flex-end; padding: 10px 18px; background: var(--bg3);
-    border-radius: 20px; border: 1px solid rgba(200,169,110,0.2); cursor: pointer;
-    font-family: 'DM Mono', monospace; font-size: 12px; color: var(--gold);
-    transition: all 0.2s; display: none;
-  }
-  .claude-btn.visible { display: block; }
-  .claude-btn:hover { background: rgba(200,169,110,0.1); }
-
-  .processing-box { display: none; flex-direction: column; align-items: center; gap: 16px; padding: 40px 0; }
-  .processing-box.active { display: flex; }
-  .spinner { width: 36px; height: 36px; border: 2px solid var(--bg3); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; }
-  .processing-text { font-size: 12px; color: var(--text3); letter-spacing: 2px; }
-
-  .section-label { font-size: 9px; color: var(--gold); letter-spacing: 3px; text-transform: uppercase; }
-
-  .cleaned-box {
-    background: var(--bg2); border-radius: 14px; padding: 20px;
-    border-left: 2px solid var(--gold); font-family: 'Cormorant Garamond', serif;
-    font-size: 18px; line-height: 30px; color: var(--text);
-  }
-  .raw-box {
-    background: var(--bg); border-radius: 10px; padding: 14px;
-    font-size: 13px; color: var(--text3); line-height: 22px; font-style: italic;
-    font-family: 'Cormorant Garamond', serif;
-  }
-
-  .save-btn {
-    width: 100%; padding: 18px; border-radius: 14px; background: var(--gold);
-    border: none; cursor: pointer; font-family: 'DM Mono', monospace;
-    font-size: 13px; letter-spacing: 2px; color: var(--bg); font-weight: 400;
-    transition: all 0.2s; margin-top: 8px;
-  }
-  .save-btn:active { transform: scale(0.98); }
-
-  /* ─── ENTRIES ─── */
-  #entries { padding-bottom: 40px; }
+  /* entries */
+  #entries { padding-bottom: 80px; }
   .entries-list { padding: 0 20px; display: flex; flex-direction: column; gap: 12px; }
-  .entry-card {
-    background: var(--bg2); border-radius: 14px; padding: 18px;
-    border: 1px solid var(--bg3); cursor: pointer; transition: border-color 0.2s;
-    animation: fadeUp 0.4s ease both;
-  }
-  .entry-card:hover { border-color: rgba(200,169,110,0.2); }
-  .entry-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .entry-card { background: var(--bg2); border-radius: 14px; padding: 18px; border: 1px solid var(--bg3); animation: fadeUp 0.3s ease both; }
+  .entry-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
   .entry-badge { font-size: 9px; letter-spacing: 2px; padding: 3px 8px; border-radius: 5px; text-transform: uppercase; }
   .badge-journal { background: rgba(200,169,110,0.1); color: var(--gold); }
   .badge-idea { background: rgba(158,122,232,0.1); color: var(--purple); }
+  .badge-metric { background: rgba(82,200,169,0.1); color: var(--green); }
   .entry-time { font-size: 10px; color: var(--text3); }
-  .entry-date { font-size: 12px; color: var(--text2); margin-bottom: 6px; font-family: 'Cormorant Garamond', serif; }
+  .entry-date { font-size: 12px; color: var(--text2); margin-bottom: 8px; font-family: 'Cormorant Garamond', serif; }
   .entry-preview { font-size: 15px; color: var(--text2); line-height: 24px; font-family: 'Cormorant Garamond', serif; }
-  .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 80px 40px; text-align: center; }
-  .empty-icon { font-size: 48px; opacity: 0.2; }
-  .empty-title { font-size: 18px; color: var(--text3); font-family: 'Cormorant Garamond', serif; }
-  .empty-sub { font-size: 12px; color: var(--text3); line-height: 20px; }
+  .entry-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .entry-tag { font-size: 9px; color: var(--text3); background: var(--bg3); padding: 2px 8px; border-radius: 4px; letter-spacing: 1px; }
 
-  /* ─── PULSE ─── */
-  #pulse { padding-bottom: 40px; }
-  .pulse-content { padding: 0 20px; display: flex; flex-direction: column; gap: 16px; }
+  /* pulse */
+  #pulse { padding-bottom: 80px; }
+  .pulse-content { padding: 0 20px; display: flex; flex-direction: column; gap: 14px; }
+  .tab-row { display: flex; margin: 0 20px 12px; background: var(--bg2); border-radius: 10px; padding: 4px; }
+  .tab-btn { flex: 1; padding: 9px; text-align: center; border-radius: 7px; border: none; cursor: pointer; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text3); background: none; transition: all 0.2s; letter-spacing: 1px; }
+  .tab-btn.active { background: var(--bg3); color: var(--gold); }
   .metric-card { background: var(--bg2); border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 14px; }
   .metric-header { display: flex; align-items: center; gap: 10px; }
   .metric-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
@@ -231,64 +174,56 @@
   .metric-desc { font-size: 11px; color: var(--text3); margin-top: 2px; }
   .metric-score { font-size: 28px; font-weight: 700; font-family: 'Cormorant Garamond', serif; }
   .slider-row { display: flex; gap: 5px; }
-  .slider-pip {
-    flex: 1; height: 6px; border-radius: 3px; background: var(--bg3);
-    cursor: pointer; transition: all 0.15s; position: relative;
-  }
+  .slider-pip { flex: 1; height: 6px; border-radius: 3px; background: var(--bg3); cursor: pointer; transition: all 0.15s; }
   .slider-pip.active { height: 18px; margin-top: -6px; border-radius: 4px; }
-  .metric-labels { display: flex; justify-content: space-between; }
-  .metric-label-text { font-size: 9px; color: var(--text3); letter-spacing: 1px; }
+  .metric-end-labels { display: flex; justify-content: space-between; }
+  .end-label { font-size: 9px; color: var(--text3); letter-spacing: 1px; }
+  .save-btn { width: 100%; padding: 18px; border-radius: 14px; background: var(--gold); border: none; cursor: pointer; font-family: 'DM Mono', monospace; font-size: 13px; letter-spacing: 2px; color: var(--bg); transition: all 0.2s; margin-top: 4px; }
+  .save-btn:active { transform: scale(0.98); }
 
-  .tab-row { display: flex; margin: 0 20px 16px; background: var(--bg2); border-radius: 10px; padding: 4px; }
-  .tab-btn { flex: 1; padding: 9px; text-align: center; border-radius: 7px; border: none; cursor: pointer; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text3); background: none; transition: all 0.2s; letter-spacing: 1px; }
-  .tab-btn.active { background: var(--bg3); color: var(--gold); }
-
-  /* ─── IDEAS ─── */
-  #ideas { padding-bottom: 40px; }
-  .ideas-list { padding: 0 20px; display: flex; flex-direction: column; gap: 12px; }
-  .idea-card { background: var(--bg2); border-radius: 14px; padding: 18px; border-left: 2px solid var(--purple); cursor: pointer; }
-  .idea-card-title { font-size: 17px; color: var(--text); font-family: 'Cormorant Garamond', serif; font-weight: 600; margin-bottom: 6px; }
-  .idea-card-preview { font-size: 13px; color: var(--text3); line-height: 20px; font-family: 'Cormorant Garamond', serif; }
-  .idea-card-date { font-size: 10px; color: var(--text3); margin-top: 8px; }
-  .add-btn { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: none; border: none; cursor: pointer; font-size: 28px; color: var(--gold); }
-
-  /* ─── INSIGHTS ─── */
-  #insights { padding-bottom: 40px; }
+  /* insights */
+  #insights { padding-bottom: 80px; }
   .insights-content { padding: 0 20px; display: flex; flex-direction: column; gap: 20px; }
   .insights-prompt { display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 40px 0; text-align: center; }
-  .insights-icon { width: 80px; height: 80px; border-radius: 50%; background: var(--bg2); display: flex; align-items: center; justify-content: center; font-size: 36px; border: 1px solid rgba(200,169,110,0.15); }
-  .insights-title { font-size: 24px; font-family: 'Cormorant Garamond', serif; color: var(--text); }
-  .insights-desc { font-size: 13px; color: var(--text3); line-height: 22px; }
+  .insights-icon { width: 80px; height: 80px; border-radius: 50%; background: var(--bg2); display: flex; align-items: center; justify-content: center; font-size: 32px; border: 1px solid rgba(200,169,110,0.15); }
+  .insights-title { font-size: 22px; font-family: 'Cormorant Garamond', serif; color: var(--text); }
+  .insights-desc { font-size: 12px; color: var(--text3); line-height: 22px; }
   .generate-btn { padding: 14px 28px; background: var(--gold); border: none; border-radius: 14px; cursor: pointer; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--bg); letter-spacing: 1px; }
   .insight-box { background: var(--bg2); border-radius: 16px; padding: 20px; border: 1px solid rgba(200,169,110,0.1); }
-  .insight-box-header { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
-  .insight-box-label { font-size: 9px; color: var(--gold); letter-spacing: 3px; }
+  .insight-label { font-size: 9px; color: var(--gold); letter-spacing: 3px; margin-bottom: 14px; }
   .insight-text { font-size: 16px; color: var(--text2); line-height: 28px; font-family: 'Cormorant Garamond', serif; }
+  .section-label { font-size: 9px; color: var(--gold); letter-spacing: 3px; text-transform: uppercase; }
   .question-card { display: flex; gap: 14px; background: var(--bg2); border-radius: 12px; padding: 16px; }
-  .q-num { font-size: 10px; color: var(--gold); opacity: 0.5; padding-top: 2px; }
+  .q-num { font-size: 10px; color: var(--gold); opacity: 0.5; padding-top: 2px; min-width: 20px; }
   .q-text { font-size: 15px; color: var(--text2); line-height: 24px; font-family: 'Cormorant Garamond', serif; }
 
-  /* ─── CONFIG ─── */
-  #config { padding-bottom: 40px; }
-  .config-content { padding: 0 20px; display: flex; flex-direction: column; gap: 16px; }
+  /* config */
+  #config { padding-bottom: 80px; }
+  .config-content { padding: 0 20px; display: flex; flex-direction: column; gap: 14px; }
   .config-card { background: var(--bg2); border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
   .config-label { font-size: 9px; color: var(--gold); letter-spacing: 3px; text-transform: uppercase; }
   .config-desc { font-size: 12px; color: var(--text3); line-height: 20px; }
-  .config-input { width: 100%; background: var(--bg3); border-radius: 8px; padding: 12px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 12px; border: 1px solid var(--bg3); outline: none; }
+  .config-input { width: 100%; background: var(--bg3); border-radius: 8px; padding: 12px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 11px; border: 1px solid var(--bg3); outline: none; }
   .config-input:focus { border-color: rgba(200,169,110,0.3); }
   .config-save-btn { padding: 14px; background: var(--gold); border: none; border-radius: 10px; cursor: pointer; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--bg); letter-spacing: 1px; }
 
+  /* empty */
+  .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 80px 40px; text-align: center; }
+  .empty-icon { font-size: 40px; opacity: 0.15; }
+  .empty-title { font-size: 18px; color: var(--text3); font-family: 'Cormorant Garamond', serif; }
+  .empty-sub { font-size: 11px; color: var(--text3); line-height: 20px; }
+
+  /* spinner */
+  .spinner { width: 32px; height: 32px; border: 2px solid var(--bg3); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; }
+
   /* ─── ANIMATIONS ─── */
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes ringPulse { 0%, 100% { transform: scale(1); opacity: 0.2; } 50% { transform: scale(1.05); opacity: 0.35; } }
-  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes ringPulse { 0%,100% { transform: scale(1); opacity: 0.2; } 50% { transform: scale(1.04); opacity: 0.35; } }
+  @keyframes recPulse { 0%,100% { box-shadow: 0 0 40px rgba(224,82,82,0.3); } 50% { box-shadow: 0 0 70px rgba(224,82,82,0.55); } }
   @keyframes spin { to { transform: rotate(360deg); } }
-  @keyframes recordPulse { 0%, 100% { box-shadow: 0 0 40px rgba(200,169,110,0.3); } 50% { box-shadow: 0 0 60px rgba(200,169,110,0.5); } }
-  .record-btn.recording { background: var(--red); animation: recordPulse 1s ease-in-out infinite; box-shadow: 0 0 40px rgba(224,82,82,0.4); }
 </style>
 </head>
 <body>
-<div class="grain"></div>
 
 <!-- ─── HOME ─── -->
 <div id="home" class="screen active">
@@ -298,20 +233,33 @@
     <div class="home-line"></div>
   </div>
 
-  <div id="lastEntryCard" class="last-entry hidden" onclick="showScreen('entries')">
-    <div class="last-entry-label" id="lastEntryLabel">last entry</div>
-    <div class="last-entry-text" id="lastEntryText"></div>
+  <div class="mic-wrap" onclick="toggleRecord()">
+    <div class="ring ring-1" id="ring1"></div>
+    <div class="ring ring-2" id="ring2"></div>
+    <button class="mic-btn" id="micBtn">
+      <!-- mic icon -->
+      <svg id="micIcon" viewBox="0 0 24 24" fill="none" stroke="#080810" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 1a4 4 0 0 1 4 4v6a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4z"/>
+        <path d="M19 10a7 7 0 0 1-14 0"/>
+        <line x1="12" y1="19" x2="12" y2="23"/>
+        <line x1="8" y1="23" x2="16" y2="23"/>
+      </svg>
+      <!-- stop icon (hidden) -->
+      <svg id="stopIcon" viewBox="0 0 24 24" fill="white" style="display:none" width="48" height="48">
+        <rect x="6" y="6" width="12" height="12" rx="2"/>
+      </svg>
+      <!-- spinner (hidden) -->
+      <div class="spinner" id="micSpinner" style="display:none;border-top-color:var(--gold)"></div>
+    </button>
   </div>
 
-  <div class="record-section">
-    <div class="record-btn-wrap">
-      <div class="record-ring"></div>
-      <div class="record-ring-2"></div>
-      <button class="record-btn" id="homeRecordBtn" onclick="goToRecord()">
-        <svg viewBox="0 0 24 24"><path d="M12 1a4 4 0 0 1 4 4v6a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4z"/><path d="M19 10a7 7 0 0 1-14 0M12 19v4M8 23h8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
-      </button>
-    </div>
-    <div class="record-hint">tap to speak</div>
+  <div class="status-text" id="statusText">tap to speak</div>
+
+  <div class="transcript-preview" id="transcriptPreview"></div>
+
+  <div class="last-entry-hint" id="lastEntryHint" onclick="showScreen('entries')" style="display:none">
+    <div class="last-entry-label" id="lastEntryLabel"></div>
+    <div class="last-entry-ago" id="lastEntryAgo"></div>
   </div>
 
   <nav class="nav">
@@ -323,10 +271,6 @@
       <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
       <span>pulse</span>
     </button>
-    <button class="nav-btn" onclick="showScreen('ideas')">
-      <svg viewBox="0 0 24 24"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17H8v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"/></svg>
-      <span>ideas</span>
-    </button>
     <button class="nav-btn" onclick="showScreen('insights')">
       <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
       <span>insights</span>
@@ -336,54 +280,6 @@
       <span>settings</span>
     </button>
   </nav>
-</div>
-
-<!-- ─── RECORD ─── -->
-<div id="record" class="screen">
-  <div class="screen-header">
-    <button class="back-btn" onclick="showScreen('home')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
-    <span class="screen-title" id="recordTitle">new entry</span>
-    <div style="width:44px"></div>
-  </div>
-
-  <div class="type-toggle">
-    <button class="type-btn active" id="typeJournal" onclick="setType('journal')">Journal</button>
-    <button class="type-btn" id="typeIdea" onclick="setType('idea')">Idea</button>
-  </div>
-
-  <div class="record-content" id="recordContent">
-    <div class="listening-indicator" id="listeningIndicator">
-      <div class="listening-dot"></div>
-      <span class="listening-text">listening</span>
-    </div>
-
-    <button class="mic-record-btn" id="micBtn" onclick="toggleVoice()">
-      <svg viewBox="0 0 24 24"><path d="M12 1a4 4 0 0 1 4 4v6a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4z"/><path d="M19 10a7 7 0 0 1-14 0M12 19v4M8 23h8" stroke="none"/></svg>
-      <span id="micBtnText">tap to record voice</span>
-    </button>
-
-    <div class="divider">
-      <div class="divider-line"></div>
-      <span class="divider-text">or type</span>
-      <div class="divider-line"></div>
-    </div>
-
-    <textarea id="rawInput" placeholder="Type or dictate your thoughts..." oninput="onTextInput()"></textarea>
-    <button class="claude-btn" id="claudeBtn" onclick="processWithClaude()">clean up with Claude →</button>
-
-    <div class="processing-box" id="processingBox">
-      <div class="spinner"></div>
-      <div class="processing-text">claude is thinking...</div>
-    </div>
-  </div>
-
-  <div class="record-content" id="reviewContent" style="display:none">
-    <div class="section-label">claude's version</div>
-    <div class="cleaned-box" id="cleanedBox"></div>
-    <div class="section-label">your raw input</div>
-    <div class="raw-box" id="rawBox"></div>
-    <button class="save-btn" onclick="saveEntry()">save entry</button>
-  </div>
 </div>
 
 <!-- ─── ENTRIES ─── -->
@@ -408,16 +304,6 @@
     <button class="tab-btn" id="tabWeekly" onclick="setPulseTab('weekly')">Weekly</button>
   </div>
   <div class="pulse-content" id="pulseContent"></div>
-</div>
-
-<!-- ─── IDEAS ─── -->
-<div id="ideas" class="screen">
-  <div class="screen-header">
-    <button class="back-btn" onclick="showScreen('home')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
-    <span class="screen-title">ideas & philosophy</span>
-    <button class="add-btn" onclick="newIdea()">+</button>
-  </div>
-  <div class="ideas-list" id="ideasList"></div>
 </div>
 
 <!-- ─── INSIGHTS ─── -->
@@ -447,242 +333,300 @@
   <div class="config-content">
     <div class="config-card">
       <div class="config-label">Claude API Key</div>
-      <div class="config-desc">Your Anthropic API key. Stored locally in your browser, never sent anywhere except Anthropic's API.</div>
+      <div class="config-desc">Your Anthropic API key. Stored only in your browser, never shared anywhere except Anthropic's API.</div>
       <input type="password" class="config-input" id="apiKeyInput" placeholder="sk-ant-api03-...">
-      <button class="config-save-btn" onclick="saveConfig()">save settings</button>
+      <button class="config-save-btn" onclick="saveConfig()">save</button>
+    </div>
+    <div class="config-card">
+      <div class="config-label">Email for Weekly Digest</div>
+      <div class="config-desc">Claude will send you weekly reflection questions based on your entries. Requires EmailJS setup.</div>
+      <input type="email" class="config-input" id="emailInput" placeholder="your@email.com">
+      <button class="config-save-btn" onclick="saveConfig()">save</button>
     </div>
     <div class="config-card">
       <div class="config-label">Export Data</div>
-      <div class="config-desc">Download all your journal entries, pulse data, and ideas as a JSON file.</div>
+      <div class="config-desc">Download everything as JSON. Do this regularly as a backup.</div>
       <button class="config-save-btn" onclick="exportData()">export all data</button>
-    </div>
-    <div class="config-card">
-      <div class="config-label">About</div>
-      <div class="config-desc">Harvey's Journal — built to last decades. All data stored locally in your browser. Export regularly to keep backups.</div>
     </div>
   </div>
 </div>
 
 <script>
+// ─── STORAGE ──────────────────────────────────────────────────────────────────
+const db = {
+  get: (k, d=[]) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } },
+  set: (k, v) => localStorage.setItem(k, JSON.stringify(v)),
+  config: () => db.get('hj_config', {}),
+  setConfig: v => db.set('hj_config', v),
+  entries: () => db.get('hj_entries', []),
+  addEntry: e => { const a = db.entries(); a.push(e); db.set('hj_entries', a); },
+  pulse: () => db.get('hj_pulse', []),
+  addPulse: p => { const a = db.pulse(); a.push(p); db.set('hj_pulse', a); },
+};
+
 // ─── STATE ────────────────────────────────────────────────────────────────────
-let currentType = 'journal';
-let currentPulseTab = 'daily';
-let cleanedText = '';
-let rawText = '';
 let recognition = null;
 let isRecording = false;
-let pulseScores = { stress: 5, emotional_wellbeing: 5, energy: 5, meaning: 5, connection: 5, progress: 5 };
+let transcript = '';
+let pulseTab = 'daily';
+let pulseScores = { stress:5, emotional_wellbeing:5, energy:5, meaning:5, connection:5, progress:5 };
 
 const METRICS = {
   daily: [
-    { key: 'stress', label: 'Stress', desc: 'How much pressure are you carrying?', color: '#e05252' },
-    { key: 'emotional_wellbeing', label: 'Emotional Wellbeing', desc: 'How are you doing underneath it all?', color: '#c8a96e' },
-    { key: 'energy', label: 'Energy', desc: 'Physical and mental fuel level', color: '#52c8a9' },
+    { key:'stress', label:'Stress', desc:'How much pressure are you carrying?', color:'#e05252' },
+    { key:'emotional_wellbeing', label:'Emotional Wellbeing', desc:'How are you doing underneath it all?', color:'#c8a96e' },
+    { key:'energy', label:'Energy', desc:'Physical and mental fuel level', color:'#52c8a9' },
   ],
   weekly: [
-    { key: 'meaning', label: 'Meaning & Purpose', desc: 'Are you living with direction?', color: '#9e7ae8' },
-    { key: 'connection', label: 'Connection', desc: 'Quality of relationships this week', color: '#7ab8e8' },
-    { key: 'progress', label: 'Progress', desc: 'Moving toward the life you want?', color: '#7ae87a' },
+    { key:'meaning', label:'Meaning & Purpose', desc:'Are you living with direction?', color:'#9e7ae8' },
+    { key:'connection', label:'Connection', desc:'Quality of relationships this week', color:'#7ab8e8' },
+    { key:'progress', label:'Progress', desc:'Moving toward the life you want?', color:'#7ae87a' },
   ]
-};
-
-// ─── STORAGE ──────────────────────────────────────────────────────────────────
-const db = {
-  get: (k, def = []) => { try { return JSON.parse(localStorage.getItem(k)) ?? def; } catch { return def; } },
-  set: (k, v) => localStorage.setItem(k, JSON.stringify(v)),
-  getConfig: () => db.get('hj_config', {}),
-  setConfig: (v) => db.set('hj_config', v),
-  getEntries: () => db.get('hj_entries', []),
-  saveEntry: (e) => { const entries = db.getEntries(); entries.push(e); db.set('hj_entries', entries); },
-  getPulse: () => db.get('hj_pulse', []),
-  savePulse: (p) => { const pulse = db.getPulse(); pulse.push(p); db.set('hj_pulse', pulse); },
-  getIdeas: () => db.get('hj_ideas', []),
-  saveIdea: (i) => { const ideas = db.getIdeas(); const idx = ideas.findIndex(x => x.id === i.id); if (idx >= 0) ideas[idx] = i; else ideas.push(i); db.set('hj_ideas', ideas); },
 };
 
 // ─── NAVIGATION ───────────────────────────────────────────────────────────────
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  window.scrollTo(0, 0);
-  if (id === 'entries') renderEntries();
-  if (id === 'pulse') renderPulse();
-  if (id === 'ideas') renderIdeas();
-  if (id === 'config') loadConfig();
-  if (id === 'home') renderHome();
-}
-
-function goToRecord() {
-  resetRecord();
-  showScreen('record');
+  window.scrollTo(0,0);
+  if (id==='entries') renderEntries();
+  if (id==='pulse') renderPulse();
+  if (id==='home') renderHome();
+  if (id==='config') loadConfig();
 }
 
 // ─── HOME ─────────────────────────────────────────────────────────────────────
 function renderHome() {
-  const entries = db.getEntries();
-  const card = document.getElementById('lastEntryCard');
+  const entries = db.entries();
+  const hint = document.getElementById('lastEntryHint');
   if (entries.length > 0) {
-    const last = entries[entries.length - 1];
-    const days = Math.floor((Date.now() - last.timestamp) / 86400000);
-    document.getElementById('lastEntryLabel').textContent = days === 0 ? 'entry today' : `${days}d since last entry`;
-    const preview = (last.cleaned || last.raw || '').substring(0, 100);
-    document.getElementById('lastEntryText').textContent = preview + (preview.length >= 100 ? '...' : '');
-    card.classList.remove('hidden');
+    const last = entries[entries.length-1];
+    const days = Math.floor((Date.now()-last.timestamp)/86400000);
+    document.getElementById('lastEntryLabel').textContent = days===0 ? 'last entry: today' : `last entry: ${days} day${days>1?'s':''} ago`;
+    document.getElementById('lastEntryAgo').textContent = (last.cleaned||last.raw||'').substring(0,60)+'...';
+    hint.style.display='block';
   } else {
-    card.classList.add('hidden');
+    hint.style.display='none';
   }
 }
 
-// ─── RECORD ───────────────────────────────────────────────────────────────────
-function resetRecord() {
-  currentType = 'journal';
-  cleanedText = '';
-  rawText = '';
-  document.getElementById('rawInput').value = '';
-  document.getElementById('claudeBtn').classList.remove('visible');
-  document.getElementById('processingBox').classList.remove('active');
-  document.getElementById('recordContent').style.display = 'flex';
-  document.getElementById('reviewContent').style.display = 'none';
-  document.getElementById('recordTitle').textContent = 'new entry';
-  document.getElementById('typeJournal').classList.add('active');
-  document.getElementById('typeIdea').classList.remove('active');
-  stopVoice();
+// ─── VOICE RECORDING ──────────────────────────────────────────────────────────
+function toggleRecord() {
+  if (isRecording) {
+    stopRecording();
+  } else {
+    startRecording();
+  }
 }
 
-function setType(t) {
-  currentType = t;
-  document.getElementById('typeJournal').classList.toggle('active', t === 'journal');
-  document.getElementById('typeIdea').classList.toggle('active', t === 'idea');
-}
-
-function onTextInput() {
-  const val = document.getElementById('rawInput').value;
-  document.getElementById('claudeBtn').classList.toggle('visible', val.trim().length > 0);
-}
-
-// ─── VOICE ────────────────────────────────────────────────────────────────────
-function toggleVoice() {
-  if (isRecording) { stopVoice(); return; }
+function startRecording() {
   if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-    alert('Voice recognition not supported in this browser. Please use Chrome on Android.');
+    alert('Voice recognition requires Chrome on Android. Please open this app in Chrome.');
     return;
   }
+
+  const config = db.config();
+  if (!config.apiKey) {
+    alert('Please add your Claude API key in Settings first.');
+    showScreen('config');
+    return;
+  }
+
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   recognition = new SR();
   recognition.continuous = true;
   recognition.interimResults = true;
   recognition.lang = 'en-US';
 
-  let finalTranscript = document.getElementById('rawInput').value;
+  transcript = '';
 
-  recognition.onresult = (e) => {
+  recognition.onresult = e => {
     let interim = '';
+    let final = '';
     for (let i = e.resultIndex; i < e.results.length; i++) {
-      if (e.results[i].isFinal) finalTranscript += e.results[i][0].transcript + ' ';
-      else interim = e.results[i][0].transcript;
+      if (e.results[i].isFinal) final += e.results[i][0].transcript + ' ';
+      else interim += e.results[i][0].transcript;
     }
-    document.getElementById('rawInput').value = finalTranscript + interim;
-    onTextInput();
+    transcript += final;
+    const display = transcript + interim;
+    const preview = document.getElementById('transcriptPreview');
+    preview.textContent = display;
+    preview.classList.add('visible');
   };
 
-  recognition.onerror = (e) => { stopVoice(); };
-  recognition.onend = () => { if (isRecording) recognition.start(); };
+  recognition.onerror = e => {
+    if (e.error !== 'aborted') stopRecording();
+  };
+
+  recognition.onend = () => {
+    if (isRecording) recognition.start();
+  };
 
   recognition.start();
   isRecording = true;
+
+  // Update UI
   document.getElementById('micBtn').classList.add('recording');
-  document.getElementById('micBtnText').textContent = 'tap to stop recording';
-  document.getElementById('listeningIndicator').classList.add('active');
+  document.getElementById('micIcon').style.display = 'none';
+  document.getElementById('stopIcon').style.display = 'block';
+  document.getElementById('statusText').textContent = 'listening...';
+  document.getElementById('statusText').className = 'status-text recording';
+  document.getElementById('transcriptPreview').classList.add('visible');
 }
 
-function stopVoice() {
-  if (recognition) { recognition.stop(); recognition = null; }
+function stopRecording() {
   isRecording = false;
+  if (recognition) { recognition.stop(); recognition = null; }
+
+  if (!transcript.trim()) {
+    resetMic();
+    return;
+  }
+
+  // Show processing state
   document.getElementById('micBtn').classList.remove('recording');
-  document.getElementById('micBtnText').textContent = 'tap to record voice';
-  document.getElementById('listeningIndicator').classList.remove('active');
+  document.getElementById('micBtn').classList.add('processing');
+  document.getElementById('stopIcon').style.display = 'none';
+  document.getElementById('micSpinner').style.display = 'block';
+  document.getElementById('statusText').textContent = 'claude is thinking...';
+  document.getElementById('statusText').className = 'status-text processing';
+
+  processEntry(transcript.trim());
 }
 
-// ─── CLAUDE API ───────────────────────────────────────────────────────────────
-async function callClaude(system, userMsg) {
-  const config = db.getConfig();
-  if (!config.apiKey) throw new Error('No API key. Go to Settings and add your Claude API key.');
+function resetMic() {
+  document.getElementById('micBtn').classList.remove('recording', 'processing');
+  document.getElementById('micIcon').style.display = 'block';
+  document.getElementById('stopIcon').style.display = 'none';
+  document.getElementById('micSpinner').style.display = 'none';
+  document.getElementById('statusText').textContent = 'tap to speak';
+  document.getElementById('statusText').className = 'status-text';
+  document.getElementById('transcriptPreview').classList.remove('visible');
+  document.getElementById('transcriptPreview').textContent = '';
+  transcript = '';
+}
+
+// ─── CLAUDE PROCESSING ────────────────────────────────────────────────────────
+async function callClaude(system, user) {
+  const config = db.config();
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-api-key': config.apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-    body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1500, system, messages: [{ role: 'user', content: userMsg }] })
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': config.apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1500,
+      system,
+      messages: [{ role:'user', content: user }]
+    })
   });
-  if (!res.ok) { const e = await res.text(); throw new Error(e); }
+  if (!res.ok) throw new Error(await res.text());
   const data = await res.json();
   return data.content[0].text;
 }
 
-async function processWithClaude() {
-  rawText = document.getElementById('rawInput').value.trim();
-  if (!rawText) return;
-  stopVoice();
-  document.getElementById('claudeBtn').style.display = 'none';
-  document.getElementById('processingBox').classList.add('active');
-  document.getElementById('recordTitle').textContent = 'thinking...';
+async function processEntry(raw) {
+  const system = `You are Harvey's personal journal AI. He has just spoken a voice entry. Your job is to:
 
-  const system = currentType === 'journal'
-    ? `You are Harvey's personal journal assistant. He speaks his thoughts out loud and the transcription is often messy and stream-of-consciousness. Clean up his raw voice entry into clear, flowing prose that preserves his voice, intent, and meaning. Don't add anything he didn't say. Write in first person as Harvey.`
-    : `You are helping Harvey articulate an idea. Take his raw brain dump and turn it into a clear, well-structured idea description. Preserve all his thinking. Write in first person as Harvey.`;
+1. Detect what type of entry this is by reading the content:
+   - "journal" = general thoughts, reflections, how his day went, feelings, observations
+   - "idea" = a theory, concept, philosophy, business idea, creative thought
+   - "metric" = an update to his wellbeing scores (he might say things like "stress has been high", "feeling about a 7 on energy", "been pretty happy", etc.)
 
-  try {
-    cleanedText = await callClaude(system, `Clean up this entry:\n\n${rawText}`);
-    document.getElementById('processingBox').classList.remove('active');
-    document.getElementById('recordContent').style.display = 'none';
-    document.getElementById('reviewContent').style.display = 'flex';
-    document.getElementById('cleanedBox').textContent = cleanedText;
-    document.getElementById('rawBox').textContent = rawText;
-    document.getElementById('recordTitle').textContent = 'review';
-  } catch (err) {
-    document.getElementById('processingBox').classList.remove('active');
-    document.getElementById('claudeBtn').style.display = 'block';
-    alert('Error: ' + err.message);
-    document.getElementById('recordTitle').textContent = 'new entry';
-  }
+2. Clean up the raw voice transcript into clear, flowing prose in Harvey's voice.
+
+3. Extract any metric updates if mentioned (stress, emotional_wellbeing, energy, meaning, connection, progress - all on scale 1-10).
+
+4. Generate 2-3 relevant tags that describe the themes.
+
+Respond ONLY with valid JSON, no markdown:
+{
+  "type": "journal|idea|metric",
+  "cleaned": "cleaned up version of what he said",
+  "tags": ["tag1", "tag2"],
+  "metrics": { "stress": 7 }
 }
 
-function saveEntry() {
-  const entry = { id: Date.now().toString(), raw: rawText, cleaned: cleanedText, type: currentType, timestamp: Date.now() };
-  db.saveEntry(entry);
-  showScreen('home');
+The "metrics" field should only be included if he actually mentioned specific scores or levels. Leave it out for pure journal/idea entries.`;
+
+  try {
+    const result = await callClaude(system, `Raw voice entry:\n\n${raw}`);
+    const clean = result.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+
+    // Save entry
+    const entry = {
+      id: Date.now().toString(),
+      raw,
+      cleaned: parsed.cleaned,
+      type: parsed.type,
+      tags: parsed.tags || [],
+      timestamp: Date.now()
+    };
+    db.addEntry(entry);
+
+    // Save any metric updates
+    if (parsed.metrics && Object.keys(parsed.metrics).length > 0) {
+      Object.assign(pulseScores, parsed.metrics);
+      db.addPulse({ id: Date.now().toString(), scores: {...pulseScores}, timestamp: Date.now(), source: 'voice' });
+    }
+
+    // Show success
+    document.getElementById('transcriptPreview').textContent = parsed.cleaned;
+    document.getElementById('statusText').textContent = `saved as ${parsed.type} ✓`;
+    document.getElementById('statusText').style.color = 'var(--green)';
+
+    setTimeout(() => {
+      resetMic();
+      renderHome();
+    }, 2500);
+
+  } catch (err) {
+    document.getElementById('statusText').textContent = 'error — tap to try again';
+    document.getElementById('statusText').style.color = 'var(--red)';
+    document.getElementById('micBtn').classList.remove('processing');
+    document.getElementById('micIcon').style.display = 'block';
+    document.getElementById('micSpinner').style.display = 'none';
+    console.error(err);
+  }
 }
 
 // ─── ENTRIES ──────────────────────────────────────────────────────────────────
 function renderEntries() {
-  const entries = db.getEntries().reverse();
+  const entries = db.entries().reverse();
   const list = document.getElementById('entriesList');
-  if (entries.length === 0) {
-    list.innerHTML = `<div class="empty-state"><div class="empty-icon">◎</div><div class="empty-title">No entries yet</div><div class="empty-sub">Tap the mic on the home screen to begin your journal</div></div>`;
+  if (!entries.length) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">◎</div><div class="empty-title">No entries yet</div><div class="empty-sub">Tap the mic on the home screen and start speaking</div></div>`;
     return;
   }
   list.innerHTML = entries.map(e => `
     <div class="entry-card">
-      <div class="entry-card-header">
+      <div class="entry-card-top">
         <span class="entry-badge badge-${e.type}">${e.type}</span>
-        <span class="entry-time">${new Date(e.timestamp).toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit'})}</span>
+        <span class="entry-time">${new Date(e.timestamp).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}</span>
       </div>
-      <div class="entry-date">${new Date(e.timestamp).toLocaleDateString('en-GB', {weekday:'short',day:'numeric',month:'long',year:'numeric'})}</div>
-      <div class="entry-preview">${(e.cleaned || e.raw || '').substring(0, 150)}${(e.cleaned || e.raw || '').length > 150 ? '...' : ''}</div>
+      <div class="entry-date">${new Date(e.timestamp).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'long',year:'numeric'})}</div>
+      <div class="entry-preview">${(e.cleaned||e.raw||'').substring(0,160)}${(e.cleaned||e.raw||'').length>160?'...':''}</div>
+      ${e.tags?.length ? `<div class="entry-tags">${e.tags.map(t=>`<span class="entry-tag">${t}</span>`).join('')}</div>` : ''}
     </div>
   `).join('');
 }
 
 // ─── PULSE ────────────────────────────────────────────────────────────────────
 function setPulseTab(tab) {
-  currentPulseTab = tab;
-  document.getElementById('tabDaily').classList.toggle('active', tab === 'daily');
-  document.getElementById('tabWeekly').classList.toggle('active', tab === 'weekly');
+  pulseTab = tab;
+  document.getElementById('tabDaily').classList.toggle('active', tab==='daily');
+  document.getElementById('tabWeekly').classList.toggle('active', tab==='weekly');
   renderPulse();
 }
 
 function renderPulse() {
-  const metrics = METRICS[currentPulseTab];
-  const content = document.getElementById('pulseContent');
-  content.innerHTML = metrics.map(m => `
+  const metrics = METRICS[pulseTab];
+  document.getElementById('pulseContent').innerHTML = metrics.map(m => `
     <div class="metric-card">
       <div class="metric-header">
         <div class="metric-dot" style="background:${m.color}"></div>
@@ -690,142 +634,87 @@ function renderPulse() {
           <div class="metric-name">${m.label}</div>
           <div class="metric-desc">${m.desc}</div>
         </div>
-        <div class="metric-score" id="score_${m.key}" style="color:${m.color}">${pulseScores[m.key]}</div>
+        <div class="metric-score" id="sc_${m.key}" style="color:${m.color}">${pulseScores[m.key]}</div>
       </div>
-      <div class="slider-row">
-        ${[1,2,3,4,5,6,7,8,9,10].map(n => `
-          <div class="slider-pip ${n <= pulseScores[m.key] ? 'active' : ''}"
-               style="${n <= pulseScores[m.key] ? `background:${m.color}` : ''}"
-               onclick="setScore('${m.key}', ${n}, '${m.color}')"></div>
+      <div class="slider-row" id="sr_${m.key}">
+        ${[1,2,3,4,5,6,7,8,9,10].map(n=>`
+          <div class="slider-pip ${n<=pulseScores[m.key]?'active':''}"
+               style="${n<=pulseScores[m.key]?`background:${m.color}`:''}"
+               onclick="setScore('${m.key}',${n},'${m.color}')"></div>
         `).join('')}
       </div>
-      <div class="metric-labels"><span class="metric-label-text">low</span><span class="metric-label-text">high</span></div>
+      <div class="metric-end-labels"><span class="end-label">low</span><span class="end-label">high</span></div>
     </div>
   `).join('') + `<button class="save-btn" onclick="savePulse()">save check-in</button>`;
 }
 
 function setScore(key, val, color) {
   pulseScores[key] = val;
-  document.getElementById(`score_${key}`).textContent = val;
-  const pips = document.querySelectorAll(`[onclick^="setScore('${key}'"]`);
-  pips.forEach((pip, i) => {
-    const n = i + 1;
-    pip.classList.toggle('active', n <= val);
-    pip.style.background = n <= val ? color : '';
+  document.getElementById(`sc_${key}`).textContent = val;
+  document.querySelectorAll(`#sr_${key} .slider-pip`).forEach((pip, i) => {
+    pip.classList.toggle('active', i+1<=val);
+    pip.style.background = i+1<=val ? color : '';
   });
 }
 
 function savePulse() {
-  db.savePulse({ id: Date.now().toString(), scores: {...pulseScores}, timestamp: Date.now() });
-  alert('Check-in saved!');
+  db.addPulse({ id: Date.now().toString(), scores: {...pulseScores}, timestamp: Date.now(), source: 'manual' });
   showScreen('home');
-}
-
-// ─── IDEAS ────────────────────────────────────────────────────────────────────
-function renderIdeas() {
-  const ideas = db.getIdeas().reverse();
-  const list = document.getElementById('ideasList');
-  if (ideas.length === 0) {
-    list.innerHTML = `<div class="empty-state"><div class="empty-icon">◈</div><div class="empty-title">No ideas yet</div><div class="empty-sub">Tap + to brain dump an idea and let Claude help develop it</div></div>`;
-    return;
-  }
-  list.innerHTML = ideas.map(i => `
-    <div class="idea-card">
-      <div class="idea-card-title">${i.title || 'Untitled'}</div>
-      <div class="idea-card-preview">${(i.refined || i.raw || '').substring(0, 120)}...</div>
-      <div class="idea-card-date">${new Date(i.updatedAt || i.timestamp).toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'})}</div>
-    </div>
-  `).join('');
-}
-
-async function newIdea() {
-  const raw = prompt('Brain dump your idea (just speak your mind):');
-  if (!raw) return;
-  const system = `You are Harvey's intellectual sparring partner. He brain-dumps raw ideas and you help develop them. Respond ONLY with valid JSON: {"title": "short title max 5 words", "refined": "idea written clearly in Harvey's voice, 2-3 paragraphs", "questions": ["probing question 1", "probing question 2", "probing question 3"]}`;
-  try {
-    const result = await callClaude(system, raw);
-    const clean = result.replace(/```json|```/g, '').trim();
-    const parsed = JSON.parse(clean);
-    const idea = { id: Date.now().toString(), title: parsed.title, raw, refined: parsed.refined, questions: parsed.questions, timestamp: Date.now(), updatedAt: Date.now() };
-    db.saveIdea(idea);
-    renderIdeas();
-    if (parsed.questions?.length > 0) {
-      setTimeout(() => {
-        const q = parsed.questions[0];
-        const answer = prompt(`Claude asks:\n\n"${q}"`);
-        if (answer) deepenIdea(idea, q, answer);
-      }, 500);
-    }
-  } catch (err) {
-    alert('Error processing idea: ' + err.message);
-  }
-}
-
-async function deepenIdea(idea, question, answer) {
-  const system = `You are Harvey's intellectual sparring partner refining an existing idea. Respond ONLY with valid JSON: {"title": "same or improved title", "refined": "updated idea incorporating the new answer, 2-4 paragraphs", "questions": ["follow-up question 1", "follow-up question 2"]}`;
-  try {
-    const result = await callClaude(system, `Existing idea:\n${idea.refined}\n\nQ: ${question}\nA: ${answer}`);
-    const clean = result.replace(/```json|```/g, '').trim();
-    const parsed = JSON.parse(clean);
-    const updated = { ...idea, title: parsed.title, refined: parsed.refined, questions: parsed.questions, updatedAt: Date.now() };
-    db.saveIdea(updated);
-    renderIdeas();
-  } catch (err) { /* silent fail */ }
 }
 
 // ─── INSIGHTS ─────────────────────────────────────────────────────────────────
 async function generateInsights() {
   const content = document.getElementById('insightsContent');
-  content.innerHTML = `<div class="processing-box active" style="display:flex"><div class="spinner"></div><div class="processing-text">claude is reading your journal...</div></div>`;
+  content.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;gap:16px;padding:80px 0"><div class="spinner"></div><div style="font-size:11px;color:var(--text3);letter-spacing:2px">reading your journal...</div></div>`;
 
-  const entries = db.getEntries().slice(-30);
-  const pulse = db.getPulse().slice(-30);
+  const entries = db.entries().slice(-30);
+  const pulse = db.pulse().slice(-30);
 
-  if (entries.length === 0) {
-    content.innerHTML = `<div class="insights-prompt"><div class="insights-desc">No entries yet. Start journaling and come back for insights.</div></div>`;
+  if (!entries.length) {
+    content.innerHTML = `<div class="insights-prompt"><div class="insights-desc">No entries yet. Start journaling first.</div></div>`;
     return;
   }
 
-  const system = `You are Harvey's personal AI analyst who has been reading his journal. Analyze his recent entries and wellbeing scores. Be specific, not generic. Reference actual things from his entries. Respond ONLY with valid JSON: {"summary": "3-4 paragraphs of genuine observations", "questions": ["question 1", "question 2", "question 3", "question 4", "question 5"]}`;
+  const system = `You are Harvey's personal AI analyst. Analyze his recent journal entries and wellbeing scores. Be specific — reference actual things he wrote about. Don't be generic. Respond ONLY with valid JSON:
+{"summary": "3-4 paragraphs of genuine observations about patterns and themes", "questions": ["question 1", "question 2", "question 3", "question 4", "question 5"]}`;
 
   try {
-    const result = await callClaude(system, `Recent entries:\n${JSON.stringify(entries)}\n\nPulse scores:\n${JSON.stringify(pulse)}`);
-    const clean = result.replace(/```json|```/g, '').trim();
-    const parsed = JSON.parse(clean);
-
+    const result = await callClaude(system, `Entries:\n${JSON.stringify(entries)}\n\nPulse:\n${JSON.stringify(pulse)}`);
+    const parsed = JSON.parse(result.replace(/```json|```/g,'').trim());
     content.innerHTML = `
       <div class="insight-box">
-        <div class="insight-box-header"><span style="color:var(--gold)">✦</span><span class="insight-box-label">claude's observations</span></div>
+        <div class="insight-label">claude's observations</div>
         <div class="insight-text">${parsed.summary}</div>
       </div>
-      <div class="section-label" style="margin-top:4px">reflection questions</div>
-      <div style="font-size:12px;color:var(--text3);margin-top:-8px">Questions that will matter most in hindsight</div>
-      ${parsed.questions.map((q, i) => `<div class="question-card"><div class="q-num">0${i+1}</div><div class="q-text">${q}</div></div>`).join('')}
-      <button class="generate-btn" onclick="generateInsights()" style="align-self:center;margin-top:8px">regenerate</button>
+      <div class="section-label">reflection questions</div>
+      ${parsed.questions.map((q,i)=>`<div class="question-card"><div class="q-num">0${i+1}</div><div class="q-text">${q}</div></div>`).join('')}
+      <button class="generate-btn" onclick="generateInsights()" style="align-self:center">regenerate</button>
     `;
-  } catch (err) {
-    content.innerHTML = `<div class="insights-prompt"><div class="insights-desc">Error: ${err.message}</div><button class="generate-btn" onclick="generateInsights()">try again</button></div>`;
+  } catch(err) {
+    content.innerHTML = `<div class="insights-prompt"><div class="insights-desc" style="color:var(--red)">Error: ${err.message}</div><button class="generate-btn" onclick="generateInsights()">try again</button></div>`;
   }
 }
 
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
 function loadConfig() {
-  const config = db.getConfig();
-  document.getElementById('apiKeyInput').value = config.apiKey || '';
+  const c = db.config();
+  document.getElementById('apiKeyInput').value = c.apiKey || '';
+  document.getElementById('emailInput').value = c.email || '';
 }
 
 function saveConfig() {
-  const key = document.getElementById('apiKeyInput').value.trim();
-  db.setConfig({ apiKey: key });
-  alert('Settings saved!');
+  db.setConfig({
+    apiKey: document.getElementById('apiKeyInput').value.trim(),
+    email: document.getElementById('emailInput').value.trim()
+  });
+  showScreen('home');
 }
 
 function exportData() {
-  const data = { entries: db.getEntries(), pulse: db.getPulse(), ideas: db.getIdeas(), exportedAt: new Date().toISOString() };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
+  const blob = new Blob([JSON.stringify({entries:db.entries(),pulse:db.pulse(),exportedAt:new Date().toISOString()},null,2)],{type:'application/json'});
   const a = document.createElement('a');
-  a.href = url; a.download = `harveys-journal-${new Date().toISOString().split('T')[0]}.json`;
+  a.href = URL.createObjectURL(blob);
+  a.download = `harveys-journal-${new Date().toISOString().split('T')[0]}.json`;
   a.click();
 }
 
