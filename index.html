@@ -329,18 +329,6 @@
   </div>
   <div class="config-content">
     <div class="config-card">
-      <div class="config-label">Claude API Key</div>
-      <div class="config-desc">Your Anthropic API key. Stored only in your browser, never shared anywhere except Anthropic's API.</div>
-      <input type="password" class="config-input" id="apiKeyInput" placeholder="sk-ant-api03-...">
-      <button class="config-save-btn" onclick="saveConfig()">save</button>
-    </div>
-    <div class="config-card">
-      <div class="config-label">Email for Weekly Digest</div>
-      <div class="config-desc">Claude will send you weekly reflection questions based on your entries. Requires EmailJS setup.</div>
-      <input type="email" class="config-input" id="emailInput" placeholder="your@email.com">
-      <button class="config-save-btn" onclick="saveConfig()">save</button>
-    </div>
-    <div class="config-card">
       <div class="config-label">Export Data</div>
       <div class="config-desc">Download everything as JSON. Do this regularly as a backup.</div>
       <button class="config-save-btn" onclick="exportData()">export all data</button>
@@ -432,17 +420,18 @@ function startRecording() {
 
   transcript = '';
 
+  let interimTranscript = '';
   recognition.onresult = e => {
-    let interim = '';
-    let final = '';
+    interimTranscript = '';
     for (let i = e.resultIndex; i < e.results.length; i++) {
-      if (e.results[i].isFinal) final += e.results[i][0].transcript + ' ';
-      else interim += e.results[i][0].transcript;
+      if (e.results[i].isFinal) {
+        transcript += e.results[i][0].transcript + ' ';
+      } else {
+        interimTranscript += e.results[i][0].transcript;
+      }
     }
-    transcript += final;
-    const display = transcript + interim;
     const preview = document.getElementById('transcriptPreview');
-    preview.textContent = display;
+    preview.textContent = transcript + interimTranscript;
     preview.classList.add('visible');
   };
 
@@ -451,7 +440,6 @@ function startRecording() {
   };
 
   recognition.onend = () => {
-    if (!isRecording) return;
     if (isRecording) recognition.start();
   };
 
@@ -501,8 +489,7 @@ function resetMic() {
 
 // ─── CLAUDE PROCESSING ────────────────────────────────────────────────────────
 async function callClaude(system, user) {
-  const config = db.config();
-  const apiKey = config.apiKey || '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';
+  const apiKey = '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';
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
