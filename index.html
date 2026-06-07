@@ -269,6 +269,9 @@
   .entries-list::-webkit-scrollbar-thumb { background: var(--border2); }
 
   .entry-card {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
     padding: 18px 24px;
     border-bottom: 1px solid var(--border);
     cursor: pointer;
@@ -1319,8 +1322,11 @@ function attachLongPress(el, entry, monthKey) {
   el.addEventListener('touchstart', (e) => {
     longPressTimer = setTimeout(() => show(e), LONG_PRESS_MS);
   }, { passive: true });
-  el.addEventListener('touchend', () => clearTimeout(longPressTimer));
+  el.addEventListener('touchend', (e) => {
+    clearTimeout(longPressTimer);
+  });
   el.addEventListener('touchmove', () => clearTimeout(longPressTimer));
+  el.addEventListener('selectstart', (e) => e.preventDefault());
 
   // Desktop right-click
   el.addEventListener('contextmenu', (e) => { e.preventDefault(); show(e); });
@@ -1532,10 +1538,7 @@ function openBlogEntry(entry, monthKey) {
         ${paras.map(p => `<p style="margin-bottom:1.3em">${escHtml(p.trim())}</p>`).join('')}
       </div>
     </div>
-    <div style="margin-top:24px">
-      <div class="detail-section-label">raw transcript</div>
-      <div class="text-block raw">${escHtml(entry.rawTranscript || '—')}</div>
-    </div>
+
   `;
   showScreen('blog');
 }
@@ -1581,16 +1584,17 @@ async function toggleEditDictation() {
     editMediaRecorder.onstop = async () => {
       if (!editAudioChunks.length) return;
       const mtype = editMediaRecorder.mimeType || 'audio/webm';
-      const blob = new Blob(editAudioChunks, { type: mtype });
+      const blob = new Blob(editAudioChunks, { type: mtype }); // full recording, one blob
+      editAudioChunks = [];
       const ext = mtype.includes('ogg') ? 'ogg' : mtype.includes('mp4') ? 'mp4' : 'webm';
-      if (btn) { btn.innerHTML = '…'; btn.disabled = true; }
+      if (btn) { btn.disabled = false; btn.innerHTML = '…'; btn.style.borderColor=''; btn.style.color=''; }
       try {
         const text = await whisperTranscribe(blob, ext);
         inp.value = (inp.value ? inp.value.trim() + ' ' : '') + text.trim();
       } catch(e) { toast('Transcription failed: ' + e.message, true); }
-      if (btn) { btn.disabled = false; btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="17" x2="12" y2="21"/><line x1="9" y1="21" x2="15" y2="21"/></svg>'; }
+      if (btn) { btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="17" x2="12" y2="21"/><line x1="9" y1="21" x2="15" y2="21"/></svg>'; }
     };
-    editMediaRecorder.start(250);
+    editMediaRecorder.start(); // no timeslice — collect entire recording as one chunk
     editDictationActive = true;
     if (btn) { btn.style.borderColor = 'var(--red)'; btn.style.color = 'var(--red)'; btn.innerHTML = '⏹'; }
   } catch(e) {
