@@ -3,742 +3,1535 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0d0b08">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#080810">
 <title>Harvey's Journal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@300;400&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
 <style>
+  /* ── RESET & BASE ─────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
   :root {
-    --bg: #080810;
-    --bg2: #10101c;
-    --bg3: #16162a;
-    --gold: #c8a96e;
-    --text: #f0ece4;
-    --text2: #a09880;
-    --text3: #504840;
-    --red: #e05252;
-    --purple: #9e7ae8;
-    --green: #52c8a9;
+    --ink:      #1a1208;
+    --paper:    #0d0b08;
+    --amber:    #c8852a;
+    --amber2:   #e8a84a;
+    --amber-dim:#6b4515;
+    --cream:    #e8d9b8;
+    --cream-dim:#7a6a4f;
+    --red:      #c0392b;
+    --surface:  #161208;
+    --surface2: #1e1810;
+    --border:   #2a2118;
+    --border2:  #3a3128;
+    --glow:     rgba(200,133,42,0.15);
+    --glow2:    rgba(200,133,42,0.08);
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bot: env(safe-area-inset-bottom, 0px);
   }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    min-height: 100dvh;
-    overflow-x: hidden;
-    user-select: none;
+  html, body {
+    height: 100%; width: 100%;
+    background: var(--paper);
+    color: var(--cream);
+    font-family: 'Lora', Georgia, serif;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    touch-action: manipulation;
   }
 
-  .screen { display: none; min-height: 100dvh; flex-direction: column; }
+  /* ── APP SHELL ────────────────────────────────────── */
+  #app {
+    display: flex; flex-direction: column;
+    height: 100%; height: 100dvh;
+    padding-top: var(--safe-top);
+  }
+
+  /* ── HEADER ───────────────────────────────────────── */
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 24px 12px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .date-display {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--amber-dim);
+  }
+  .app-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px; font-weight: 400; font-style: italic;
+    color: var(--cream);
+    letter-spacing: 0.02em;
+  }
+  .settings-btn {
+    background: none; border: none; cursor: pointer;
+    color: var(--amber-dim); padding: 4px; border-radius: 4px;
+    transition: color 0.2s;
+    font-size: 16px; line-height: 1;
+  }
+  .settings-btn:hover { color: var(--amber); }
+
+  /* ── SCREENS ──────────────────────────────────────── */
+  .screen { display: none; flex: 1; overflow: hidden; flex-direction: column; }
   .screen.active { display: flex; }
 
-  /* ─── HOME / RECORD ─── */
-  #home {
-    align-items: center;
-    justify-content: center;
-    padding: 40px 24px;
-    gap: 32px;
+  /* ── RECORD SCREEN ────────────────────────────────── */
+  #screen-record {
+    align-items: center; justify-content: center;
     position: relative;
   }
 
-  .home-header { text-align: center; }
-  .home-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 42px; font-weight: 700; letter-spacing: 8px;
-    color: var(--text); text-transform: uppercase;
-  }
-  .home-subtitle {
-    font-size: 9px; letter-spacing: 14px; color: var(--gold);
-    text-transform: uppercase; margin-top: 2px;
-  }
-  .home-line { width: 40px; height: 1px; background: var(--gold); margin: 12px auto 0; opacity: 0.4; }
-
-  /* Big mic button */
-  .mic-wrap {
-    position: relative;
-    width: 220px; height: 220px;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
+  /* Background texture */
+  #screen-record::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 50% 60%, rgba(200,133,42,0.06) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 30% at 30% 30%, rgba(200,133,42,0.03) 0%, transparent 60%);
+    pointer-events: none;
   }
 
-  .ring {
-    position: absolute; border-radius: 50%; border: 1px solid var(--gold);
-    animation: ringPulse 3s ease-in-out infinite;
+  .record-center {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 40px; position: relative; z-index: 1;
   }
-  .ring-1 { width: 185px; height: 185px; opacity: 0.2; }
-  .ring-2 { width: 210px; height: 210px; opacity: 0.1; animation-delay: 0.4s; }
+
+  /* ── WAVEFORM ─────────────────────────────────────── */
+  .waveform-ring {
+    position: relative; width: 200px; height: 200px;
+  }
+  .waveform-svg {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    opacity: 0; transition: opacity 0.4s;
+  }
+  .waveform-svg.visible { opacity: 1; }
+
+  /* ── MIC BUTTON ───────────────────────────────────── */
+  .mic-outer {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120px; height: 120px;
+  }
+  .mic-pulse-ring {
+    position: absolute; inset: -20px;
+    border-radius: 50%;
+    border: 1px solid var(--amber-dim);
+    animation: pulse-idle 3s ease-in-out infinite;
+    opacity: 0; transition: opacity 0.4s;
+  }
+  .mic-pulse-ring.nth2 { animation-delay: 1s; inset: -35px; }
+  .mic-pulse-ring.nth3 { animation-delay: 2s; inset: -50px; }
+  #screen-record:not(.recording) .mic-pulse-ring { opacity: 1; }
+  #screen-record.recording .mic-pulse-ring { opacity: 0; }
+
+  @keyframes pulse-idle {
+    0%, 100% { transform: scale(0.95); opacity: 0.4; }
+    50%       { transform: scale(1.05); opacity: 0.15; }
+  }
 
   .mic-btn {
-    width: 155px; height: 155px; border-radius: 50%;
-    background: var(--gold); border: none; cursor: pointer;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1.5px solid var(--amber-dim);
+    cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 0 50px rgba(200,169,110,0.25);
-    transition: transform 0.15s ease;
-    position: relative; z-index: 1;
+    position: relative; overflow: hidden;
+    transition: border-color 0.3s, box-shadow 0.3s, transform 0.15s;
     -webkit-tap-highlight-color: transparent;
+    box-shadow: 0 0 40px rgba(200,133,42,0.08), inset 0 1px 0 rgba(255,255,255,0.04);
   }
-  .mic-btn:active { transform: scale(0.93); }
-  .mic-btn svg { width: 56px; height: 56px; }
-
-  .mic-btn.recording {
-    background: var(--red);
-    box-shadow: 0 0 50px rgba(224,82,82,0.35);
-    animation: recPulse 1.2s ease-in-out infinite;
+  .mic-btn:hover, .mic-btn:focus-visible {
+    border-color: var(--amber);
+    box-shadow: 0 0 60px rgba(200,133,42,0.2), inset 0 1px 0 rgba(255,255,255,0.06);
   }
-  .mic-btn.recording .ring-1 { border-color: var(--red); }
-
-  .mic-btn.processing {
-    background: var(--bg2);
-    box-shadow: none;
+  .mic-btn:active { transform: scale(0.97); }
+  .mic-btn svg { width: 44px; height: 44px; transition: transform 0.3s, opacity 0.3s; }
+  .mic-btn .icon-mic { color: var(--amber); }
+  .mic-btn .icon-stop {
+    position: absolute;
+    color: var(--red);
+    opacity: 0; transform: scale(0.6);
   }
 
-  .status-text {
-    font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
-    color: var(--text3); text-align: center; min-height: 16px;
+  #screen-record.recording .mic-btn {
+    border-color: var(--red);
+    box-shadow: 0 0 60px rgba(192,57,43,0.25), 0 0 120px rgba(192,57,43,0.1);
+    animation: rec-breathe 1.8s ease-in-out infinite;
+  }
+  #screen-record.recording .icon-mic { opacity: 0; transform: scale(0.6); }
+  #screen-record.recording .icon-stop { opacity: 1; transform: scale(1); }
+
+  @keyframes rec-breathe {
+    0%, 100% { box-shadow: 0 0 40px rgba(192,57,43,0.2), 0 0 80px rgba(192,57,43,0.08); }
+    50%       { box-shadow: 0 0 80px rgba(192,57,43,0.35), 0 0 140px rgba(192,57,43,0.15); }
+  }
+
+  /* ── TIMER ────────────────────────────────────────── */
+  .rec-timer {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px; font-weight: 300; letter-spacing: 0.2em;
+    color: var(--amber-dim);
+    height: 20px;
     transition: color 0.3s;
   }
-  .status-text.recording { color: var(--red); }
-  .status-text.processing { color: var(--gold); }
+  #screen-record.recording .rec-timer { color: var(--amber); }
 
-  .transcript-preview {
-    width: 100%; background: var(--bg2); border-radius: 14px;
-    padding: 16px 18px; min-height: 80px;
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 17px; line-height: 28px; color: var(--text2);
-    font-style: italic; display: none;
-    border-left: 2px solid var(--gold);
+  .rec-hint {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--cream-dim);
+    opacity: 0.5;
   }
-  .transcript-preview.visible { display: block; }
+  #screen-record.recording .rec-hint { opacity: 0; }
 
-  .last-entry-hint {
-    width: 100%; text-align: center; cursor: pointer;
+  /* ── PROCESSING OVERLAY ───────────────────────────── */
+  #processing-overlay {
+    position: absolute; inset: 0;
+    background: var(--paper);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 32px;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.4s;
+    z-index: 10;
   }
-  .last-entry-label { font-size: 9px; color: var(--text3); letter-spacing: 3px; text-transform: uppercase; }
-  .last-entry-ago { font-size: 12px; color: var(--text3); margin-top: 4px; font-family: 'Cormorant Garamond', serif; font-style: italic; }
+  #processing-overlay.visible { opacity: 1; pointer-events: all; }
 
-  .nav {
-    display: flex; width: 100%; justify-content: space-around;
-    border-top: 1px solid var(--bg3); padding-top: 20px;
-    position: fixed; bottom: 0; left: 0; right: 0;
-    background: var(--bg); padding-bottom: max(20px, env(safe-area-inset-bottom));
-    padding-top: 16px;
+  .processing-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px; font-style: italic;
+    color: var(--cream-dim);
   }
-  .nav-btn { display: flex; flex-direction: column; align-items: center; gap: 5px; background: none; border: none; cursor: pointer; padding: 4px 16px; }
-  .nav-btn svg { width: 20px; height: 20px; stroke: var(--text3); fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; transition: stroke 0.2s; }
-  .nav-btn span { font-size: 9px; color: var(--text3); letter-spacing: 1px; transition: color 0.2s; }
-  .nav-btn:hover svg, .nav-btn:hover span,
-  .nav-btn.active svg, .nav-btn.active span { stroke: var(--gold); color: var(--gold); }
-
-  /* ─── INNER SCREENS ─── */
-  .screen-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 56px 20px 16px;
-    position: sticky; top: 0; background: var(--bg); z-index: 10;
+  .processing-steps {
+    display: flex; flex-direction: column; gap: 12px;
+    width: 260px;
   }
-  .back-btn { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: none; border: none; cursor: pointer; }
-  .back-btn svg { width: 24px; height: 24px; stroke: var(--text2); fill: none; stroke-width: 2; stroke-linecap: round; }
-  .screen-title { font-size: 11px; color: var(--text2); letter-spacing: 3px; text-transform: uppercase; }
+  .proc-step {
+    display: flex; align-items: center; gap: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; letter-spacing: 0.08em;
+    color: var(--cream-dim);
+    transition: color 0.3s;
+  }
+  .proc-step .step-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--border2); flex-shrink: 0;
+    transition: background 0.3s, box-shadow 0.3s;
+  }
+  .proc-step.active { color: var(--cream); }
+  .proc-step.active .step-dot {
+    background: var(--amber);
+    box-shadow: 0 0 8px var(--amber);
+    animation: dot-pulse 1s ease-in-out infinite;
+  }
+  .proc-step.done { color: var(--amber-dim); }
+  .proc-step.done .step-dot { background: var(--amber-dim); }
 
-  /* entries */
-  #entries { padding-bottom: 80px; }
-  .entries-list { padding: 0 20px; display: flex; flex-direction: column; gap: 12px; }
-  .entry-card { background: var(--bg2); border-radius: 14px; padding: 18px; border: 1px solid var(--bg3); animation: fadeUp 0.3s ease both; }
-  .entry-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-  .entry-badge { font-size: 9px; letter-spacing: 2px; padding: 3px 8px; border-radius: 5px; text-transform: uppercase; }
-  .badge-journal { background: rgba(200,169,110,0.1); color: var(--gold); }
-  .badge-idea { background: rgba(158,122,232,0.1); color: var(--purple); }
-  .badge-metric { background: rgba(82,200,169,0.1); color: var(--green); }
-  .entry-time { font-size: 10px; color: var(--text3); }
-  .entry-date { font-size: 12px; color: var(--text2); margin-bottom: 8px; font-family: 'Cormorant Garamond', serif; }
-  .entry-preview { font-size: 15px; color: var(--text2); line-height: 24px; font-family: 'Cormorant Garamond', serif; }
-  .entry-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-  .entry-tag { font-size: 9px; color: var(--text3); background: var(--bg3); padding: 2px 8px; border-radius: 4px; letter-spacing: 1px; }
+  @keyframes dot-pulse {
+    0%, 100% { opacity: 1; } 50% { opacity: 0.4; }
+  }
 
-  /* pulse */
-  #pulse { padding-bottom: 80px; }
-  .pulse-content { padding: 0 20px; display: flex; flex-direction: column; gap: 14px; }
-  .tab-row { display: flex; margin: 0 20px 12px; background: var(--bg2); border-radius: 10px; padding: 4px; }
-  .tab-btn { flex: 1; padding: 9px; text-align: center; border-radius: 7px; border: none; cursor: pointer; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text3); background: none; transition: all 0.2s; letter-spacing: 1px; }
-  .tab-btn.active { background: var(--bg3); color: var(--gold); }
-  .metric-card { background: var(--bg2); border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 14px; }
-  .metric-header { display: flex; align-items: center; gap: 10px; }
-  .metric-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .metric-info { flex: 1; }
-  .metric-name { font-size: 14px; color: var(--text); font-family: 'Cormorant Garamond', serif; font-weight: 600; }
-  .metric-desc { font-size: 11px; color: var(--text3); margin-top: 2px; }
-  .metric-score { font-size: 28px; font-weight: 700; font-family: 'Cormorant Garamond', serif; }
-  .slider-row { display: flex; gap: 5px; }
-  .slider-pip { flex: 1; height: 6px; border-radius: 3px; background: var(--bg3); cursor: pointer; transition: all 0.15s; }
-  .slider-pip.active { height: 18px; margin-top: -6px; border-radius: 4px; }
-  .metric-end-labels { display: flex; justify-content: space-between; }
-  .end-label { font-size: 9px; color: var(--text3); letter-spacing: 1px; }
-  .save-btn { width: 100%; padding: 18px; border-radius: 14px; background: var(--gold); border: none; cursor: pointer; font-family: 'DM Mono', monospace; font-size: 13px; letter-spacing: 2px; color: var(--bg); transition: all 0.2s; margin-top: 4px; }
-  .save-btn:active { transform: scale(0.98); }
+  /* ── ENTRIES SCREEN ───────────────────────────────── */
+  #screen-entries {
+    overflow: hidden;
+  }
 
-  /* insights */
-  #insights { padding-bottom: 80px; }
-  .insights-content { padding: 0 20px; display: flex; flex-direction: column; gap: 20px; }
-  .insights-prompt { display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 40px 0; text-align: center; }
-  .insights-icon { width: 80px; height: 80px; border-radius: 50%; background: var(--bg2); display: flex; align-items: center; justify-content: center; font-size: 32px; border: 1px solid rgba(200,169,110,0.15); }
-  .insights-title { font-size: 22px; font-family: 'Cormorant Garamond', serif; color: var(--text); }
-  .insights-desc { font-size: 12px; color: var(--text3); line-height: 22px; }
-  .generate-btn { padding: 14px 28px; background: var(--gold); border: none; border-radius: 14px; cursor: pointer; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--bg); letter-spacing: 1px; }
-  .insight-box { background: var(--bg2); border-radius: 16px; padding: 20px; border: 1px solid rgba(200,169,110,0.1); }
-  .insight-label { font-size: 9px; color: var(--gold); letter-spacing: 3px; margin-bottom: 14px; }
-  .insight-text { font-size: 16px; color: var(--text2); line-height: 28px; font-family: 'Cormorant Garamond', serif; }
-  .section-label { font-size: 9px; color: var(--gold); letter-spacing: 3px; text-transform: uppercase; }
-  .question-card { display: flex; gap: 14px; background: var(--bg2); border-radius: 12px; padding: 16px; }
-  .q-num { font-size: 10px; color: var(--gold); opacity: 0.5; padding-top: 2px; min-width: 20px; }
-  .q-text { font-size: 15px; color: var(--text2); line-height: 24px; font-family: 'Cormorant Garamond', serif; }
+  .entries-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .entries-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-style: italic;
+    color: var(--cream);
+  }
+  .entries-sub {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--amber-dim);
+    margin-top: 4px;
+  }
 
-  /* config */
-  #config { padding-bottom: 80px; }
-  .config-content { padding: 0 20px; display: flex; flex-direction: column; gap: 14px; }
-  .config-card { background: var(--bg2); border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
-  .config-label { font-size: 9px; color: var(--gold); letter-spacing: 3px; text-transform: uppercase; }
-  .config-desc { font-size: 12px; color: var(--text3); line-height: 20px; }
-  .config-input { width: 100%; background: var(--bg3); border-radius: 8px; padding: 12px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 11px; border: 1px solid var(--bg3); outline: none; }
-  .config-input:focus { border-color: rgba(200,169,110,0.3); }
-  .config-save-btn { padding: 14px; background: var(--gold); border: none; border-radius: 10px; cursor: pointer; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--bg); letter-spacing: 1px; }
+  .entries-list {
+    flex: 1; overflow-y: auto;
+    padding: 16px 0;
+    -webkit-overflow-scrolling: touch;
+  }
+  .entries-list::-webkit-scrollbar { width: 2px; }
+  .entries-list::-webkit-scrollbar-thumb { background: var(--border2); }
 
-  /* empty */
-  .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 80px 40px; text-align: center; }
-  .empty-icon { font-size: 40px; opacity: 0.15; }
-  .empty-title { font-size: 18px; color: var(--text3); font-family: 'Cormorant Garamond', serif; }
-  .empty-sub { font-size: 11px; color: var(--text3); line-height: 20px; }
+  .entry-card {
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.15s;
+    position: relative;
+  }
+  .entry-card:hover { background: var(--surface); }
+  .entry-card:active { background: var(--surface2); }
 
-  /* spinner */
-  .spinner { width: 32px; height: 32px; border: 2px solid var(--bg3); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  .entry-time {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--amber-dim);
+    margin-bottom: 8px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .entry-time .has-audio {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--amber-dim);
+  }
+  .entry-preview {
+    font-size: 14px; line-height: 1.6;
+    color: var(--cream-dim);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .entry-badge {
+    position: absolute; top: 18px; right: 24px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--amber-dim); opacity: 0.6;
+  }
+  .entry-badge.processing { color: var(--amber); opacity: 1; animation: dot-pulse 1.5s infinite; }
 
-  /* ─── ANIMATIONS ─── */
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes ringPulse { 0%,100% { transform: scale(1); opacity: 0.2; } 50% { transform: scale(1.04); opacity: 0.35; } }
-  @keyframes recPulse { 0%,100% { box-shadow: 0 0 40px rgba(224,82,82,0.3); } 50% { box-shadow: 0 0 70px rgba(224,82,82,0.55); } }
-  @keyframes spin { to { transform: rotate(360deg); } }
+  .empty-state {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; padding: 60px 32px; gap: 12px;
+    color: var(--cream-dim); opacity: 0.4; text-align: center;
+  }
+  .empty-state p { font-style: italic; font-size: 15px; }
+  .empty-state span {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+  }
+
+  /* ── ENTRY DETAIL SCREEN ─────────────────────────── */
+  #screen-detail {
+    overflow: hidden;
+  }
+
+  .detail-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .back-btn {
+    background: none; border: none; cursor: pointer;
+    color: var(--amber-dim); padding: 4px 8px 4px 0;
+    font-size: 18px; line-height: 1;
+    transition: color 0.2s;
+  }
+  .back-btn:hover { color: var(--amber); }
+  .detail-meta {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--amber-dim);
+  }
+
+  .detail-body {
+    flex: 1; overflow-y: auto;
+    padding: 24px;
+    display: flex; flex-direction: column; gap: 28px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .detail-body::-webkit-scrollbar { width: 2px; }
+  .detail-body::-webkit-scrollbar-thumb { background: var(--border2); }
+
+  .detail-section-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--amber-dim);
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .detail-section-label::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+
+  /* Audio player */
+  .audio-player {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 14px 18px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .play-btn {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: none; border: 1px solid var(--amber-dim);
+    cursor: pointer; color: var(--amber);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; font-size: 14px;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .play-btn:hover { border-color: var(--amber); background: var(--glow2); }
+  .audio-progress {
+    flex: 1; display: flex; flex-direction: column; gap: 6px;
+  }
+  .progress-bar {
+    height: 2px; background: var(--border2); border-radius: 1px;
+    cursor: pointer; position: relative; overflow: visible;
+  }
+  .progress-fill {
+    height: 100%; background: var(--amber); border-radius: 1px;
+    width: 0%; transition: width 0.1s linear;
+    pointer-events: none;
+  }
+  .audio-time {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; color: var(--cream-dim);
+    letter-spacing: 0.08em;
+  }
+
+  /* Text sections */
+  .text-block {
+    font-family: 'Lora', serif;
+    font-size: 15px; line-height: 1.8;
+    color: var(--cream-dim);
+  }
+  .text-block.raw { font-style: italic; opacity: 0.8; }
+  .text-block.clean { color: var(--cream); }
+
+  /* Insights */
+  .insights-block {
+    background: var(--surface);
+    border-left: 2px solid var(--amber-dim);
+    padding: 16px 18px;
+    border-radius: 0 4px 4px 0;
+  }
+  .insights-block p {
+    font-size: 14px; line-height: 1.8;
+    color: var(--cream-dim);
+    margin-bottom: 12px;
+  }
+  .insights-block p:last-child { margin-bottom: 0; }
+  .insights-pending {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--amber-dim);
+    letter-spacing: 0.08em;
+    animation: dot-pulse 1.5s infinite;
+  }
+
+  /* ── SETTINGS SCREEN ──────────────────────────────── */
+  #screen-settings {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  #screen-settings::-webkit-scrollbar { width: 2px; }
+
+  .settings-body {
+    padding: 24px;
+    display: flex; flex-direction: column; gap: 28px;
+  }
+  .settings-section-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--amber-dim);
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .settings-section-title::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+  .settings-field { margin-bottom: 16px; }
+  .settings-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--cream-dim); margin-bottom: 8px; display: block;
+  }
+  .settings-input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    color: var(--cream);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+  }
+  .settings-input:focus {
+    border-color: var(--amber-dim);
+    box-shadow: 0 0 0 2px var(--glow2);
+  }
+  .settings-hint {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; color: var(--cream-dim);
+    opacity: 0.5; margin-top: 6px;
+    line-height: 1.5;
+  }
+
+  .settings-save-btn {
+    width: 100%;
+    background: none;
+    border: 1px solid var(--amber-dim);
+    border-radius: 4px;
+    color: var(--amber);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 14px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .settings-save-btn:hover {
+    background: var(--glow2);
+    border-color: var(--amber);
+  }
+  .settings-status {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; text-align: center;
+    color: var(--amber-dim);
+    height: 16px; letter-spacing: 0.1em;
+  }
+
+  /* Google auth button */
+  .google-btn {
+    width: 100%;
+    background: none;
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    color: var(--cream-dim);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 14px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  .google-btn:hover { background: var(--surface); border-color: var(--border2); color: var(--cream); }
+  .google-btn.connected { border-color: var(--amber-dim); color: var(--amber-dim); }
+
+  /* ── BOTTOM NAV ───────────────────────────────────── */
+  nav {
+    display: flex;
+    border-top: 1px solid var(--border);
+    padding-bottom: var(--safe-bot);
+    flex-shrink: 0;
+  }
+  .nav-btn {
+    flex: 1;
+    background: none; border: none; cursor: pointer;
+    padding: 14px 0 12px;
+    display: flex; flex-direction: column; align-items: center; gap: 5px;
+    color: var(--cream-dim);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
+    transition: color 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .nav-btn svg { width: 18px; height: 18px; }
+  .nav-btn.active { color: var(--amber); }
+  .nav-btn:hover { color: var(--cream); }
+
+  /* ── TOAST ────────────────────────────────────────── */
+  #toast {
+    position: fixed; bottom: calc(80px + var(--safe-bot)); left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    padding: 10px 20px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; letter-spacing: 0.08em;
+    color: var(--cream-dim);
+    white-space: nowrap;
+    opacity: 0; transition: opacity 0.3s, transform 0.3s;
+    pointer-events: none; z-index: 1000;
+  }
+  #toast.show {
+    opacity: 1; transform: translateX(-50%) translateY(0);
+  }
+  #toast.error { border-color: var(--red); color: #e87070; }
+
+  /* no-creds warning */
+  .no-creds-banner {
+    margin: 24px;
+    padding: 14px 18px;
+    background: var(--surface);
+    border: 1px solid var(--amber-dim);
+    border-radius: 4px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; letter-spacing: 0.08em;
+    color: var(--amber-dim);
+    line-height: 1.6;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .no-creds-banner:hover { background: var(--glow2); }
 </style>
 </head>
 <body>
 
-<!-- ─── HOME ─── -->
-<div id="home" class="screen active">
-  <div class="home-header">
-    <div class="home-title">Harvey's</div>
-    <div class="home-subtitle">Journal</div>
-    <div class="home-line"></div>
+<div id="app">
+  <!-- HEADER -->
+  <header>
+    <div class="date-display" id="header-date">—</div>
+    <div class="app-title">Journal</div>
+    <button class="settings-btn" onclick="showScreen('settings')" title="Settings">⚙</button>
+  </header>
+
+  <!-- RECORD SCREEN -->
+  <div class="screen active" id="screen-record">
+    <div id="processing-overlay">
+      <div class="processing-title">saving entry…</div>
+      <div class="processing-steps">
+        <div class="proc-step" id="step-upload"><div class="step-dot"></div>uploading audio</div>
+        <div class="proc-step" id="step-transcribe"><div class="step-dot"></div>transcribing</div>
+        <div class="proc-step" id="step-clean"><div class="step-dot"></div>cleaning text</div>
+        <div class="proc-step" id="step-save"><div class="step-dot"></div>saving to journal</div>
+      </div>
+    </div>
+
+    <div class="record-center">
+      <!-- Waveform ring -->
+      <div class="waveform-ring">
+        <svg class="waveform-svg" id="waveform-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(200,133,42,0.08)" stroke-width="1"/>
+          <!-- bars rendered by JS -->
+          <g id="waveform-bars"></g>
+        </svg>
+
+        <!-- Mic button positioned in center -->
+        <div class="mic-outer">
+          <div class="mic-pulse-ring"></div>
+          <div class="mic-pulse-ring nth2"></div>
+          <div class="mic-pulse-ring nth3"></div>
+          <button class="mic-btn" id="mic-btn" onclick="toggleRecord()">
+            <!-- Mic icon -->
+            <svg class="icon-mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="9" y="2" width="6" height="12" rx="3"/>
+              <path d="M5 10a7 7 0 0 0 14 0"/>
+              <line x1="12" y1="17" x2="12" y2="21"/>
+              <line x1="9" y1="21" x2="15" y2="21"/>
+            </svg>
+            <!-- Stop icon -->
+            <svg class="icon-stop" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="6" y="6" width="12" height="12" rx="2"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Timer -->
+      <div class="rec-timer" id="rec-timer">0:00</div>
+      <div class="rec-hint">tap to record</div>
+    </div>
   </div>
 
-  <div class="mic-wrap">
-    <div class="ring ring-1" id="ring1"></div>
-    <div class="ring ring-2" id="ring2"></div>
-    <button class="mic-btn" id="micBtn" onclick="toggleRecord(); event.stopPropagation();">
-      <!-- mic icon -->
-      <svg id="micIcon" viewBox="0 0 24 24" fill="none" stroke="#080810" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 1a4 4 0 0 1 4 4v6a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4z"/>
-        <path d="M19 10a7 7 0 0 1-14 0"/>
-        <line x1="12" y1="19" x2="12" y2="23"/>
-        <line x1="8" y1="23" x2="16" y2="23"/>
+  <!-- ENTRIES SCREEN -->
+  <div class="screen" id="screen-entries">
+    <div class="entries-header">
+      <div class="entries-title">entries</div>
+      <div class="entries-sub" id="entries-sub">today</div>
+    </div>
+    <div class="entries-list" id="entries-list"></div>
+  </div>
+
+  <!-- ENTRY DETAIL SCREEN -->
+  <div class="screen" id="screen-detail">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showScreen('entries')">←</button>
+      <div class="detail-meta" id="detail-meta">—</div>
+    </div>
+    <div class="detail-body" id="detail-body"></div>
+  </div>
+
+  <!-- SETTINGS SCREEN -->
+  <div class="screen" id="screen-settings">
+    <div class="settings-body">
+      <div>
+        <div class="settings-section-title">OpenAI</div>
+        <div class="settings-field">
+          <label class="settings-label" for="s-openai-key">API Key</label>
+          <input class="settings-input" id="s-openai-key" type="password" placeholder="sk-..." autocomplete="off" autocorrect="off" spellcheck="false">
+        </div>
+        <div class="settings-field">
+          <label class="settings-label" for="s-model-light">Light model (transcription cleanup)</label>
+          <input class="settings-input" id="s-model-light" type="text" value="gpt-5.4-mini" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="settings-field">
+          <label class="settings-label" for="s-model-heavy">Heavy model (insights)</label>
+          <input class="settings-input" id="s-model-heavy" type="text" value="gpt-5.5" autocomplete="off" spellcheck="false">
+        </div>
+      </div>
+
+      <div>
+        <div class="settings-section-title">Google Drive</div>
+        <div class="settings-field">
+          <label class="settings-label" for="s-client-id">OAuth Client ID</label>
+          <input class="settings-input" id="s-client-id" type="text" placeholder="xxx.apps.googleusercontent.com" autocomplete="off" spellcheck="false">
+          <div class="settings-hint">Create at console.cloud.google.com → APIs & Services → Credentials → OAuth 2.0 Client ID (type: Web). Add this page's URL to Authorized JavaScript Origins.</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="settings-section-title">Connection</div>
+        <button class="google-btn" id="google-auth-btn" onclick="googleAuth()">
+          <svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Connect Google Drive
+        </button>
+      </div>
+
+      <button class="settings-save-btn" onclick="saveSettings()">save settings</button>
+      <div class="settings-status" id="settings-status"></div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav>
+    <button class="nav-btn active" id="nav-record" onclick="showScreen('record')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="12" cy="12" r="8"/>
+        <circle cx="12" cy="12" r="3" fill="currentColor" stroke="none"/>
       </svg>
-      <!-- stop icon (hidden) -->
-      <svg id="stopIcon" viewBox="0 0 24 24" fill="white" style="display:none" width="48" height="48">
-        <rect x="6" y="6" width="12" height="12" rx="2"/>
+      record
+    </button>
+    <button class="nav-btn" id="nav-entries" onclick="showScreen('entries')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M4 6h16M4 12h16M4 18h10"/>
       </svg>
-      <!-- spinner (hidden) -->
-      <div class="spinner" id="micSpinner" style="display:none;border-top-color:var(--gold)"></div>
+      entries
     </button>
-  </div>
-
-  <div class="status-text" id="statusText">tap to speak</div>
-
-  <div class="transcript-preview" id="transcriptPreview"></div>
-
-  <div class="last-entry-hint" id="lastEntryHint" onclick="showScreen('entries')" style="display:none">
-    <div class="last-entry-label" id="lastEntryLabel"></div>
-    <div class="last-entry-ago" id="lastEntryAgo"></div>
-  </div>
-
-  <nav class="nav">
-    <button class="nav-btn" onclick="showScreen('entries')">
-      <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-      <span>entries</span>
-    </button>
-    <button class="nav-btn" onclick="showScreen('pulse')">
-      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-      <span>pulse</span>
-    </button>
-    <button class="nav-btn" onclick="showScreen('insights')">
-      <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-      <span>insights</span>
-    </button>
-
   </nav>
 </div>
 
-<!-- ─── ENTRIES ─── -->
-<div id="entries" class="screen">
-  <div class="screen-header">
-    <button class="back-btn" onclick="showScreen('home')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
-    <span class="screen-title">entries</span>
-    <div style="width:44px"></div>
-  </div>
-  <div class="entries-list" id="entriesList"></div>
-</div>
+<div id="toast"></div>
 
-<!-- ─── PULSE ─── -->
-<div id="pulse" class="screen">
-  <div class="screen-header">
-    <button class="back-btn" onclick="showScreen('home')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
-    <span class="screen-title">pulse check</span>
-    <div style="width:44px"></div>
-  </div>
-  <div class="tab-row">
-    <button class="tab-btn active" id="tabDaily" onclick="setPulseTab('daily')">Daily</button>
-    <button class="tab-btn" id="tabWeekly" onclick="setPulseTab('weekly')">Weekly</button>
-  </div>
-  <div class="pulse-content" id="pulseContent"></div>
-</div>
-
-<!-- ─── INSIGHTS ─── -->
-<div id="insights" class="screen">
-  <div class="screen-header">
-    <button class="back-btn" onclick="showScreen('home')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
-    <span class="screen-title">insights</span>
-    <div style="width:44px"></div>
-  </div>
-  <div class="insights-content" id="insightsContent">
-    <div class="insights-prompt">
-      <div class="insights-icon">◈</div>
-      <div class="insights-title">What's your data saying?</div>
-      <div class="insights-desc">Claude reads your recent entries and pulse scores, finds patterns, and generates reflection questions tailored to what's actually been happening in your life.</div>
-      <button class="generate-btn" onclick="generateInsights()">generate insights</button>
-    </div>
-  </div>
-</div>
-
-<!-- ─── CONFIG ─── -->
-<div id="config" class="screen">
-  <div class="screen-header">
-    <button class="back-btn" onclick="showScreen('home')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
-    <span class="screen-title">settings</span>
-    <div style="width:44px"></div>
-  </div>
-  <div class="config-content">
-    <div class="config-card">
-      <div class="config-label">Export Data</div>
-      <div class="config-desc">Download everything as JSON. Do this regularly as a backup.</div>
-      <button class="config-save-btn" onclick="exportData()">export all data</button>
-    </div>
-  </div>
-</div>
+<!-- Google Identity Services -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 
 <script>
-// ─── STORAGE ──────────────────────────────────────────────────────────────────
-const db = {
-  get: (k, d=[]) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } },
-  set: (k, v) => localStorage.setItem(k, JSON.stringify(v)),
-  config: () => db.get('hj_config', {}),
-  setConfig: v => db.set('hj_config', v),
-  entries: () => db.get('hj_entries', []),
-  addEntry: e => { const a = db.entries(); a.push(e); db.set('hj_entries', a); },
-  pulse: () => db.get('hj_pulse', []),
-  addPulse: p => { const a = db.pulse(); a.push(p); db.set('hj_pulse', a); },
-};
+'use strict';
+// ═══════════════════════════════════════════════════════════════════
+// CONFIG & STATE
+// ═══════════════════════════════════════════════════════════════════
+const CFG_KEY = 'hj_cfg_v2';
 
-// ─── STATE ────────────────────────────────────────────────────────────────────
-let recognition = null;
-let isRecording = false;
-let transcript = '';
-let pulseTab = 'daily';
-let pulseScores = { stress:5, emotional_wellbeing:5, energy:5, meaning:5, connection:5, progress:5 };
-
-const METRICS = {
-  daily: [
-    { key:'stress', label:'Stress', desc:'How much pressure are you carrying?', color:'#e05252' },
-    { key:'emotional_wellbeing', label:'Emotional Wellbeing', desc:'How are you doing underneath it all?', color:'#c8a96e' },
-    { key:'energy', label:'Energy', desc:'Physical and mental fuel level', color:'#52c8a9' },
-  ],
-  weekly: [
-    { key:'meaning', label:'Meaning & Purpose', desc:'Are you living with direction?', color:'#9e7ae8' },
-    { key:'connection', label:'Connection', desc:'Quality of relationships this week', color:'#7ab8e8' },
-    { key:'progress', label:'Progress', desc:'Moving toward the life you want?', color:'#7ae87a' },
-  ]
-};
-
-// ─── NAVIGATION ───────────────────────────────────────────────────────────────
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  window.scrollTo(0,0);
-  if (id==='entries') renderEntries();
-  if (id==='pulse') renderPulse();
-  if (id==='home') renderHome();
-  if (id==='config') loadConfig();
+function loadCfg() {
+  try { return JSON.parse(localStorage.getItem(CFG_KEY)) || {}; } catch { return {}; }
+}
+function saveCfg(cfg) {
+  localStorage.setItem(CFG_KEY, JSON.stringify(cfg));
 }
 
-// ─── HOME ─────────────────────────────────────────────────────────────────────
-function renderHome() {
-  const entries = db.entries();
-  const hint = document.getElementById('lastEntryHint');
-  if (entries.length > 0) {
-    const last = entries[entries.length-1];
-    const days = Math.floor((Date.now()-last.timestamp)/86400000);
-    document.getElementById('lastEntryLabel').textContent = days===0 ? 'last entry: today' : `last entry: ${days} day${days>1?'s':''} ago`;
-    document.getElementById('lastEntryAgo').textContent = (last.cleaned||last.raw||'').substring(0,60)+'...';
-    hint.style.display='block';
-  } else {
-    hint.style.display='none';
+let cfg = loadCfg();
+let accessToken = cfg.accessToken || null;
+let tokenExpiry = cfg.tokenExpiry || 0;
+
+// Recording state
+let mediaRecorder = null;
+let audioChunks = [];
+let recTimerInterval = null;
+let recSeconds = 0;
+let analyserNode = null;
+let animFrameId = null;
+let audioCtx = null;
+
+// Waveform bars
+const WAVEFORM_BARS = 48;
+let waveformBars = [];
+
+// In-memory entry cache (from Drive)
+let entriesCache = {}; // key: "YYYY-MM" -> array of entries
+let currentDetailEntry = null;
+
+// Audio objects for playback
+let currentAudio = null;
+
+// ═══════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  updateHeaderDate();
+  initWaveformBars();
+  loadSettingsUI();
+  updateGoogleAuthBtn();
+  renderEntriesList();
+
+  // Refresh date every minute
+  setInterval(updateHeaderDate, 60000);
+});
+
+function updateHeaderDate() {
+  const d = new Date();
+  const opts = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' };
+  document.getElementById('header-date').textContent = d.toLocaleDateString('en-GB', opts).toUpperCase();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// WAVEFORM VISUALISER
+// ═══════════════════════════════════════════════════════════════════
+function initWaveformBars() {
+  const g = document.getElementById('waveform-bars');
+  g.innerHTML = '';
+  waveformBars = [];
+  const cx = 100, cy = 100, r = 72;
+  for (let i = 0; i < WAVEFORM_BARS; i++) {
+    const angle = (i / WAVEFORM_BARS) * 2 * Math.PI - Math.PI / 2;
+    const x1 = cx + r * Math.cos(angle);
+    const y1 = cy + r * Math.sin(angle);
+    const x2 = cx + (r + 8) * Math.cos(angle);
+    const y2 = cy + (r + 8) * Math.sin(angle);
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+    line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+    line.setAttribute('stroke', 'rgba(200,133,42,0.5)');
+    line.setAttribute('stroke-width', '1.5');
+    line.setAttribute('stroke-linecap', 'round');
+    g.appendChild(line);
+    waveformBars.push({ line, angle, cx, cy, r, x1, y1 });
   }
 }
 
-// ─── VOICE RECORDING ──────────────────────────────────────────────────────────
-function toggleRecord() {
-  if (isRecording) {
+function animateWaveform(analyser) {
+  const dataArr = new Uint8Array(analyser.frequencyBinCount);
+  const svg = document.getElementById('waveform-svg');
+  svg.classList.add('visible');
+
+  function draw() {
+    animFrameId = requestAnimationFrame(draw);
+    analyser.getByteFrequencyData(dataArr);
+    const step = Math.floor(dataArr.length / WAVEFORM_BARS);
+    waveformBars.forEach((b, i) => {
+      const val = dataArr[i * step] / 255;
+      const len = 8 + val * 28;
+      const nx2 = b.cx + (b.r + len) * Math.cos(b.angle);
+      const ny2 = b.cy + (b.r + len) * Math.sin(b.angle);
+      b.line.setAttribute('x2', nx2);
+      b.line.setAttribute('y2', ny2);
+      const opacity = 0.3 + val * 0.7;
+      b.line.setAttribute('stroke', `rgba(200,133,42,${opacity})`);
+    });
+  }
+  draw();
+}
+
+function stopWaveform() {
+  if (animFrameId) { cancelAnimationFrame(animFrameId); animFrameId = null; }
+  const svg = document.getElementById('waveform-svg');
+  svg.classList.remove('visible');
+  initWaveformBars(); // reset
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// RECORDING
+// ═══════════════════════════════════════════════════════════════════
+async function toggleRecord() {
+  if (!cfg.openaiKey) {
+    toast('Add your OpenAI key in settings first', true);
+    showScreen('settings');
+    return;
+  }
+  if (!accessToken || Date.now() > tokenExpiry) {
+    if (!cfg.clientId) {
+      toast('Connect Google Drive in settings first', true);
+      showScreen('settings');
+      return;
+    }
+    await doGoogleAuth();
+    return;
+  }
+
+  if (mediaRecorder && mediaRecorder.state === 'recording') {
     stopRecording();
   } else {
     startRecording();
   }
 }
 
-function startRecording() {
-  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-    alert('Voice recognition requires Chrome on Android. Please open this app in Chrome.');
-    return;
-  }
-
-  const config = db.config();
-
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  recognition = new SR();
-  recognition.continuous = true;
-  recognition.interimResults = true;
-  recognition.lang = 'en-US';
-
-  transcript = '';
-  let lastResultIndex = 0;
-
-  recognition.onresult = e => {
-    // Only process truly new results to avoid duplication on restart
-    let interim = '';
-    for (let i = Math.max(e.resultIndex, lastResultIndex); i < e.results.length; i++) {
-      if (e.results[i].isFinal) {
-        transcript += e.results[i][0].transcript + ' ';
-        lastResultIndex = i + 1;
-      } else {
-        interim += e.results[i][0].transcript;
-      }
-    }
-    const preview = document.getElementById('transcriptPreview');
-    preview.textContent = transcript + interim;
-    preview.classList.add('visible');
-  };
-
-  recognition.onerror = e => {
-    if (e.error === 'aborted' || e.error === 'no-speech') return;
-    isRecording = false;
-    recognition = null;
-    resetMic();
-  };
-
-  recognition.onend = () => {
-    if (isRecording) {
-      try { recognition.start(); } catch(e) {}
-    }
-  };
-
-  recognition.start();
-  isRecording = true;
-
-  document.getElementById('micBtn').classList.add('recording');
-  document.getElementById('micIcon').style.display = 'none';
-  document.getElementById('stopIcon').style.display = 'block';
-  document.getElementById('statusText').textContent = 'listening...';
-  document.getElementById('statusText').className = 'status-text recording';
-  document.getElementById('transcriptPreview').classList.add('visible');
-}
-
-function stopRecording() {
-  if (!isRecording) return;
-  isRecording = false;
-
-  // Show processing UI immediately
-  document.getElementById('micBtn').classList.remove('recording');
-  document.getElementById('micBtn').classList.add('processing');
-  document.getElementById('stopIcon').style.display = 'none';
-  document.getElementById('micSpinner').style.display = 'block';
-  document.getElementById('statusText').textContent = 'processing...';
-  document.getElementById('statusText').className = 'status-text processing';
-
-  if (recognition) {
-    // Let onend fire to collect final results, then process
-    recognition.onerror = null;
-    recognition.onend = () => {
-      recognition = null;
-      // Small delay to ensure all final results are in
-      setTimeout(() => {
-        const captured = transcript.trim();
-        if (!captured) {
-          resetMic();
-          return;
-        }
-        document.getElementById('statusText').textContent = 'claude is thinking...';
-        processEntry(captured);
-      }, 300);
-    };
-    recognition.stop();
-  } else {
-    const captured = transcript.trim();
-    if (!captured) { resetMic(); return; }
-    document.getElementById('statusText').textContent = 'claude is thinking...';
-    processEntry(captured);
-  }
-}
-
-function resetMic() {
-  document.getElementById('micBtn').classList.remove('recording', 'processing');
-  document.getElementById('micIcon').style.display = 'block';
-  document.getElementById('stopIcon').style.display = 'none';
-  document.getElementById('micSpinner').style.display = 'none';
-  document.getElementById('statusText').textContent = 'tap to speak';
-  document.getElementById('statusText').className = 'status-text';
-  document.getElementById('transcriptPreview').classList.remove('visible');
-  document.getElementById('transcriptPreview').textContent = '';
-  transcript = '';
-}
-
-// ─── CLAUDE PROCESSING ────────────────────────────────────────────────────────
-async function callClaude(system, user) {
-  const stored = db.config();
-  const apiKey = (stored && stored.apiKey) ? stored.apiKey : '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';
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true'
-    },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 1500,
-      system,
-      messages: [{ role:'user', content: user }]
-    })
-  });
-  if (!res.ok) throw new Error(await res.text());
-  const data = await res.json();
-  return data.content[0].text;
-}
-
-async function processEntry(raw) {
-  const recentEntries = db.entries().slice(-5);
-  const context = recentEntries.length > 0
-    ? `\n\nFor context, here are Harvey's last ${recentEntries.length} entries:\n${recentEntries.map(e => `[${new Date(e.timestamp).toLocaleDateString()}] ${e.cleaned||e.raw}`).join('\n')}`
-    : '';
-
-  const system = `You are Harvey's personal journal AI. He has spoken a voice entry and you need to process it intelligently.
-
-1. Detect the type:
-   - "journal" = thoughts, reflections, feelings, how his day went, observations about life
-   - "idea" = a theory, philosophy, concept, business idea, creative thought he is developing
-   - "metric" = mentions of how he has been feeling in terms of stress, energy, wellbeing, happiness, purpose, connection
-
-2. Write a cleaned-up version in Harvey's voice — flowing, clear prose. Preserve everything he said but make it readable. Keep it personal and in first person.
-
-3. Add a "reflection" — 1-2 sentences that are genuinely perceptive. Reference patterns across his recent entries if relevant. What does this reveal? What is he working through? How does this connect to what he's been saying lately? Be specific, not generic.
-
-4. Extract metric updates if mentioned (stress, emotional_wellbeing, energy, meaning, connection, progress — scale 1-10).
-
-5. Generate 2-3 tags describing the themes.
-
-Respond ONLY with valid JSON, no markdown:
-{
-  "type": "journal|idea|metric",
-  "cleaned": "full cleaned up version of what he said",
-  "reflection": "1-2 perceptive sentences connecting this entry to patterns in his life",
-  "tags": ["tag1", "tag2"],
-  "metrics": { "stress": 7 }
-}`;
-
+async function startRecording() {
   try {
-    const result = await callClaude(system, `Raw voice entry:\n\n${raw}${context}`);
-    const clean = result.replace(/```json|```/g, '').trim();
-    const parsed = JSON.parse(clean);
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
-    // Save entry
-    const entry = {
-      id: Date.now().toString(),
-      raw,
-      cleaned: parsed.cleaned,
-      reflection: parsed.reflection || '',
-      type: parsed.type,
-      tags: parsed.tags || [],
-      timestamp: Date.now()
-    };
-    db.addEntry(entry);
+    // Audio analyser
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    analyserNode = audioCtx.createAnalyser();
+    analyserNode.fftSize = 256;
+    const src = audioCtx.createMediaStreamSource(stream);
+    src.connect(analyserNode);
 
-    // Save any metric updates
-    if (parsed.metrics && Object.keys(parsed.metrics).length > 0) {
-      Object.assign(pulseScores, parsed.metrics);
-      db.addPulse({ id: Date.now().toString(), scores: {...pulseScores}, timestamp: Date.now(), source: 'voice' });
-    }
+    // MediaRecorder — prefer webm/opus, fallback to whatever works
+    const mimeType = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg', 'audio/mp4']
+      .find(m => MediaRecorder.isTypeSupported(m)) || '';
+    mediaRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : {});
+    audioChunks = [];
 
-    // Show success
-    document.getElementById('transcriptPreview').textContent = parsed.cleaned;
-    document.getElementById('statusText').textContent = `saved as ${parsed.type} ✓`;
-    document.getElementById('statusText').style.color = 'var(--green)';
+    mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+    mediaRecorder.onstop = handleRecordingStop;
+    mediaRecorder.start(250); // collect every 250ms
 
-    setTimeout(() => {
-      resetMic();
-      renderHome();
-    }, 2500);
+    // UI
+    document.getElementById('screen-record').classList.add('recording');
+    animateWaveform(analyserNode);
+    recSeconds = 0;
+    recTimerInterval = setInterval(() => {
+      recSeconds++;
+      const m = Math.floor(recSeconds / 60);
+      const s = String(recSeconds % 60).padStart(2, '0');
+      document.getElementById('rec-timer').textContent = `${m}:${s}`;
+    }, 1000);
 
   } catch (err) {
-    document.getElementById('statusText').textContent = 'error — tap to try again';
-    document.getElementById('statusText').style.color = 'var(--red)';
-    document.getElementById('micBtn').classList.remove('processing');
-    document.getElementById('micIcon').style.display = 'block';
-    document.getElementById('micSpinner').style.display = 'none';
+    toast('Microphone access denied', true);
     console.error(err);
   }
 }
 
-// ─── ENTRIES ──────────────────────────────────────────────────────────────────
-function renderEntries() {
-  const entries = db.entries().reverse();
-  const list = document.getElementById('entriesList');
-  if (!entries.length) {
-    list.innerHTML = `<div class="empty-state"><div class="empty-icon">◎</div><div class="empty-title">No entries yet</div><div class="empty-sub">Tap the mic on the home screen and start speaking</div></div>`;
-    return;
+function stopRecording() {
+  if (mediaRecorder && mediaRecorder.state === 'recording') {
+    mediaRecorder.stop();
+    mediaRecorder.stream.getTracks().forEach(t => t.stop());
   }
-  list.innerHTML = entries.map(e => `
-    <div class="entry-card">
-      <div class="entry-card-top">
-        <span class="entry-badge badge-${e.type}">${e.type}</span>
-        <span class="entry-time">${new Date(e.timestamp).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}</span>
-      </div>
-      <div class="entry-date">${new Date(e.timestamp).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'long',year:'numeric'})}</div>
-      ${e.cleaned && e.cleaned !== e.raw ? `
-        <div style="font-size:9px;color:var(--gold);letter-spacing:2px;margin-bottom:6px">CLAUDE'S VERSION</div>
-        <div class="entry-preview">${e.cleaned}</div>
-        <div style="font-size:9px;color:var(--text3);letter-spacing:2px;margin:12px 0 6px">YOU SAID</div>
-        <div style="font-size:13px;color:var(--text3);font-style:italic;font-family:'Cormorant Garamond',serif;line-height:22px">${e.raw}</div>
-      ` : `<div class="entry-preview">${e.cleaned||e.raw||''}</div>`}
-      ${e.reflection ? `<div style="font-size:14px;color:var(--text3);font-style:italic;margin-top:12px;padding-top:12px;border-top:1px solid var(--bg3);font-family:'Cormorant Garamond',serif;line-height:22px">↳ ${e.reflection}</div>` : ''}
-      ${e.tags?.length ? `<div class="entry-tags">${e.tags.map(t=>`<span class="entry-tag">${t}</span>`).join('')}</div>` : ''}
-    </div>
-  `).join('');
+  clearInterval(recTimerInterval);
+  document.getElementById('screen-record').classList.remove('recording');
+  document.getElementById('rec-timer').textContent = '0:00';
+  stopWaveform();
+  if (audioCtx) { audioCtx.close(); audioCtx = null; }
 }
 
-// ─── PULSE ────────────────────────────────────────────────────────────────────
-function setPulseTab(tab) {
-  pulseTab = tab;
-  document.getElementById('tabDaily').classList.toggle('active', tab==='daily');
-  document.getElementById('tabWeekly').classList.toggle('active', tab==='weekly');
-  renderPulse();
-}
+async function handleRecordingStop() {
+  const mimeType = mediaRecorder.mimeType || 'audio/webm';
+  const audioBlob = new Blob(audioChunks, { type: mimeType });
+  const duration = recSeconds;
+  audioChunks = [];
 
-function renderPulse() {
-  const metrics = METRICS[pulseTab];
-  document.getElementById('pulseContent').innerHTML = metrics.map(m => `
-    <div class="metric-card">
-      <div class="metric-header">
-        <div class="metric-dot" style="background:${m.color}"></div>
-        <div class="metric-info">
-          <div class="metric-name">${m.label}</div>
-          <div class="metric-desc">${m.desc}</div>
-        </div>
-        <div class="metric-score" id="sc_${m.key}" style="color:${m.color}">${pulseScores[m.key]}</div>
-      </div>
-      <div class="slider-row" id="sr_${m.key}">
-        ${[1,2,3,4,5,6,7,8,9,10].map(n=>`
-          <div class="slider-pip ${n<=pulseScores[m.key]?'active':''}"
-               style="${n<=pulseScores[m.key]?`background:${m.color}`:''}"
-               onclick="setScore('${m.key}',${n},'${m.color}')"></div>
-        `).join('')}
-      </div>
-      <div class="metric-end-labels"><span class="end-label">low</span><span class="end-label">high</span></div>
-    </div>
-  `).join('') + `<button class="save-btn" onclick="savePulse()">save check-in</button>`;
-}
+  if (duration < 1) { toast('Recording too short'); return; }
 
-function setScore(key, val, color) {
-  pulseScores[key] = val;
-  document.getElementById(`sc_${key}`).textContent = val;
-  document.querySelectorAll(`#sr_${key} .slider-pip`).forEach((pip, i) => {
-    pip.classList.toggle('active', i+1<=val);
-    pip.style.background = i+1<=val ? color : '';
-  });
-}
-
-function savePulse() {
-  db.addPulse({ id: Date.now().toString(), scores: {...pulseScores}, timestamp: Date.now(), source: 'manual' });
-  showScreen('home');
-}
-
-// ─── INSIGHTS ─────────────────────────────────────────────────────────────────
-async function generateInsights() {
-  const content = document.getElementById('insightsContent');
-  content.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;gap:16px;padding:80px 0"><div class="spinner"></div><div style="font-size:11px;color:var(--text3);letter-spacing:2px">reading your journal...</div></div>`;
-
-  const entries = db.entries().slice(-30);
-  const pulse = db.pulse().slice(-30);
-
-  if (!entries.length) {
-    content.innerHTML = `<div class="insights-prompt"><div class="insights-desc">No entries yet. Start journaling first.</div></div>`;
-    return;
-  }
-
-  const system = `You are Harvey's personal AI analyst. Analyze his recent journal entries and wellbeing scores. Be specific — reference actual things he wrote about. Don't be generic. Respond ONLY with valid JSON:
-{"summary": "3-4 paragraphs of genuine observations about patterns and themes", "questions": ["question 1", "question 2", "question 3", "question 4", "question 5"]}`;
+  showProcessing(true);
 
   try {
-    const result = await callClaude(system, `Entries:\n${JSON.stringify(entries)}\n\nPulse:\n${JSON.stringify(pulse)}`);
-    const parsed = JSON.parse(result.replace(/```json|```/g,'').trim());
-    content.innerHTML = `
-      <div class="insight-box">
-        <div class="insight-label">claude's observations</div>
-        <div class="insight-text">${parsed.summary}</div>
-      </div>
-      <div class="section-label">reflection questions</div>
-      ${parsed.questions.map((q,i)=>`<div class="question-card"><div class="q-num">0${i+1}</div><div class="q-text">${q}</div></div>`).join('')}
-      <button class="generate-btn" onclick="generateInsights()" style="align-self:center">regenerate</button>
-    `;
-  } catch(err) {
-    content.innerHTML = `<div class="insights-prompt"><div class="insights-desc" style="color:var(--red)">Error: ${err.message}</div><button class="generate-btn" onclick="generateInsights()">try again</button></div>`;
+    const now = new Date();
+    const entryId = `${now.getTime()}`;
+    const monthKey = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    const ext = mimeType.includes('ogg') ? 'ogg' : mimeType.includes('mp4') ? 'mp4' : 'webm';
+    const audioFilename = `${monthKey}-${entryId}.${ext}`;
+
+    // STEP 1: Upload audio to Drive
+    setStep('upload');
+    const audioFileId = await uploadAudioToDrive(audioBlob, audioFilename, mimeType);
+
+    // STEP 2: Transcribe with Whisper
+    setStep('transcribe');
+    const rawTranscript = await whisperTranscribe(audioBlob, ext);
+
+    // STEP 3: Clean with gpt-5.4-mini
+    setStep('clean');
+    const cleanedText = await cleanTranscript(rawTranscript);
+
+    // STEP 4: Save entry JSON to Drive
+    setStep('save');
+    const entry = {
+      id: entryId,
+      timestamp: now.toISOString(),
+      duration,
+      audioFileId,
+      audioFilename,
+      rawTranscript,
+      cleanedText,
+      insights: null,
+      insightsStatus: 'pending'
+    };
+
+    await saveEntryToDrive(entry, monthKey);
+
+    // Cache locally
+    if (!entriesCache[monthKey]) entriesCache[monthKey] = [];
+    entriesCache[monthKey].unshift(entry);
+
+    showProcessing(false);
+    toast('Entry saved ✓');
+
+    // Run insights in background (non-blocking)
+    generateInsights(entry, monthKey);
+
+    // Switch to entries to see the new entry
+    setTimeout(() => {
+      renderEntriesList();
+      showScreen('entries');
+    }, 600);
+
+  } catch (err) {
+    showProcessing(false);
+    console.error(err);
+    toast('Error: ' + (err.message || 'unknown'), true);
   }
 }
 
-// ─── CONFIG ───────────────────────────────────────────────────────────────────
-function loadConfig() {
-  const c = db.config();
-  document.getElementById('apiKeyInput').value = c.apiKey || '';
-  document.getElementById('emailInput').value = c.email || '';
+// ═══════════════════════════════════════════════════════════════════
+// PROCESSING UI
+// ═══════════════════════════════════════════════════════════════════
+function showProcessing(show) {
+  document.getElementById('processing-overlay').classList.toggle('visible', show);
+  if (!show) {
+    ['upload','transcribe','clean','save'].forEach(s => {
+      const el = document.getElementById('step-'+s);
+      el.classList.remove('active','done');
+    });
+  }
 }
 
-function saveConfig() {
-  db.setConfig({
-    apiKey: document.getElementById('apiKeyInput').value.trim(),
-    email: document.getElementById('emailInput').value.trim()
+function setStep(step) {
+  const steps = ['upload','transcribe','clean','save'];
+  const idx = steps.indexOf(step);
+  steps.forEach((s, i) => {
+    const el = document.getElementById('step-'+s);
+    el.classList.remove('active','done');
+    if (i < idx) el.classList.add('done');
+    if (i === idx) el.classList.add('active');
   });
-  showScreen('home');
 }
 
-function exportData() {
-  const blob = new Blob([JSON.stringify({entries:db.entries(),pulse:db.pulse(),exportedAt:new Date().toISOString()},null,2)],{type:'application/json'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `harveys-journal-${new Date().toISOString().split('T')[0]}.json`;
-  a.click();
+// ═══════════════════════════════════════════════════════════════════
+// OPENAI — WHISPER
+// ═══════════════════════════════════════════════════════════════════
+async function whisperTranscribe(blob, ext) {
+  const form = new FormData();
+  form.append('file', blob, `audio.${ext}`);
+  form.append('model', 'whisper-1');
+  form.append('language', 'en');
+
+  const res = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${cfg.openaiKey}` },
+    body: form
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error('Whisper: ' + (err.error?.message || res.status));
+  }
+  const data = await res.json();
+  return data.text || '';
 }
 
-// ─── INIT ─────────────────────────────────────────────────────────────────────
-renderHome();
-renderPulse();
+// ═══════════════════════════════════════════════════════════════════
+// OPENAI — CLEAN TRANSCRIPT
+// ═══════════════════════════════════════════════════════════════════
+async function cleanTranscript(rawText) {
+  const res = await openaiChat(cfg.modelLight || 'gpt-5.4-mini', [
+    { role: 'system', content: `You are a personal journal assistant. The user has just spoken a voice journal entry and it has been transcribed by Whisper. Your job is to clean and lightly format the transcription into readable prose. Rules:
+- Fix obvious transcription errors (wrong words, run-ons)
+- Add punctuation and paragraph breaks where natural
+- Do NOT change the meaning or add content
+- Do NOT add a title or commentary
+- Preserve first-person voice exactly
+- Return ONLY the cleaned text, nothing else` },
+    { role: 'user', content: rawText }
+  ]);
+  return res;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// OPENAI — INSIGHTS (background, runs after save)
+// ═══════════════════════════════════════════════════════════════════
+async function generateInsights(entry, monthKey) {
+  try {
+    // Pull recent entries for cross-referencing (up to 20)
+    const recent = (entriesCache[monthKey] || [])
+      .filter(e => e.id !== entry.id)
+      .slice(0, 19)
+      .map(e => ({ date: e.timestamp.slice(0,10), text: e.cleanedText?.slice(0, 400) }));
+
+    const res = await openaiChat(cfg.modelHeavy || 'gpt-5.5', [
+      { role: 'system', content: `You are an insightful personal journal analyst. You read journal entries deeply and notice patterns, themes, emotional undercurrents, and connections the writer might not have noticed themselves. You write in a warm, curious, thoughtful voice — like a brilliant friend who genuinely pays attention. Be specific and reference actual content.` },
+      { role: 'user', content: `Here is my latest journal entry:\n\n${entry.cleanedText}\n\n${recent.length ? `\nContext from recent entries:\n${JSON.stringify(recent)}` : ''}\n\nGive me:\n1. Your observations about this entry — what stands out, what might be worth reflecting on, emotional undercurrents, what I might not have noticed\n2. Any connections to patterns or themes from my recent entries\n3. One or two genuinely interesting questions to sit with\n\nWrite in flowing paragraphs, not bullet points. Be specific to what I actually said.` }
+    ], true); // true = use reasoning
+
+    // Update entry
+    entry.insights = res;
+    entry.insightsStatus = 'done';
+
+    // Patch the Drive JSON
+    await patchEntryInDrive(entry, monthKey);
+
+    // If detail screen is showing this entry, refresh
+    if (currentDetailEntry && currentDetailEntry.id === entry.id) {
+      currentDetailEntry = entry;
+      renderDetailInsights(entry);
+    }
+    // Refresh entries list badge
+    renderEntriesList();
+
+  } catch (err) {
+    console.error('Insights failed:', err);
+    entry.insightsStatus = 'error';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// OPENAI — GENERIC CHAT
+// ═══════════════════════════════════════════════════════════════════
+async function openaiChat(model, messages, thinking = false) {
+  const body = { model, messages, max_completion_tokens: 2000 };
+  if (thinking) {
+    body.reasoning_effort = 'medium';
+  }
+
+  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${cfg.openaiKey}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err.error?.message || res.status));
+  }
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content || '';
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// GOOGLE DRIVE AUTH
+// ═══════════════════════════════════════════════════════════════════
+function doGoogleAuth() {
+  return new Promise((resolve, reject) => {
+    if (!cfg.clientId) { reject(new Error('No client ID')); return; }
+
+    const client = google.accounts.oauth2.initTokenClient({
+      client_id: cfg.clientId,
+      scope: 'https://www.googleapis.com/auth/drive.file',
+      callback: (resp) => {
+        if (resp.error) { reject(new Error(resp.error)); return; }
+        accessToken = resp.access_token;
+        tokenExpiry = Date.now() + (resp.expires_in - 60) * 1000;
+        cfg.accessToken = accessToken;
+        cfg.tokenExpiry = tokenExpiry;
+        saveCfg(cfg);
+        updateGoogleAuthBtn();
+        resolve();
+      }
+    });
+    client.requestAccessToken();
+  });
+}
+
+async function googleAuth() {
+  try {
+    await doGoogleAuth();
+    toast('Google Drive connected ✓');
+    updateGoogleAuthBtn();
+  } catch (e) {
+    toast('Auth failed: ' + e.message, true);
+  }
+}
+
+function updateGoogleAuthBtn() {
+  const btn = document.getElementById('google-auth-btn');
+  if (!btn) return;
+  const connected = accessToken && Date.now() < tokenExpiry;
+  btn.className = 'google-btn' + (connected ? ' connected' : '');
+  btn.innerHTML = connected
+    ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Drive connected`
+    : `<svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> Connect Google Drive`;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// GOOGLE DRIVE — FILE OPS
+// ═══════════════════════════════════════════════════════════════════
+async function driveRequest(url, options = {}) {
+  // Ensure valid token
+  if (!accessToken || Date.now() > tokenExpiry) {
+    await doGoogleAuth();
+  }
+  const headers = { 'Authorization': `Bearer ${accessToken}`, ...(options.headers || {}) };
+  const res = await fetch(url, { ...options, headers });
+  if (!res.ok) {
+    const t = await res.text();
+    throw new Error(`Drive ${res.status}: ${t.slice(0,200)}`);
+  }
+  return res;
+}
+
+async function getOrCreateFolder(name, parentId = null) {
+  // Search for existing folder
+  let q = `name='${name}' and mimeType='application/vnd.google-apps.folder' and trashed=false`;
+  if (parentId) q += ` and '${parentId}' in parents`;
+  const res = await driveRequest(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id,name)`);
+  const data = await res.json();
+  if (data.files && data.files.length > 0) return data.files[0].id;
+
+  // Create
+  const body = { name, mimeType: 'application/vnd.google-apps.folder' };
+  if (parentId) body.parents = [parentId];
+  const cr = await driveRequest('https://www.googleapis.com/drive/v3/files', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  const created = await cr.json();
+  return created.id;
+}
+
+async function getDriveFolderIds() {
+  // Get/create Journal folder, then Journal/audio subfolder
+  const journalId = await getOrCreateFolder('Journal');
+  const audioId = await getOrCreateFolder('audio', journalId);
+  return { journalId, audioId };
+}
+
+async function uploadAudioToDrive(blob, filename, mimeType) {
+  const { audioId } = await getDriveFolderIds();
+
+  const metadata = { name: filename, parents: [audioId] };
+  const form = new FormData();
+  form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+  form.append('file', blob, filename);
+
+  const res = await driveRequest(
+    'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id',
+    { method: 'POST', body: form }
+  );
+  const data = await res.json();
+  return data.id;
+}
+
+async function getMonthFileId(monthKey) {
+  const { journalId } = await getDriveFolderIds();
+  const name = `${monthKey}.json`;
+  const q = `name='${name}' and '${journalId}' in parents and trashed=false`;
+  const res = await driveRequest(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id)`);
+  const data = await res.json();
+  return data.files?.[0]?.id || null;
+}
+
+async function saveEntryToDrive(entry, monthKey) {
+  const { journalId } = await getDriveFolderIds();
+  const name = `${monthKey}.json`;
+
+  // Load existing or start fresh
+  let entries = [];
+  const existingId = await getMonthFileId(monthKey);
+
+  if (existingId) {
+    const res = await driveRequest(`https://www.googleapis.com/drive/v3/files/${existingId}?alt=media`);
+    entries = await res.json().catch(() => []);
+    if (!Array.isArray(entries)) entries = [];
+  }
+
+  entries.unshift(entry); // newest first
+
+  const content = JSON.stringify(entries, null, 2);
+  const blob = new Blob([content], { type: 'application/json' });
+
+  if (existingId) {
+    // Update existing file
+    await driveRequest(
+      `https://www.googleapis.com/upload/drive/v3/files/${existingId}?uploadType=media`,
+      { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: blob }
+    );
+  } else {
+    // Create new file
+    const form = new FormData();
+    form.append('metadata', new Blob([JSON.stringify({ name, parents: [journalId] })], { type: 'application/json' }));
+    form.append('file', blob, name);
+    await driveRequest(
+      'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',
+      { method: 'POST', body: form }
+    );
+  }
+}
+
+async function patchEntryInDrive(entry, monthKey) {
+  try {
+    const fileId = await getMonthFileId(monthKey);
+    if (!fileId) return;
+
+    const res = await driveRequest(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`);
+    let entries = await res.json().catch(() => []);
+    if (!Array.isArray(entries)) return;
+
+    const idx = entries.findIndex(e => e.id === entry.id);
+    if (idx >= 0) entries[idx] = entry;
+
+    const content = JSON.stringify(entries, null, 2);
+    await driveRequest(
+      `https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`,
+      { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: new Blob([content], { type: 'application/json' }) }
+    );
+  } catch (e) {
+    console.warn('patchEntryInDrive failed:', e);
+  }
+}
+
+async function loadMonthEntries(monthKey) {
+  if (entriesCache[monthKey]) return entriesCache[monthKey];
+  try {
+    const fileId = await getMonthFileId(monthKey);
+    if (!fileId) { entriesCache[monthKey] = []; return []; }
+    const res = await driveRequest(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`);
+    const entries = await res.json().catch(() => []);
+    entriesCache[monthKey] = Array.isArray(entries) ? entries : [];
+    return entriesCache[monthKey];
+  } catch { entriesCache[monthKey] = []; return []; }
+}
+
+async function getAudioUrl(fileId) {
+  // Return a short-lived Drive download URL
+  return `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&access_token=${accessToken}`;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// ENTRIES LIST
+// ═══════════════════════════════════════════════════════════════════
+async function renderEntriesList() {
+  const list = document.getElementById('entries-list');
+  const now = new Date();
+  const monthKey = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+
+  list.innerHTML = `<div style="padding:40px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--cream-dim);opacity:0.4;letter-spacing:0.1em">loading…</div>`;
+
+  let entries = [];
+  try {
+    if (accessToken && Date.now() < tokenExpiry) {
+      entries = await loadMonthEntries(monthKey);
+    }
+  } catch (e) {
+    console.warn(e);
+  }
+
+  if (!entries.length) {
+    list.innerHTML = `<div class="empty-state"><p>No entries yet.</p><span>Tap record to begin</span></div>`;
+    return;
+  }
+
+  // Show current month entries
+  const today = now.toDateString();
+  document.getElementById('entries-sub').textContent = now.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+
+  list.innerHTML = entries.map(e => {
+    const d = new Date(e.timestamp);
+    const isToday = d.toDateString() === today;
+    const dateStr = isToday
+      ? `Today · ${d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}`
+      : d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }) + ' · ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    const preview = (e.cleanedText || e.rawTranscript || '').slice(0, 180);
+    const badge = e.insightsStatus === 'pending'
+      ? '<div class="entry-badge processing">ai thinking…</div>'
+      : '';
+    const dur = e.duration ? `${Math.floor(e.duration/60)}:${String(e.duration%60).padStart(2,'0')}` : '';
+    return `<div class="entry-card" onclick="openEntry('${e.id}','${monthKey}')">
+      <div class="entry-time">
+        <div class="has-audio"></div>${dateStr.toUpperCase()}${dur ? ' · ' + dur : ''}
+      </div>
+      <div class="entry-preview">${escHtml(preview)}${preview.length >= 180 ? '…' : ''}</div>
+      ${badge}
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// ENTRY DETAIL
+// ═══════════════════════════════════════════════════════════════════
+async function openEntry(entryId, monthKey) {
+  const entries = entriesCache[monthKey] || [];
+  const entry = entries.find(e => e.id === entryId);
+  if (!entry) return;
+  currentDetailEntry = entry;
+
+  const d = new Date(entry.timestamp);
+  document.getElementById('detail-meta').textContent =
+    d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase() +
+    ' · ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+
+  renderDetailBody(entry);
+  showScreen('detail');
+}
+
+function renderDetailBody(entry) {
+  const body = document.getElementById('detail-body');
+  const dur = entry.duration ? `${Math.floor(entry.duration/60)}:${String(entry.duration%60).padStart(2,'0')}` : '';
+
+  body.innerHTML = `
+    <div>
+      <div class="detail-section-label">recording ${dur ? '· '+dur : ''}</div>
+      <div class="audio-player" id="audio-player">
+        <button class="play-btn" id="play-btn" onclick="togglePlay()">▶</button>
+        <div class="audio-progress">
+          <div class="progress-bar" id="progress-bar" onclick="seekAudio(event)">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+          <div class="audio-time" id="audio-time">0:00</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="detail-section-label">raw transcript</div>
+      <div class="text-block raw">${escHtml(entry.rawTranscript || '—')}</div>
+    </div>
+
+    <div>
+      <div class="detail-section-label">cleaned</div>
+      <div class="text-block clean">${escHtml(entry.cleanedText || '—')}</div>
+    </div>
+
+    <div id="insights-section">
+      <div class="detail-section-label">ai insights</div>
+      ${renderInsightsHtml(entry)}
+    </div>
+  `;
+
+  // Load audio
+  if (entry.audioFileId) {
+    loadAudioForEntry(entry);
+  }
+}
+
+function renderDetailInsights(entry) {
+  const sec = document.getElementById('insights-section');
+  if (!sec) return;
+  sec.innerHTML = `<div class="detail-section-label">ai insights</div>${renderInsightsHtml(entry)}`;
+}
+
+function renderInsightsHtml(entry) {
+  if (entry.insightsStatus === 'pending' || !entry.insights) {
+    return `<div class="insights-pending">thinking in background…</div>`;
+  }
+  if (entry.insightsStatus === 'error') {
+    return `<div class="insights-pending" style="color:var(--red)">insights failed — will retry next open</div>`;
+  }
+  const paras = entry.insights.split(/\n+/).filter(Boolean);
+  return `<div class="insights-block">${paras.map(p => `<p>${escHtml(p)}</p>`).join('')}</div>`;
+}
+
+async function loadAudioForEntry(entry) {
+  try {
+    const url = await getAudioUrl(entry.audioFileId);
+    currentAudio = new Audio(url);
+
+    currentAudio.ontimeupdate = () => {
+      if (!currentAudio.duration) return;
+      const pct = (currentAudio.currentTime / currentAudio.duration) * 100;
+      const fill = document.getElementById('progress-fill');
+      const timeEl = document.getElementById('audio-time');
+      if (fill) fill.style.width = pct + '%';
+      if (timeEl) {
+        const t = Math.floor(currentAudio.currentTime);
+        timeEl.textContent = `${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}`;
+      }
+    };
+    currentAudio.onended = () => {
+      const btn = document.getElementById('play-btn');
+      if (btn) btn.textContent = '▶';
+    };
+  } catch (e) {
+    console.warn('Audio load failed:', e);
+  }
+}
+
+function togglePlay() {
+  if (!currentAudio) return;
+  const btn = document.getElementById('play-btn');
+  if (currentAudio.paused) {
+    currentAudio.play();
+    if (btn) btn.textContent = '⏸';
+  } else {
+    currentAudio.pause();
+    if (btn) btn.textContent = '▶';
+  }
+}
+
+function seekAudio(e) {
+  if (!currentAudio || !currentAudio.duration) return;
+  const bar = document.getElementById('progress-bar');
+  const rect = bar.getBoundingClientRect();
+  const pct = (e.clientX - rect.left) / rect.width;
+  currentAudio.currentTime = pct * currentAudio.duration;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════════════════════════
+function loadSettingsUI() {
+  document.getElementById('s-openai-key').value = cfg.openaiKey || '';
+  document.getElementById('s-client-id').value = cfg.clientId || '';
+  document.getElementById('s-model-light').value = cfg.modelLight || 'gpt-5.4-mini';
+  document.getElementById('s-model-heavy').value = cfg.modelHeavy || 'gpt-5.5';
+}
+
+function saveSettings() {
+  cfg.openaiKey = document.getElementById('s-openai-key').value.trim();
+  cfg.clientId = document.getElementById('s-client-id').value.trim();
+  cfg.modelLight = document.getElementById('s-model-light').value.trim() || 'gpt-5.4-mini';
+  cfg.modelHeavy = document.getElementById('s-model-heavy').value.trim() || 'gpt-5.5';
+  saveCfg(cfg);
+  const st = document.getElementById('settings-status');
+  st.textContent = 'saved ✓';
+  setTimeout(() => { st.textContent = ''; }, 2000);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SCREEN ROUTING
+// ═══════════════════════════════════════════════════════════════════
+const SCREENS = ['record','entries','detail','settings'];
+const NAV_MAP = { record: 'nav-record', entries: 'nav-entries' };
+
+function showScreen(name) {
+  // Stop audio if leaving detail
+  if (name !== 'detail' && currentAudio) {
+    currentAudio.pause();
+    currentAudio = null;
+  }
+
+  SCREENS.forEach(s => {
+    document.getElementById('screen-'+s).classList.toggle('active', s === name);
+  });
+
+  // Update nav
+  Object.entries(NAV_MAP).forEach(([s, id]) => {
+    document.getElementById(id).classList.toggle('active', s === name);
+  });
+
+  // Load entries when switching to entries screen
+  if (name === 'entries') {
+    renderEntriesList();
+  }
+
+  // Load settings UI when opening settings
+  if (name === 'settings') {
+    loadSettingsUI();
+    updateGoogleAuthBtn();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════════════
+let toastTimeout = null;
+function toast(msg, isError = false) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show' + (isError ? ' error' : '');
+  if (toastTimeout) clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => { el.className = ''; }, 3000);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════════════════
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
 </script>
 </body>
 </html>
