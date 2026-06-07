@@ -9,26 +9,27 @@
 <title>Harvey's Journal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@300;400&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=IBM+Plex+Mono:wght@300;400&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
 <style>
   /* ── RESET & BASE ─────────────────────────────────── */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --ink:      #1a1208;
-    --paper:    #0d0b08;
-    --amber:    #c8852a;
-    --amber2:   #e8a84a;
-    --amber-dim:#6b4515;
-    --cream:    #e8d9b8;
-    --cream-dim:#7a6a4f;
-    --red:      #c0392b;
-    --surface:  #161208;
-    --surface2: #1e1810;
-    --border:   #2a2118;
-    --border2:  #3a3128;
-    --glow:     rgba(200,133,42,0.15);
-    --glow2:    rgba(200,133,42,0.08);
+    --paper:    #111318;
+    --surface:  #1a1d24;
+    --surface2: #222630;
+    --border:   #2e333f;
+    --border2:  #3a4050;
+    --accent:   #7eb8f7;
+    --accent2:  #a8d4ff;
+    --accent-dim:#3a6a9e;
+    --text:     #e8edf5;
+    --text-dim: #8a9ab5;
+    --text-faint:#4a5568;
+    --red:      #e05555;
+    --green:    #4caf82;
+    --glow:     rgba(126,184,247,0.12);
+    --glow2:    rgba(126,184,247,0.06);
     --safe-top: env(safe-area-inset-top, 0px);
     --safe-bot: env(safe-area-inset-bottom, 0px);
   }
@@ -36,7 +37,7 @@
   html, body {
     height: 100%; width: 100%;
     background: var(--paper);
-    color: var(--cream);
+    color: var(--text);
     font-family: 'Lora', Georgia, serif;
     overflow: hidden;
     -webkit-font-smoothing: antialiased;
@@ -60,21 +61,21 @@
   .date-display {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
-    color: var(--amber-dim);
+    color: var(--text-dim);
   }
   .app-title {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Inter', system-ui, sans-serif;
     font-size: 18px; font-weight: 400; font-style: italic;
-    color: var(--cream);
+    color: var(--text);
     letter-spacing: 0.02em;
   }
   .settings-btn {
     background: none; border: none; cursor: pointer;
-    color: var(--amber-dim); padding: 4px; border-radius: 4px;
+    color: var(--text-dim); padding: 4px; border-radius: 4px;
     transition: color 0.2s;
     font-size: 16px; line-height: 1;
   }
-  .settings-btn:hover { color: var(--amber); }
+  .settings-btn:hover { color: var(--accent); }
 
   /* ── SCREENS ──────────────────────────────────────── */
   .screen { display: none; flex: 1; overflow: hidden; flex-direction: column; }
@@ -91,8 +92,8 @@
     content: '';
     position: absolute; inset: 0;
     background:
-      radial-gradient(ellipse 60% 50% at 50% 60%, rgba(200,133,42,0.06) 0%, transparent 70%),
-      radial-gradient(ellipse 40% 30% at 30% 30%, rgba(200,133,42,0.03) 0%, transparent 60%);
+      radial-gradient(ellipse 60% 50% at 50% 60%, rgba(126,184,247,0.05) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 30% at 30% 30%, rgba(126,184,247,0.03) 0%, transparent 60%);
     pointer-events: none;
   }
 
@@ -120,7 +121,7 @@
   .mic-pulse-ring {
     position: absolute; inset: -20px;
     border-radius: 50%;
-    border: 1px solid var(--amber-dim);
+    border: 1px solid var(--accent-dim);
     animation: pulse-idle 3s ease-in-out infinite;
     opacity: 0; transition: opacity 0.4s;
   }
@@ -138,21 +139,21 @@
     width: 120px; height: 120px;
     border-radius: 50%;
     background: var(--surface);
-    border: 1.5px solid var(--amber-dim);
+    border: 1.5px solid var(--accent-dim);
     cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     position: relative; overflow: hidden;
     transition: border-color 0.3s, box-shadow 0.3s, transform 0.15s;
     -webkit-tap-highlight-color: transparent;
-    box-shadow: 0 0 40px rgba(200,133,42,0.08), inset 0 1px 0 rgba(255,255,255,0.04);
+    box-shadow: 0 0 40px rgba(126,184,247,0.08), inset 0 1px 0 rgba(255,255,255,0.06);
   }
   .mic-btn:hover, .mic-btn:focus-visible {
-    border-color: var(--amber);
-    box-shadow: 0 0 60px rgba(200,133,42,0.2), inset 0 1px 0 rgba(255,255,255,0.06);
+    border-color: var(--accent);
+    box-shadow: 0 0 60px rgba(126,184,247,0.25), inset 0 1px 0 rgba(255,255,255,0.08);
   }
   .mic-btn:active { transform: scale(0.97); }
   .mic-btn svg { width: 44px; height: 44px; transition: transform 0.3s, opacity 0.3s; }
-  .mic-btn .icon-mic { color: var(--amber); }
+  .mic-btn .icon-mic { color: var(--accent); }
   .mic-btn .icon-stop {
     position: absolute;
     color: var(--red);
@@ -176,16 +177,16 @@
   .rec-timer {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 13px; font-weight: 300; letter-spacing: 0.2em;
-    color: var(--amber-dim);
+    color: var(--text-dim);
     height: 20px;
     transition: color 0.3s;
   }
-  #screen-record.recording .rec-timer { color: var(--amber); }
+  #screen-record.recording .rec-timer { color: var(--accent); }
 
   .rec-hint {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
-    color: var(--cream-dim);
+    color: var(--text-dim);
     opacity: 0.5;
   }
   #screen-record.recording .rec-hint { opacity: 0; }
@@ -204,9 +205,9 @@
   #processing-overlay.visible { opacity: 1; pointer-events: all; }
 
   .processing-title {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Inter', system-ui, sans-serif;
     font-size: 20px; font-style: italic;
-    color: var(--cream-dim);
+    color: var(--text-dim);
   }
   .processing-steps {
     display: flex; flex-direction: column; gap: 12px;
@@ -216,7 +217,7 @@
     display: flex; align-items: center; gap: 12px;
     font-family: 'IBM Plex Mono', monospace;
     font-size: 11px; letter-spacing: 0.08em;
-    color: var(--cream-dim);
+    color: var(--text-dim);
     transition: color 0.3s;
   }
   .proc-step .step-dot {
@@ -224,14 +225,14 @@
     background: var(--border2); flex-shrink: 0;
     transition: background 0.3s, box-shadow 0.3s;
   }
-  .proc-step.active { color: var(--cream); }
+  .proc-step.active { color: var(--text); }
   .proc-step.active .step-dot {
-    background: var(--amber);
-    box-shadow: 0 0 8px var(--amber);
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent);
     animation: dot-pulse 1s ease-in-out infinite;
   }
-  .proc-step.done { color: var(--amber-dim); }
-  .proc-step.done .step-dot { background: var(--amber-dim); }
+  .proc-step.done { color: var(--text-dim); }
+  .proc-step.done .step-dot { background: var(--accent-dim); }
 
   @keyframes dot-pulse {
     0%, 100% { opacity: 1; } 50% { opacity: 0.4; }
@@ -248,14 +249,14 @@
     flex-shrink: 0;
   }
   .entries-title {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Inter', system-ui, sans-serif;
     font-size: 22px; font-style: italic;
-    color: var(--cream);
+    color: var(--text);
   }
   .entries-sub {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
-    color: var(--amber-dim);
+    color: var(--text-dim);
     margin-top: 4px;
   }
 
@@ -280,17 +281,17 @@
   .entry-time {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--amber-dim);
+    color: var(--text-dim);
     margin-bottom: 8px;
     display: flex; align-items: center; gap: 8px;
   }
   .entry-time .has-audio {
     width: 5px; height: 5px; border-radius: 50%;
-    background: var(--amber-dim);
+    background: var(--accent-dim);
   }
   .entry-preview {
     font-size: 14px; line-height: 1.6;
-    color: var(--cream-dim);
+    color: var(--text-dim);
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
@@ -300,14 +301,14 @@
     position: absolute; top: 18px; right: 24px;
     font-family: 'IBM Plex Mono', monospace;
     font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--amber-dim); opacity: 0.6;
+    color: var(--text-dim); opacity: 0.6;
   }
-  .entry-badge.processing { color: var(--amber); opacity: 1; animation: dot-pulse 1.5s infinite; }
+  .entry-badge.processing { color: var(--accent); opacity: 1; animation: dot-pulse 1.5s infinite; }
 
   .empty-state {
     display: flex; flex-direction: column; align-items: center;
     justify-content: center; padding: 60px 32px; gap: 12px;
-    color: var(--cream-dim); opacity: 0.4; text-align: center;
+    color: var(--text-dim); opacity: 0.4; text-align: center;
   }
   .empty-state p { font-style: italic; font-size: 15px; }
   .empty-state span {
@@ -328,15 +329,15 @@
   }
   .back-btn {
     background: none; border: none; cursor: pointer;
-    color: var(--amber-dim); padding: 4px 8px 4px 0;
+    color: var(--text-dim); padding: 4px 8px 4px 0;
     font-size: 18px; line-height: 1;
     transition: color 0.2s;
   }
-  .back-btn:hover { color: var(--amber); }
+  .back-btn:hover { color: var(--accent); }
   .detail-meta {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
-    color: var(--amber-dim);
+    color: var(--text-dim);
   }
 
   .detail-body {
@@ -351,7 +352,7 @@
   .detail-section-label {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--amber-dim);
+    color: var(--text-dim);
     margin-bottom: 10px;
     display: flex; align-items: center; gap: 8px;
   }
@@ -369,13 +370,13 @@
   }
   .play-btn {
     width: 36px; height: 36px; border-radius: 50%;
-    background: none; border: 1px solid var(--amber-dim);
-    cursor: pointer; color: var(--amber);
+    background: none; border: 1px solid var(--accent-dim);
+    cursor: pointer; color: var(--accent);
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0; font-size: 14px;
     transition: border-color 0.2s, background 0.2s;
   }
-  .play-btn:hover { border-color: var(--amber); background: var(--glow2); }
+  .play-btn:hover { border-color: var(--accent); background: var(--glow2); }
   .audio-progress {
     flex: 1; display: flex; flex-direction: column; gap: 6px;
   }
@@ -384,41 +385,41 @@
     cursor: pointer; position: relative; overflow: visible;
   }
   .progress-fill {
-    height: 100%; background: var(--amber); border-radius: 1px;
+    height: 100%; background: var(--accent); border-radius: 1px;
     width: 0%; transition: width 0.1s linear;
     pointer-events: none;
   }
   .audio-time {
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px; color: var(--cream-dim);
+    font-size: 10px; color: var(--text-dim);
     letter-spacing: 0.08em;
   }
 
   /* Text sections */
   .text-block {
-    font-family: 'Lora', serif;
+    font-family: 'Lora', Georgia, serif;
     font-size: 15px; line-height: 1.8;
-    color: var(--cream-dim);
+    color: var(--text-dim);
   }
   .text-block.raw { font-style: italic; opacity: 0.8; }
-  .text-block.clean { color: var(--cream); }
+  .text-block.clean { color: var(--text); }
 
   /* Insights */
   .insights-block {
     background: var(--surface);
-    border-left: 2px solid var(--amber-dim);
+    border-left: 2px solid var(--accent);
     padding: 16px 18px;
     border-radius: 0 4px 4px 0;
   }
   .insights-block p {
     font-size: 14px; line-height: 1.8;
-    color: var(--cream-dim);
+    color: var(--text-dim);
     margin-bottom: 12px;
   }
   .insights-block p:last-child { margin-bottom: 0; }
   .insights-pending {
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px; color: var(--amber-dim);
+    font-size: 11px; color: var(--text-dim);
     letter-spacing: 0.08em;
     animation: dot-pulse 1.5s infinite;
   }
@@ -437,7 +438,7 @@
   .settings-section-title {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
-    color: var(--amber-dim);
+    color: var(--text-dim);
     margin-bottom: 14px;
     display: flex; align-items: center; gap: 8px;
   }
@@ -448,14 +449,14 @@
   .settings-label {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--cream-dim); margin-bottom: 8px; display: block;
+    color: var(--text-dim); margin-bottom: 8px; display: block;
   }
   .settings-input {
     width: 100%;
     background: var(--surface);
     border: 1px solid var(--border2);
     border-radius: 4px;
-    color: var(--cream);
+    color: var(--text);
     font-family: 'IBM Plex Mono', monospace;
     font-size: 12px;
     padding: 10px 14px;
@@ -464,12 +465,12 @@
     -webkit-appearance: none;
   }
   .settings-input:focus {
-    border-color: var(--amber-dim);
+    border-color: var(--text-dim);
     box-shadow: 0 0 0 2px var(--glow2);
   }
   .settings-hint {
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px; color: var(--cream-dim);
+    font-size: 10px; color: var(--text-dim);
     opacity: 0.5; margin-top: 6px;
     line-height: 1.5;
   }
@@ -477,9 +478,9 @@
   .settings-save-btn {
     width: 100%;
     background: none;
-    border: 1px solid var(--amber-dim);
+    border: 1px solid var(--accent-dim);
     border-radius: 4px;
-    color: var(--amber);
+    color: var(--accent);
     font-family: 'IBM Plex Mono', monospace;
     font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
     padding: 14px;
@@ -488,12 +489,12 @@
   }
   .settings-save-btn:hover {
     background: var(--glow2);
-    border-color: var(--amber);
+    border-color: var(--accent);
   }
   .settings-status {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 10px; text-align: center;
-    color: var(--amber-dim);
+    color: var(--text-dim);
     height: 16px; letter-spacing: 0.1em;
   }
 
@@ -503,7 +504,7 @@
     background: none;
     border: 1px solid var(--border2);
     border-radius: 4px;
-    color: var(--cream-dim);
+    color: var(--text-dim);
     font-family: 'IBM Plex Mono', monospace;
     font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
     padding: 14px;
@@ -511,8 +512,8 @@
     transition: background 0.2s, border-color 0.2s, color 0.2s;
     display: flex; align-items: center; justify-content: center; gap: 10px;
   }
-  .google-btn:hover { background: var(--surface); border-color: var(--border2); color: var(--cream); }
-  .google-btn.connected { border-color: var(--amber-dim); color: var(--amber-dim); }
+  .google-btn:hover { background: var(--surface); border-color: var(--border2); color: var(--text); }
+  .google-btn.connected { border-color: var(--text-dim); color: var(--text-dim); }
 
   /* ── BOTTOM NAV ───────────────────────────────────── */
   nav {
@@ -526,15 +527,15 @@
     background: none; border: none; cursor: pointer;
     padding: 14px 0 12px;
     display: flex; flex-direction: column; align-items: center; gap: 5px;
-    color: var(--cream-dim);
+    color: var(--text-dim);
     font-family: 'IBM Plex Mono', monospace;
     font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
     transition: color 0.2s;
     -webkit-tap-highlight-color: transparent;
   }
   .nav-btn svg { width: 18px; height: 18px; }
-  .nav-btn.active { color: var(--amber); }
-  .nav-btn:hover { color: var(--cream); }
+  .nav-btn.active { color: var(--accent); }
+  .nav-btn:hover { color: var(--text); }
 
   /* ── TOAST ────────────────────────────────────────── */
   #toast {
@@ -546,7 +547,7 @@
     padding: 10px 20px;
     font-family: 'IBM Plex Mono', monospace;
     font-size: 11px; letter-spacing: 0.08em;
-    color: var(--cream-dim);
+    color: var(--text-dim);
     white-space: nowrap;
     opacity: 0; transition: opacity 0.3s, transform 0.3s;
     pointer-events: none; z-index: 1000;
@@ -561,11 +562,11 @@
     margin: 24px;
     padding: 14px 18px;
     background: var(--surface);
-    border: 1px solid var(--amber-dim);
+    border: 1px solid var(--accent-dim);
     border-radius: 4px;
     font-family: 'IBM Plex Mono', monospace;
     font-size: 11px; letter-spacing: 0.08em;
-    color: var(--amber-dim);
+    color: var(--text-dim);
     line-height: 1.6;
     text-align: center;
     cursor: pointer;
@@ -577,6 +578,19 @@
 <body>
 
 <div id="app">
+  <!-- FIRST-RUN SETUP OVERLAY (mobile bootstrap) -->
+  <div id="setup-overlay" style="display:none;position:fixed;inset:0;background:var(--paper);z-index:999;flex-direction:column;align-items:center;justify-content:center;padding:32px;gap:24px">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-dim)">Harvey's Journal — First Run</div>
+    <div style="font-family:'Lora',serif;font-size:15px;color:var(--text-dim);text-align:center;line-height:1.7;max-width:320px">Paste your Google OAuth Client ID to get started. Your other settings will sync automatically from Drive.</div>
+    <input id="setup-client-id" type="text" placeholder="xxx.apps.googleusercontent.com"
+      style="width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:12px;padding:14px;outline:none;-webkit-appearance:none">
+    <button onclick="setupAndConnect()"
+      style="width:100%;background:var(--accent-dim);border:none;border-radius:6px;color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;padding:16px;cursor:pointer">
+      Connect Google →
+    </button>
+    <div id="setup-status" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-dim);text-align:center;min-height:16px"></div>
+  </div>
+
   <!-- HEADER -->
   <header>
     <div class="date-display" id="header-date">—</div>
@@ -600,7 +614,7 @@
       <!-- Waveform ring -->
       <div class="waveform-ring">
         <svg class="waveform-svg" id="waveform-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(200,133,42,0.08)" stroke-width="1"/>
+          <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(126,184,247,0.06)" stroke-width="1"/>
           <!-- bars rendered by JS -->
           <g id="waveform-bars"></g>
         </svg>
@@ -772,6 +786,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Run email scheduler a few seconds after load (gives auth time to restore)
   setTimeout(() => runEmailScheduler(), 3000);
+
+  // On mobile with no clientId stored, show the first-run setup overlay
+  if (!cfg.clientId) {
+    setTimeout(() => showSetupOverlay(), 300);
+  }
 });
 
 function updateHeaderDate() {
@@ -797,7 +816,7 @@ function initWaveformBars() {
     const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
     line.setAttribute('x1', x1); line.setAttribute('y1', y1);
     line.setAttribute('x2', x2); line.setAttribute('y2', y2);
-    line.setAttribute('stroke', 'rgba(200,133,42,0.5)');
+    line.setAttribute('stroke', 'rgba(126,184,247,0.6)');
     line.setAttribute('stroke-width', '1.5');
     line.setAttribute('stroke-linecap', 'round');
     g.appendChild(line);
@@ -839,25 +858,65 @@ function stopWaveform() {
 // RECORDING
 // ═══════════════════════════════════════════════════════════════════
 async function toggleRecord() {
+  // No client ID at all — show first-run setup
+  if (!cfg.clientId) {
+    showSetupOverlay();
+    return;
+  }
+  // Have client ID but no token — auth
+  if (!accessToken || Date.now() > tokenExpiry) {
+    try {
+      await doGoogleAuth();
+      // After auth, check if we need OpenAI key
+      if (!cfg.openaiKey) { showScreen('settings'); toast('Now add your OpenAI key', true); return; }
+    } catch(e) { toast('Auth failed: ' + e.message, true); return; }
+  }
   if (!cfg.openaiKey) {
-    toast('Add your OpenAI key in settings first', true);
+    toast('Add your OpenAI key in settings', true);
     showScreen('settings');
     return;
   }
-  if (!accessToken || Date.now() > tokenExpiry) {
-    if (!cfg.clientId) {
-      toast('Connect Google Drive in settings first', true);
-      showScreen('settings');
-      return;
-    }
-    await doGoogleAuth();
-    return;
-  }
-
   if (mediaRecorder && mediaRecorder.state === 'recording') {
     stopRecording();
   } else {
     startRecording();
+  }
+}
+
+function showSetupOverlay() {
+  const el = document.getElementById('setup-overlay');
+  el.style.display = 'flex';
+  // Pre-fill if we have one
+  const inp = document.getElementById('setup-client-id');
+  if (cfg.clientId) inp.value = cfg.clientId;
+}
+
+async function setupAndConnect() {
+  const inp = document.getElementById('setup-client-id');
+  const clientId = inp.value.trim();
+  const status = document.getElementById('setup-status');
+  if (!clientId) { status.textContent = 'paste your Client ID first'; return; }
+  cfg.clientId = clientId;
+  saveCfg(cfg);
+  status.textContent = 'connecting…';
+  try {
+    await doGoogleAuth();
+    // Pull settings from Drive — will populate OpenAI key etc
+    const driveCfg = await loadSettingsFromDrive();
+    if (driveCfg) {
+      cfg = { ...driveCfg, accessToken, tokenExpiry: cfg.tokenExpiry, clientId };
+      saveCfg(cfg);
+      loadSettingsUI();
+      status.textContent = 'synced ✓';
+    } else {
+      status.textContent = 'connected — add OpenAI key in settings';
+    }
+    setTimeout(() => {
+      document.getElementById('setup-overlay').style.display = 'none';
+      if (!cfg.openaiKey) showScreen('settings');
+    }, 1200);
+  } catch(e) {
+    status.textContent = 'failed: ' + e.message;
   }
 }
 
