@@ -1442,17 +1442,32 @@ async function sendBlogDraftEmail(entry) {
 }
 
 async function approveBlog(entry, monthKey) {
+  // Instant feedback — don't wait for Drive
+  const btn = document.getElementById('approve-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'publishing…'; }
+
   entry.blogStatus = 'published';
   entry.publishedAt = new Date().toISOString();
   if (!entry.tags) entry.tags = [];
   if (!entry.tags.includes('published')) entry.tags.push('published');
   entry.tags = entry.tags.filter(t => t !== 'awaiting');
-  await upsertPiece(entry);
   if (currentDetailEntry && currentDetailEntry.id === entry.id) currentDetailEntry = entry;
-  const count = await countPublished();
+
+  // Refresh UI immediately
+  openBlogEntry(entry, monthKey);
+  toast('Published ✓');
   renderEntriesList();
-  if (currentDetailEntry && currentDetailEntry.id === entry.id) openBlogEntry(entry, monthKey);
-  toast('Published ✓ — ' + count + ' piece' + (count !== 1 ? 's' : '') + ' total');
+
+  // Save to Drive in background
+  upsertPiece(entry)
+    .then(() => countPublished())
+    .then(count => { toast('Published ✓ — ' + count + ' piece' + (count !== 1 ? 's' : '') + ' total'); })
+    .catch(e => {
+      toast('Save failed — try again', true);
+      entry.blogStatus = 'awaiting';
+      entry.tags = entry.tags.filter(t => t !== 'published');
+      if (currentDetailEntry && currentDetailEntry.id === entry.id) openBlogEntry(entry, monthKey);
+    });
 }
 
 
@@ -1854,11 +1869,21 @@ async function renderPiecesList(tab, silent) {
         + '</div>';
     }).join('');
 
-    // Attach click handlers after render
+    // Attach click + long-press handlers after render
     list.querySelectorAll('.piece-card').forEach(card => {
       const pieceId = card.getAttribute('data-piece-id');
       const piece = filtered.find(p => p.id === pieceId);
-      if (piece) card.addEventListener('click', () => openBlogEntry(piece, piece.timestamp.slice(0,7)));
+      if (!piece) return;
+      card.addEventListener('click', () => openBlogEntry(piece, piece.timestamp.slice(0,7)));
+      // Long-press to delete
+      let lpTimer = null;
+      card.addEventListener('touchstart', () => {
+        lpTimer = setTimeout(() => { lpTimer = null; confirmDeletePiece(piece); }, 600);
+      }, { passive: true });
+      card.addEventListener('touchend', () => clearTimeout(lpTimer));
+      card.addEventListener('touchmove', () => clearTimeout(lpTimer));
+      card.addEventListener('contextmenu', (e) => { e.preventDefault(); confirmDeletePiece(piece); });
+      card.addEventListener('selectstart', (e) => e.preventDefault());
     });
 
   } catch(err) {
@@ -1904,6 +1929,24 @@ async function upsertPiece(piece) {
   // Also patch the monthly journal JSON so the entry stays in sync
   const monthKey = piece.timestamp.slice(0,7);
   await patchEntryInDrive(piece, monthKey).catch(() => {});
+}
+
+async function confirmDeletePiece(piece) {
+  if (!confirm('"' + (piece.blogTitle || 'Untitled') + '" — delete this piece? Cannot be undone.')) return;
+  toast('Deleting…');
+  try {
+    await deletePieceFromFile(piece.id);
+    // Also update monthly entry to remove blog type
+    const monthKey = piece.timestamp.slice(0,7);
+    const monthEntries = entriesCache[monthKey];
+    if (monthEntries) {
+      const e = monthEntries.find(e => e.id === piece.id);
+      if (e) { e.type = 'journal'; delete e.blogStatus; delete e.blogTitle; delete e.blogVersion; await patchEntryInDrive(e, monthKey); }
+    }
+    toast('Piece deleted');
+    renderPiecesList(currentPiecesTab, true);
+    renderEntriesList();
+  } catch(e) { toast('Delete failed: ' + e.message, true); }
 }
 
 async function deletePieceFromFile(pieceId) {
@@ -2482,10 +2525,7 @@ function showScreen(name) {
     renderEntriesList();
   }
 
-  // Init swipe-back on detail screens
-  if (name === 'detail' || name === 'blog') {
-    initSwipeBack(document.getElementById('screen-' + name), name === 'blog' ? 'pieces' : 'entries');
-  }
+  // Swipe-back handled globally
   // Render chart when switching to chart screen
   if (name === 'chart') {
     setTimeout(() => renderPublishedChart(), 100);
@@ -2556,47 +2596,45 @@ function initPullToRefresh(listId, indicatorId, onRefresh) {
 // SWIPE BACK GESTURE
 // ═══════════════════════════════════════════════════════════════════
 // Swipe state per screen
-const swipeState = {};
+// Global swipe-back — works on any detail screen, from anywhere (not just edge)
+let _swipeStartX = 0, _swipeStartY = 0, _swipeTracking = false, _swipeBackTarget = null;
+const SWIPE_SCREENS = { 'screen-detail': 'entries', 'screen-blog': 'pieces' };
 
-function initSwipeBack(el, backScreen) {
-  if (!el) return;
-  const id = el.id;
-  if (swipeState[id]) return; // already initialised
-  swipeState[id] = true;
+document.addEventListener('touchstart', (e) => {
+  const activeScreen = Object.keys(SWIPE_SCREENS).find(id => {
+    const el = document.getElementById(id);
+    return el && el.classList.contains('active');
+  });
+  if (!activeScreen) return;
+  _swipeBackTarget = SWIPE_SCREENS[activeScreen];
+  _swipeStartX = e.touches[0].clientX;
+  _swipeStartY = e.touches[0].clientY;
+  _swipeTracking = true;
+}, { passive: true });
 
-  let startX = 0, startY = 0, tracking = false;
+document.addEventListener('touchmove', (e) => {
+  if (!_swipeTracking || !_swipeBackTarget) return;
+  const dx = e.touches[0].clientX - _swipeStartX;
+  const dy = Math.abs(e.touches[0].clientY - _swipeStartY);
+  // Cancel if more vertical than horizontal
+  if (dy > Math.abs(dx)) { _swipeTracking = false; return; }
+  // Only care about rightward swipes starting from left half of screen
+  if (_swipeStartX > window.innerWidth * 0.5) { _swipeTracking = false; return; }
+}, { passive: true });
 
-  el.addEventListener('touchstart', (e) => {
-    const touch = e.touches[0];
-    // Trigger from anywhere in left 60px — more forgiving
-    if (touch.clientX > 60) return;
-    startX = touch.clientX;
-    startY = touch.clientY;
-    tracking = true;
-  }, { passive: true });
+document.addEventListener('touchend', (e) => {
+  if (!_swipeTracking || !_swipeBackTarget) return;
+  _swipeTracking = false;
+  const dx = e.changedTouches[0].clientX - _swipeStartX;
+  const dy = Math.abs(e.changedTouches[0].clientY - _swipeStartY);
+  // Swipe right > 80px, more horizontal than vertical, started in left half
+  if (dx > 80 && dy < 100 && _swipeStartX < window.innerWidth * 0.5) {
+    showScreen(_swipeBackTarget);
+  }
+  _swipeBackTarget = null;
+}, { passive: true });
 
-  el.addEventListener('touchmove', (e) => {
-    if (!tracking) return;
-    const touch = e.touches[0];
-    const dx = touch.clientX - startX;
-    const dy = Math.abs(touch.clientY - startY);
-    if (dy > dx) { tracking = false; el.style.transform = ''; return; } // more vertical than horizontal
-    if (dx > 0) el.style.transform = 'translateX(' + Math.min(dx * 0.6, 120) + 'px)';
-  }, { passive: true });
-
-  el.addEventListener('touchend', (e) => {
-    if (!tracking) return;
-    tracking = false;
-    const dx = e.changedTouches[0].clientX - startX;
-    el.style.transform = '';
-    if (dx > 50) showScreen(backScreen);
-  }, { passive: true });
-
-  el.addEventListener('touchcancel', () => {
-    tracking = false;
-    el.style.transform = '';
-  }, { passive: true });
-}
+function initSwipeBack(el, backScreen) { /* handled globally now */ }
 
 // ═══════════════════════════════════════════════════════════════════
 // TOAST
