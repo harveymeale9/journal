@@ -78,7 +78,7 @@
   .settings-btn:hover { color: var(--accent); }
 
   /* ── SCREENS ──────────────────────────────────────── */
-  .screen { display: none; flex: 1; overflow: hidden; flex-direction: column; }
+  .screen { display: none; flex: 1; overflow: hidden; flex-direction: column; transition: transform 0.15s ease; }
   .screen.active { display: flex; }
 
   /* ── RECORD SCREEN ────────────────────────────────── */
@@ -2141,7 +2141,6 @@ async function renderEntriesList() {
   const today = now.toDateString();
   document.getElementById('entries-sub').textContent = now.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
 
-  // Build cards and attach long-press after render
   list.innerHTML = entries.map(e => {
     const d = new Date(e.timestamp);
     const isToday = d.toDateString() === today;
@@ -2164,6 +2163,12 @@ async function renderEntriesList() {
       ${badge}
     </div>`;
   }).join('');
+
+  // Attach long-press handlers to every card
+  entries.forEach(e => {
+    const card = list.querySelector('[data-id="' + e.id + '"]');
+    if (card) attachLongPress(card, e, monthKey);
+  });
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -2365,6 +2370,11 @@ function showScreen(name) {
   if (name === 'entries') {
     renderEntriesList();
   }
+
+  // Init swipe-back on detail screens
+  if (name === 'detail' || name === 'blog') {
+    initSwipeBack(document.getElementById('screen-' + name), name === 'blog' ? 'pieces' : 'entries');
+  }
   // Render chart when switching to chart screen
   if (name === 'chart') {
     setTimeout(() => renderPublishedChart(), 100);
@@ -2379,6 +2389,47 @@ function showScreen(name) {
     loadSettingsUI();
     updateGoogleAuthBtn();
   }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SWIPE BACK GESTURE
+// ═══════════════════════════════════════════════════════════════════
+function initSwipeBack(el, backScreen) {
+  if (!el) return;
+  // Remove old listeners by cloning
+  const fresh = el.cloneNode(true);
+  el.parentNode.replaceChild(fresh, el);
+  // Re-attach click handlers that were in the HTML (back-btn etc)
+  // — these are inline onclick so they survive cloneNode
+
+  let startX = 0, startY = 0, tracking = false;
+  fresh.addEventListener('touchstart', (e) => {
+    if (e.touches[0].clientX > 40) return; // only trigger from left 40px edge
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    tracking = true;
+  }, { passive: true });
+
+  fresh.addEventListener('touchmove', (e) => {
+    if (!tracking) return;
+    const dx = e.touches[0].clientX - startX;
+    const dy = Math.abs(e.touches[0].clientY - startY);
+    if (dy > 30) { tracking = false; return; } // vertical scroll, cancel
+    if (dx > 0) fresh.style.transform = 'translateX(' + Math.min(dx, 80) + 'px)';
+  }, { passive: true });
+
+  fresh.addEventListener('touchend', (e) => {
+    if (!tracking) return;
+    tracking = false;
+    const dx = e.changedTouches[0].clientX - startX;
+    fresh.style.transform = '';
+    if (dx > 60) showScreen(backScreen);
+  }, { passive: true });
+
+  fresh.addEventListener('touchcancel', () => {
+    tracking = false;
+    fresh.style.transform = '';
+  }, { passive: true });
 }
 
 // ═══════════════════════════════════════════════════════════════════
