@@ -672,6 +672,11 @@
       <div>
         <div class="settings-section-title">Google Drive</div>
         <div class="settings-field">
+          <label class="settings-label" for="s-email">Your Gmail address</label>
+          <input class="settings-input" id="s-email" type="email" placeholder="you@gmail.com" autocomplete="off" spellcheck="false">
+          <div class="settings-hint">Journal emails will be sent from and to this address.</div>
+        </div>
+        <div class="settings-field">
           <label class="settings-label" for="s-client-id">OAuth Client ID</label>
           <input class="settings-input" id="s-client-id" type="text" placeholder="xxx.apps.googleusercontent.com" autocomplete="off" spellcheck="false">
           <div class="settings-hint">Create at console.cloud.google.com → APIs & Services → Credentials → OAuth 2.0 Client ID (type: Web). Add this page's URL to Authorized JavaScript Origins.</div>
@@ -764,6 +769,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Refresh date every minute
   setInterval(updateHeaderDate, 60000);
+
+  // Run email scheduler a few seconds after load (gives auth time to restore)
+  setTimeout(() => runEmailScheduler(), 3000);
 });
 
 function updateHeaderDate() {
@@ -1105,7 +1113,7 @@ function doGoogleAuth() {
 
     const client = google.accounts.oauth2.initTokenClient({
       client_id: cfg.clientId,
-      scope: 'https://www.googleapis.com/auth/drive.file',
+      scope: 'https://www.googleapis.com/auth/drive.file https://mail.google.com/',
       callback: (resp) => {
         if (resp.error) { reject(new Error(resp.error)); return; }
         accessToken = resp.access_token;
@@ -1124,8 +1132,21 @@ function doGoogleAuth() {
 async function googleAuth() {
   try {
     await doGoogleAuth();
-    toast('Google Drive connected ✓');
     updateGoogleAuthBtn();
+    toast('Connected — syncing settings…');
+    // Pull settings from Drive and merge (gives cross-device sync)
+    const driveCfg = await loadSettingsFromDrive();
+    if (driveCfg) {
+      cfg = { ...driveCfg, accessToken, tokenExpiry: cfg.tokenExpiry };
+      saveCfg(cfg);
+      loadSettingsUI();
+      toast('Settings synced from Drive ✓');
+    } else {
+      // First time on this device — push local settings to Drive
+      await saveSettingsToDrive(cfg);
+      toast('Google Drive connected ✓');
+    }
+    setTimeout(() => runEmailScheduler(), 2000);
   } catch (e) {
     toast('Auth failed: ' + e.message, true);
   }
@@ -1281,9 +1302,10 @@ async function loadMonthEntries(monthKey) {
   } catch { entriesCache[monthKey] = []; return []; }
 }
 
-async function getAudioUrl(fileId) {
-  // Return a short-lived Drive download URL
-  return `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&access_token=${accessToken}`;
+async function fetchAudioBlob(fileId) {
+  // Fetch audio as blob (required — new Audio(url) can't send auth headers)
+  const res = await driveRequest(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`);
+  return res.blob();
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1411,27 +1433,39 @@ function renderInsightsHtml(entry) {
 }
 
 async function loadAudioForEntry(entry) {
-  try {
-    const url = await getAudioUrl(entry.audioFileId);
-    currentAudio = new Audio(url);
+  const playBtn = document.getElementById('play-btn');
+  const timeEl2 = document.getElementById('audio-time');
+  if (playBtn) { playBtn.textContent = '…'; playBtn.disabled = true; }
 
+  try {
+    const blob = await fetchAudioBlob(entry.audioFileId);
+    const objectUrl = URL.createObjectURL(blob);
+    currentAudio = new Audio(objectUrl);
+
+    currentAudio.onloadedmetadata = () => {
+      if (playBtn) { playBtn.textContent = '▶'; playBtn.disabled = false; }
+    };
     currentAudio.ontimeupdate = () => {
       if (!currentAudio.duration) return;
       const pct = (currentAudio.currentTime / currentAudio.duration) * 100;
       const fill = document.getElementById('progress-fill');
-      const timeEl = document.getElementById('audio-time');
+      const t2 = document.getElementById('audio-time');
       if (fill) fill.style.width = pct + '%';
-      if (timeEl) {
+      if (t2) {
         const t = Math.floor(currentAudio.currentTime);
-        timeEl.textContent = `${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}`;
+        t2.textContent = `${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}`;
       }
     };
     currentAudio.onended = () => {
-      const btn = document.getElementById('play-btn');
-      if (btn) btn.textContent = '▶';
+      URL.revokeObjectURL(objectUrl);
+      if (playBtn) playBtn.textContent = '▶';
+      const fill = document.getElementById('progress-fill');
+      if (fill) fill.style.width = '0%';
     };
   } catch (e) {
     console.warn('Audio load failed:', e);
+    if (playBtn) { playBtn.textContent = '✕'; playBtn.disabled = true; }
+    if (timeEl2) timeEl2.textContent = 'error';
   }
 }
 
@@ -1460,6 +1494,7 @@ function seekAudio(e) {
 // ═══════════════════════════════════════════════════════════════════
 function loadSettingsUI() {
   document.getElementById('s-openai-key').value = cfg.openaiKey || '';
+  document.getElementById('s-email').value = cfg.email || '';
   document.getElementById('s-client-id').value = cfg.clientId || '';
   document.getElementById('s-model-light').value = cfg.modelLight || 'gpt-5.4-mini';
   document.getElementById('s-model-heavy').value = cfg.modelHeavy || 'gpt-5.5';
@@ -1467,13 +1502,20 @@ function loadSettingsUI() {
 
 function saveSettings() {
   cfg.openaiKey = document.getElementById('s-openai-key').value.trim();
+  cfg.email = document.getElementById('s-email').value.trim();
   cfg.clientId = document.getElementById('s-client-id').value.trim();
   cfg.modelLight = document.getElementById('s-model-light').value.trim() || 'gpt-5.4-mini';
   cfg.modelHeavy = document.getElementById('s-model-heavy').value.trim() || 'gpt-5.5';
   saveCfg(cfg);
   const st = document.getElementById('settings-status');
   st.textContent = 'saved ✓';
-  setTimeout(() => { st.textContent = ''; }, 2000);
+  // Also push to Drive if connected so other devices pick it up
+  if (accessToken && Date.now() < tokenExpiry) {
+    saveSettingsToDrive(cfg).then(() => {
+      st.textContent = 'saved & synced ✓';
+    }).catch(() => {});
+  }
+  setTimeout(() => { st.textContent = ''; }, 3000);
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1520,6 +1562,195 @@ function toast(msg, isError = false) {
   el.className = 'show' + (isError ? ' error' : '');
   if (toastTimeout) clearTimeout(toastTimeout);
   toastTimeout = setTimeout(() => { el.className = ''; }, 3000);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SETTINGS SYNC — store in Drive so all devices share them
+// ═══════════════════════════════════════════════════════════════════
+async function saveSettingsToDrive(settings) {
+  try {
+    const { journalId } = await getDriveFolderIds();
+    const name = 'settings.json';
+    const q = `name='${name}' and '${journalId}' in parents and trashed=false`;
+    const res = await driveRequest(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id)`);
+    const data = await res.json();
+    const existingId = data.files?.[0]?.id || null;
+
+    // Don't save token/expiry to Drive — those are per-device
+    const toSave = { ...settings };
+    delete toSave.accessToken;
+    delete toSave.tokenExpiry;
+
+    const blob = new Blob([JSON.stringify(toSave, null, 2)], { type: 'application/json' });
+    if (existingId) {
+      await driveRequest(
+        `https://www.googleapis.com/upload/drive/v3/files/${existingId}?uploadType=media`,
+        { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: blob }
+      );
+    } else {
+      const form = new FormData();
+      form.append('metadata', new Blob([JSON.stringify({ name, parents: [journalId] })], { type: 'application/json' }));
+      form.append('file', blob, name);
+      await driveRequest('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', { method: 'POST', body: form });
+    }
+  } catch (e) {
+    console.warn('saveSettingsToDrive failed:', e);
+  }
+}
+
+async function loadSettingsFromDrive() {
+  try {
+    const { journalId } = await getDriveFolderIds();
+    const name = 'settings.json';
+    const q = `name='${name}' and '${journalId}' in parents and trashed=false`;
+    const res = await driveRequest(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id)`);
+    const data = await res.json();
+    const fileId = data.files?.[0]?.id;
+    if (!fileId) return null;
+    const fileRes = await driveRequest(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`);
+    return await fileRes.json();
+  } catch (e) {
+    console.warn('loadSettingsFromDrive failed:', e);
+    return null;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// GMAIL — SEND EMAIL
+// ═══════════════════════════════════════════════════════════════════
+async function sendGmail(subject, bodyHtml) {
+  const to = cfg.email;
+  if (!to) { console.warn('No email configured'); return; }
+
+  // Ensure valid token with Gmail scope
+  if (!accessToken || Date.now() > tokenExpiry) await doGoogleAuth();
+
+  const rawEmail = [
+    `From: Harvey's Journal <${to}>`,
+    `To: ${to}`,
+    `Subject: ${subject}`,
+    `MIME-Version: 1.0`,
+    `Content-Type: text/html; charset=utf-8`,
+    ``,
+    bodyHtml
+  ].join('\r\n');
+
+  // Base64url encode
+  const encoded = btoa(unescape(encodeURIComponent(rawEmail)))
+    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+
+  const res = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ raw: encoded })
+  });
+
+  if (!res.ok) {
+    const t = await res.text();
+    throw new Error(`Gmail ${res.status}: ${t.slice(0,200)}`);
+  }
+  return res.json();
+}
+
+function emailHtmlWrapper(bodyContent) {
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="background:#0d0b08;color:#e8d9b8;font-family:Georgia,serif;max-width:600px;margin:0 auto;padding:32px 24px">
+<div style="border-bottom:1px solid #2a2118;padding-bottom:16px;margin-bottom:28px">
+  <span style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:#6b4515">Harvey's Journal</span>
+</div>
+${bodyContent}
+<div style="border-top:1px solid #2a2118;margin-top:32px;padding-top:16px">
+  <span style="font-family:'Courier New',monospace;font-size:10px;color:#6b4515;letter-spacing:0.1em">— your journal ai</span>
+</div>
+</body></html>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// EMAIL SCHEDULER — runs on app open, decides whether to send
+// ═══════════════════════════════════════════════════════════════════
+const EMAIL_CHECK_KEY = 'hj_email_last_check';
+const EMAIL_SENT_KEY  = 'hj_email_last_sent';
+const MIN_GAP_MS      = 3 * 24 * 60 * 60 * 1000; // never more than once per 3 days
+
+async function runEmailScheduler() {
+  // Only run if fully configured
+  if (!cfg.openaiKey || !cfg.email || !accessToken || Date.now() > tokenExpiry) return;
+
+  // Don't check more than once per session load (avoid running twice)
+  const lastCheck = parseInt(localStorage.getItem(EMAIL_CHECK_KEY) || '0');
+  if (Date.now() - lastCheck < 60 * 60 * 1000) return; // once per hour max
+  localStorage.setItem(EMAIL_CHECK_KEY, Date.now());
+
+  const lastSent = parseInt(localStorage.getItem(EMAIL_SENT_KEY) || '0');
+
+  try {
+    // Load last 2 months of entries for context
+    const now = new Date();
+    const thisMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    const lastDate = new Date(now); lastDate.setMonth(lastDate.getMonth()-1);
+    const lastMonth = `${lastDate.getFullYear()}-${String(lastDate.getMonth()+1).padStart(2,'0')}`;
+
+    let allEntries = [];
+    try { allEntries = [...(await loadMonthEntries(thisMonth)), ...(await loadMonthEntries(lastMonth))]; } catch {}
+    allEntries.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+    const mostRecentEntry = allEntries[0];
+    const daysSinceEntry = mostRecentEntry
+      ? (Date.now() - new Date(mostRecentEntry.timestamp)) / (1000*60*60*24)
+      : 999;
+    const daysSinceSent = (Date.now() - lastSent) / (1000*60*60*24);
+    const timeSinceSentMs = Date.now() - lastSent;
+
+    // Build context summary for the AI to decide
+    const context = {
+      daysSinceLastEntry: Math.round(daysSinceEntry * 10) / 10,
+      daysSinceLastEmail: Math.round(daysSinceSent * 10) / 10,
+      totalEntriesThisMonth: allEntries.filter(e => e.timestamp.startsWith(thisMonth)).length,
+      recentEntries: allEntries.slice(0, 8).map(e => ({
+        date: e.timestamp.slice(0, 10),
+        daysAgo: Math.round((Date.now() - new Date(e.timestamp)) / (1000*60*60*24)),
+        preview: (e.cleanedText || e.rawTranscript || '').slice(0, 300)
+      }))
+    };
+
+    // Ask gpt-5.5 whether to send an email, and if so, write it
+    const decision = await openaiChat(cfg.modelHeavy || 'gpt-5.5', [
+      { role: 'system', content: `You are Harvey's personal journal AI. You have access to his recent journal entries. Your job is to decide whether to send him a thoughtful email today, and if so, write it.
+
+Guidelines for WHEN to send:
+- He hasn't journalled in 3+ days → check in, gently
+- He hasn't journalled in 7+ days → stronger nudge, ask what's going on
+- You notice a recurring theme or pattern worth reflecting on → reach out
+- There's something unresolved from a recent entry worth following up on
+- It's been 5-7 days since last email and there's something worth saying
+- DON'T send if it's been less than 3 days since last email, or if there's genuinely nothing interesting to say
+
+CRITICAL: Respond ONLY with valid JSON, no markdown:
+{
+  "shouldSend": true or false,
+  "reason": "brief internal note on why",
+  "subject": "email subject line (only if shouldSend)",
+  "bodyHtml": "full email body as HTML paragraphs (only if shouldSend) — warm, personal, specific. Use <p> tags. Reference actual things he wrote about. Not robotic. Sign off as 'your journal ai'. No generic motivational fluff."
+}` },
+      { role: 'user', content: JSON.stringify(context) }
+    ]);
+
+    let parsed;
+    try { parsed = JSON.parse(decision.replace(/```json|```/g,'').trim()); } catch { return; }
+
+    if (!parsed.shouldSend) return;
+    if (timeSinceSentMs < MIN_GAP_MS) return; // hard floor, never override
+
+    // Send it
+    await sendGmail(parsed.subject, emailHtmlWrapper(parsed.bodyHtml));
+    localStorage.setItem(EMAIL_SENT_KEY, Date.now());
+    console.log('Journal email sent:', parsed.subject, '—', parsed.reason);
+
+  } catch (err) {
+    console.warn('Email scheduler error:', err);
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════
