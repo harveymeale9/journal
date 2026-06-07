@@ -971,8 +971,8 @@ document.addEventListener('DOMContentLoaded', () => {
     renderEntriesList();
   });
   initPullToRefresh('pieces-list', 'ptr-pieces', () => {
-    Object.keys(entriesCache).forEach(k => delete entriesCache[k]);
-    renderPiecesList(currentPiecesTab);
+    piecesCache = null;
+    return renderPiecesList(currentPiecesTab, true);
   });
 });
 
@@ -1349,8 +1349,8 @@ async function ctxConvert() {
     ctxEntry.blogVersion = 1;
     if (!ctxEntry.tags) ctxEntry.tags = [];
     result.extraTags.forEach(t => { if (!ctxEntry.tags.includes(t)) ctxEntry.tags.push(t); });
-    await patchEntryInDrive(ctxEntry, ctxMonthKey);
-    // Update cache
+    await upsertPiece(ctxEntry);
+    // Update monthly cache too
     const cached = entriesCache[ctxMonthKey];
     if (cached) { const i = cached.findIndex(e => e.id === ctxEntry.id); if (i>=0) cached[i] = ctxEntry; }
     toast('Converted ✓ — find it in Pieces');
@@ -1441,7 +1441,7 @@ async function approveBlog(entry, monthKey) {
   if (!entry.tags) entry.tags = [];
   if (!entry.tags.includes('published')) entry.tags.push('published');
   entry.tags = entry.tags.filter(t => t !== 'awaiting');
-  await patchEntryInDrive(entry, monthKey);
+  await upsertPiece(entry);
   if (currentDetailEntry && currentDetailEntry.id === entry.id) currentDetailEntry = entry;
   const count = await countPublished();
   renderEntriesList();
@@ -1471,7 +1471,7 @@ ${editInstructions}` }
     entry.cleanedText = revised;
     entry.blogVersion = (entry.blogVersion || 1) + 1;
     entry.blogStatus = 'awaiting';
-    await patchEntryInDrive(entry, monthKey);
+    await upsertPiece(entry);
     if (currentDetailEntry && currentDetailEntry.id === entry.id) currentDetailEntry = entry;
     toast('Edits applied ✓');
     if (currentDetailEntry && currentDetailEntry.id === entry.id) openBlogEntry(entry, monthKey);
@@ -1479,15 +1479,8 @@ ${editInstructions}` }
 }
 
 async function countPublished() {
-  let count = 0;
-  const now = new Date();
-  for (let i = 0; i < 12; i++) {
-    const d = new Date(now); d.setMonth(d.getMonth() - i);
-    const mk = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-    const entries = await loadMonthEntries(mk).catch(() => []);
-    count += entries.filter(e => e.blogStatus === 'published').length;
-  }
-  return count;
+  const pieces = await loadPiecesFile();
+  return pieces.filter(p => p.blogStatus === 'published').length;
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1773,66 +1766,107 @@ function switchPiecesTab(tab) {
   renderPiecesList(tab);
 }
 
-async function renderPiecesList(tab) {
+async function renderPiecesList(tab, silent) {
   const list = document.getElementById('pieces-list');
   if (!list) return;
-  list.innerHTML = '<div style="padding:40px;text-align:center;font-family:monospace;font-size:11px;color:var(--text-dim);opacity:0.4;letter-spacing:0.1em">loading…</div>';
 
   if (!accessToken || Date.now() > tokenExpiry) {
     list.innerHTML = '<div class="empty-state"><p>Connect Google Drive first.</p></div>';
     return;
   }
 
-  try {
-    // Scan all cached months + current month for blog entries
-    const now = new Date();
-    const monthsToCheck = new Set();
-    // Always check last 6 months
-    for (let i = 0; i < 6; i++) {
-      const d = new Date(now); d.setMonth(d.getMonth() - i);
-      monthsToCheck.add(d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0'));
-    }
-    // Also check any already-cached months
-    Object.keys(entriesCache).forEach(mk => monthsToCheck.add(mk));
+  // Don't blank the list while refreshing — only show loading on first load
+  if (!silent && piecesCache === null) {
+    list.innerHTML = '<div style="padding:40px;text-align:center;font-family:monospace;font-size:11px;color:var(--text-dim);opacity:0.4;letter-spacing:0.1em">loading…</div>';
+  }
 
-    let pieces = [];
-    for (const mk of monthsToCheck) {
-      const entries = await loadMonthEntries(mk).catch(() => []);
-      entries.filter(e => e.type === 'blog').forEach(e => {
-        pieces.push({ ...e, _monthKey: mk });
-      });
-    }
+  try {
+    // Force reload from Drive if silent refresh
+    if (silent) piecesCache = null;
+    const pieces = await loadPiecesFile();
     pieces.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
 
-  const filtered = pieces.filter(p => tab === 'published' ? p.blogStatus === 'published' : p.blogStatus !== 'published');
-  const sub = document.getElementById('pieces-sub');
-  if (sub) sub.textContent = tab === 'published'
-    ? filtered.length + ' piece' + (filtered.length !== 1 ? 's' : '') + ' published'
-    : filtered.length + ' awaiting approval';
+    const filtered = pieces.filter(p => tab === 'published' ? p.blogStatus === 'published' : p.blogStatus !== 'published');
+    const sub = document.getElementById('pieces-sub');
+    if (sub) sub.textContent = tab === 'published'
+      ? filtered.length + ' piece' + (filtered.length !== 1 ? 's' : '') + ' published'
+      : filtered.length + ' awaiting approval';
 
-  if (!filtered.length) {
-    list.innerHTML = '<div class="empty-state"><p>' + (tab === 'published' ? 'Nothing published yet.' : 'Nothing awaiting approval.') + '</p><span>Say "ok here is a blog entry" when recording</span></div>';
-    return;
-  }
+    if (!filtered.length) {
+      list.innerHTML = '<div class="empty-state"><p>' + (tab === 'published' ? 'Nothing published yet.' : 'Nothing awaiting approval.') + '</p><span>Long-press any entry and convert it to a piece</span></div>';
+      return;
+    }
 
-  list.innerHTML = filtered.map(p => {
-    const d = new Date(p.timestamp);
-    const dateStr = d.toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'}).toUpperCase();
-    const words = (p.cleanedText || '').trim().split(/s+/).length;
-    const statusBadge = p.blogStatus === 'published'
-      ? '<span class="tag published">published</span>'
-      : '<span class="tag awaiting">v' + (p.blogVersion||1) + ' · awaiting</span>';
-    const clickAttr = 'openBlogEntryById("' + p.id + '","' + p._monthKey + '")';
-    return '<div class="entry-card" onclick="' + clickAttr + '">'
-      + '<div class="entry-time"><div class="has-audio"></div>' + dateStr + ' · ' + words + ' words</div>'
-      + '<div style="font-size:15px;font-weight:400;color:var(--text);margin:6px 0 8px;line-height:1.4">' + escHtml(p.blogTitle || 'Untitled') + '</div>'
-      + '<div class="entry-tags">' + statusBadge + (p.tags||[]).filter(t=>t!=='blog'&&t!=='published'&&t!=='awaiting').map(t=>'<span class="tag">' + t + '</span>').join('') + '</div>'
-      + '</div>';
-  }).join('');
+    // Use data-id for click — avoids quote issues in onclick attr
+    list.innerHTML = filtered.map(p => {
+      const d = new Date(p.timestamp);
+      const dateStr = d.toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'}).toUpperCase();
+      const words = (p.cleanedText || '').trim().split(/s+/).length;
+      const statusBadge = p.blogStatus === 'published'
+        ? '<span class="tag published">published</span>'
+        : '<span class="tag awaiting">v' + (p.blogVersion||1) + ' · awaiting</span>';
+      return '<div class="entry-card piece-card" data-piece-id="' + p.id + '">'
+        + '<div class="entry-time"><div class="has-audio"></div>' + dateStr + ' · ' + words + ' words</div>'
+        + '<div style="font-size:15px;font-weight:400;color:var(--text);margin:6px 0 8px;line-height:1.4">' + escHtml(p.blogTitle || 'Untitled') + '</div>'
+        + '<div class="entry-tags">' + statusBadge + (p.tags||[]).filter(t=>t!=='blog'&&t!=='published'&&t!=='awaiting').map(t=>'<span class="tag">' + t + '</span>').join('') + '</div>'
+        + '</div>';
+    }).join('');
+
+    // Attach click handlers after render
+    list.querySelectorAll('.piece-card').forEach(card => {
+      const pieceId = card.getAttribute('data-piece-id');
+      const piece = filtered.find(p => p.id === pieceId);
+      if (piece) card.addEventListener('click', () => openBlogEntry(piece, piece.timestamp.slice(0,7)));
+    });
+
   } catch(err) {
     console.error('renderPiecesList error:', err);
-    list.innerHTML = '<div class="empty-state"><p>Error loading pieces.</p><span>' + (err.message||'') + '</span></div>';
+    if (piecesCache === null) {
+      list.innerHTML = '<div class="empty-state"><p>Error loading pieces.</p><span>' + (err.message||'') + '</span></div>';
+    }
   }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// PIECES FILE — pieces.json in Journal folder (fast, dedicated)
+// ═══════════════════════════════════════════════════════════════════
+let piecesCache = null; // null = not loaded yet
+
+async function loadPiecesFile() {
+  if (piecesCache !== null) return piecesCache;
+  try {
+    const { journalId } = await getDriveFolderIds();
+    const fileId = await findDriveFile('pieces.json', journalId);
+    if (!fileId) { piecesCache = []; return []; }
+    const res = await driveRequest('https://www.googleapis.com/drive/v3/files/' + fileId + '?alt=media');
+    piecesCache = await res.json().catch(() => []);
+    if (!Array.isArray(piecesCache)) piecesCache = [];
+    return piecesCache;
+  } catch(e) { console.warn('loadPiecesFile:', e); piecesCache = []; return []; }
+}
+
+async function savePiecesFile(pieces) {
+  try {
+    const { journalId } = await getDriveFolderIds();
+    piecesCache = pieces;
+    await upsertDriveFile('pieces.json', journalId, JSON.stringify(pieces, null, 2), 'application/json');
+  } catch(e) { console.warn('savePiecesFile:', e); }
+}
+
+async function upsertPiece(piece) {
+  const pieces = await loadPiecesFile();
+  const idx = pieces.findIndex(p => p.id === piece.id);
+  if (idx >= 0) pieces[idx] = piece;
+  else pieces.unshift(piece);
+  await savePiecesFile(pieces);
+  // Also patch the monthly journal JSON so the entry stays in sync
+  const monthKey = piece.timestamp.slice(0,7);
+  await patchEntryInDrive(piece, monthKey).catch(() => {});
+}
+
+async function deletePieceFromFile(pieceId) {
+  const pieces = await loadPiecesFile();
+  await savePiecesFile(pieces.filter(p => p.id !== pieceId));
 }
 
 function zoomChart(dir) {
@@ -2416,7 +2450,7 @@ function showScreen(name) {
   }
   // Load pieces screen
   if (name === 'pieces') {
-    renderPiecesList('awaiting');
+    renderPiecesList(currentPiecesTab || 'awaiting', false);
   }
 
   // Load settings UI when opening settings
