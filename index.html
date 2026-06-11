@@ -930,6 +930,7 @@ let tokenExpiry = cfg.tokenExpiry || 0;
 
 // Recording state
 let mediaRecorder = null;
+let currentLocation = null; // { lat, lng, suburb }
 let wakeLock = null;
 
 async function acquireWakeLock() {
@@ -1051,6 +1052,30 @@ function stopWaveform() {
   const svg = document.getElementById('waveform-svg');
   svg.classList.remove('visible');
   initWaveformBars(); // reset
+}
+
+async function captureLocation() {
+  currentLocation = null;
+  if (!navigator.geolocation) return;
+  try {
+    const pos = await new Promise((res, rej) =>
+      navigator.geolocation.getCurrentPosition(res, rej, { timeout: 8000, maximumAge: 60000 })
+    );
+    const { latitude: lat, longitude: lng } = pos.coords;
+    // Reverse geocode via free nominatim API
+    try {
+      const r = await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng, {
+        headers: { 'Accept-Language': 'en', 'User-Agent': 'HarveyJournal/1.0' }
+      });
+      const geo = await r.json();
+      const a = geo.address || {};
+      const suburb = a.suburb || a.neighbourhood || a.village || a.town || a.city_district || a.city || a.county || '';
+      const city = a.city || a.town || a.county || '';
+      currentLocation = { lat, lng, suburb, city, display: [suburb, city].filter(Boolean).join(', ') };
+    } catch {
+      currentLocation = { lat, lng, suburb: '', city: '', display: lat.toFixed(4) + ', ' + lng.toFixed(4) };
+    }
+  } catch(e) { console.warn('Location:', e.message); }
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1990,13 +2015,13 @@ function zoomChart(dir) {
 
 async function cleanTranscript(rawText) {
   const res = await openaiChat(cfg.modelLight || 'gpt-5.4-mini', [
-    { role: 'system', content: `You are a personal journal editor. The user has spoken a voice journal entry and it has been transcribed by Whisper. Clean and format it into readable prose. Rules:
-- Fix obvious transcription errors and run-on sentences
-- Add punctuation throughout
-- Break into paragraphs every 2-3 sentences — like a blog post, not a wall of text
-- Do NOT change the meaning, add commentary, or add a title
-- Preserve first-person voice exactly as spoken
-- Return ONLY the cleaned text with paragraph breaks (use double newlines between paragraphs), nothing else` },
+    { role: 'system', content: 'You are a personal journal editor. The user has spoken a voice journal entry transcribed by Whisper — which sometimes mishears words, especially proper nouns, technical terms, names, and unusual words. Your job:\n\n'
+      + '1. READ the whole entry first to understand the full context and meaning\n'
+      + '2. IDENTIFY words or phrases that seem wrong — they sound phonetically similar to what was probably said but make no sense in context (e.g. "their" vs "there", "sea" vs "see", misheared names, garbled technical words)\n'
+      + '3. CORRECT those errors using context to infer the most likely intended word\n'
+      + '4. FORMAT into clean readable prose: proper punctuation, paragraph breaks every 2-3 sentences\n'
+      + '5. Preserve first-person voice and meaning exactly — do not add commentary, opinions, or a title\n\n'
+      + 'Return ONLY the corrected, formatted text. No explanations of what you changed.' },
     { role: 'user', content: rawText }
   ]);
   return res;
@@ -2334,7 +2359,7 @@ async function renderEntriesList() {
     const clickFn = e.type === 'blog' ? `openBlogEntryById('${e.id}','${monthKey}')` : `openEntry('${e.id}','${monthKey}')`;
     return `<div class="entry-card" data-id="${e.id}" onclick="${clickFn}">
       <div class="entry-time">
-        <div class="has-audio"></div>${dateStr.toUpperCase()}${dur ? ' · ' + dur : ''}
+        <div class="has-audio"></div>${dateStr.toUpperCase()}${dur ? ' · ' + dur : ''}${e.location && e.location.display ? ' · ' + e.location.display : ''}
       </div>
       <div class="entry-preview">${e.type==='blog'?`<strong style="color:var(--text)">${escHtml(e.blogTitle||'Untitled piece')}</strong><br>`:''} ${escHtml(preview)}${preview.length >= 180 ? '…' : ''}</div>
       ${tagHtml}
@@ -2365,9 +2390,10 @@ async function openEntry(entryId, monthKey) {
   currentDetailEntry = entry;
 
   const d = new Date(entry.timestamp);
+  const locStr = entry.location && entry.location.display ? ' · ' + entry.location.display : '';
   document.getElementById('detail-meta').textContent =
     d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase() +
-    ' · ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    ' · ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + locStr;
 
   renderDetailBody(entry);
   showScreen('detail');
