@@ -19,7 +19,8 @@
     --ink-faint:#5d4c35;
     --brass:#9c7c3c;
     --rubric:#7a2f1d; /* oxblood red used in medieval rubrication */
-    --page-w: clamp(280px, 42vw, 460px);
+    --page-w: min(44vw, calc((100vh - 190px) / 1.36));
+    --page-w: min(44vw, calc((100dvh - 190px) / 1.36));
     --page-h: calc(var(--page-w) * 1.36);
     --turn-ms: 900ms;
   }
@@ -37,7 +38,7 @@
     font-family:'IM Fell English', Georgia, serif;
     color:var(--paper);
     overflow-x:hidden;
-    padding:4vh 2vw;
+    padding:2vh 2vw;
   }
 
   /* ambient candlelight flicker on the desk */
@@ -52,7 +53,7 @@
 
   header.site{
     text-align:center;
-    margin-bottom:3vh;
+    margin-bottom:2vh;
     user-select:none;
   }
   header.site h1{
@@ -194,39 +195,39 @@
   /* ============ TYPOGRAPHY OF THE PAGE ============ */
   .running-head{
     font-family:'IM Fell English SC', serif;
-    font-size:.62rem; letter-spacing:.32em; text-indent:.32em;
+    font-size:calc(var(--page-w) * .015); letter-spacing:.32em; text-indent:.32em;
     text-align:center; color:var(--ink-faint);
     margin-bottom:1.6em;
   }
   .folio{
     position:absolute; bottom:5.5%;
     font-family:'Cormorant Garamond', serif;
-    font-size:.7rem; letter-spacing:.15em; color:var(--ink-faint);
+    font-size:calc(var(--page-w) * .016); letter-spacing:.15em; color:var(--ink-faint);
   }
   .page.left .folio, .leaf-face.back .folio{ left:11%; }
   .page.right .folio, .leaf-face.front .folio{ right:11%; }
 
   .entry-no{
     font-family:'IM Fell English SC', serif;
-    text-align:center; font-size:.7rem; letter-spacing:.4em; text-indent:.4em;
+    text-align:center; font-size:calc(var(--page-w) * .016); letter-spacing:.4em; text-indent:.4em;
     color:var(--rubric); margin-bottom:.9em;
   }
   h2.entry-title{
     font-family:'IM Fell English SC', serif;
     font-weight:400; text-align:center;
-    font-size:clamp(1rem, 2vw, 1.45rem);
+    font-size:calc(var(--page-w) * .046);
     letter-spacing:.12em; line-height:1.25;
     margin-bottom:.4em;
   }
   .ornament{
     text-align:center; color:var(--brass);
-    font-size:.9rem; margin:.6em 0 1.1em;
+    font-size:calc(var(--page-w) * .026); margin:.6em 0 1.1em;
     letter-spacing:.6em; text-indent:.6em;
   }
 
   .body-text{
     font-family:'IM Fell English', Georgia, serif;
-    font-size:clamp(.72rem, 1.25vw, .92rem);
+    font-size:calc(var(--page-w) * .0295);
     line-height:1.62;
     text-align:justify;
     hyphens:auto;
@@ -243,7 +244,7 @@
 
   .marginal{
     font-family:'Cormorant Garamond', serif;
-    font-style:italic; font-size:.72em;
+    font-style:italic; font-size:calc(var(--page-w) * .023);
     color:var(--ink-faint);
     border-left:1px solid rgba(122,47,29,.4);
     padding-left:.9em; margin:1.1em 0 1.1em .5em;
@@ -254,22 +255,22 @@
   /* title page */
   .title-page{ text-align:center; justify-content:center; }
   .title-page .tp-small{
-    font-family:'IM Fell English SC', serif; font-size:.66rem;
+    font-family:'IM Fell English SC', serif; font-size:calc(var(--page-w) * .0155);
     letter-spacing:.4em; text-indent:.4em; color:var(--ink-faint);
   }
   .title-page h1{
     font-family:'IM Fell English SC', serif; font-weight:400;
-    font-size:clamp(1.4rem, 3vw, 2.2rem); letter-spacing:.14em;
+    font-size:calc(var(--page-w) * .07); letter-spacing:.14em;
     margin:.7em 0 .3em; line-height:1.2;
   }
   .title-page .tp-rule{ color:var(--brass); margin:1em 0; letter-spacing:.5em; text-indent:.5em; }
   .title-page .tp-edition{
     font-family:'Cormorant Garamond', serif; font-style:italic;
-    font-size:.85rem; color:var(--ink-faint); line-height:1.7;
+    font-size:calc(var(--page-w) * .026); color:var(--ink-faint); line-height:1.7;
   }
 
   /* contents */
-  .toc{ list-style:none; font-size:clamp(.7rem, 1.2vw, .88rem); }
+  .toc{ list-style:none; font-size:calc(var(--page-w) * .028); }
   .toc li{
     display:flex; align-items:baseline; gap:.5em;
     margin-bottom:.85em; line-height:1.4;
@@ -286,7 +287,7 @@
   }
   .plate-caption{
     font-family:'Cormorant Garamond', serif; font-style:italic;
-    text-align:center; font-size:.7em; color:var(--ink-faint);
+    text-align:center; font-size:calc(var(--page-w) * .021); color:var(--ink-faint);
     margin-bottom:1em;
   }
   .sigil-rotate{ transform-origin:50% 50%; animation:sigilspin 60s linear infinite; }
@@ -297,18 +298,18 @@
 
   /* sealed / paywall page */
   .sealed{ justify-content:center; text-align:center; }
-  .sealed .seal-glyph{ font-size:2.2rem; color:var(--rubric); margin-bottom:.5em;}
+  .sealed .seal-glyph{ font-size:calc(var(--page-w) * .07); color:var(--rubric); margin-bottom:.5em;}
   .sealed h3{
     font-family:'IM Fell English SC', serif; font-weight:400;
-    letter-spacing:.2em; font-size:1rem; margin-bottom:1em; color:var(--ink);
+    letter-spacing:.2em; font-size:calc(var(--page-w) * .032); margin-bottom:1em; color:var(--ink);
   }
   .sealed p{
-    font-size:.85em; line-height:1.7; color:var(--ink-faint);
+    font-size:calc(var(--page-w) * .027); line-height:1.7; color:var(--ink-faint);
     max-width:26ch; margin:0 auto 1.6em; font-style:italic;
   }
   .sealed button{
     font-family:'IM Fell English SC', serif;
-    letter-spacing:.25em; text-indent:.25em; font-size:.72rem;
+    letter-spacing:.25em; text-indent:.25em; font-size:calc(var(--page-w) * .022);
     background:none; color:var(--rubric);
     border:1px solid var(--rubric); border-radius:2px;
     padding:.9em 1.6em; cursor:pointer;
@@ -322,7 +323,7 @@
   /* blurred teaser text behind the seal */
   .veiled{
     filter:blur(4px); opacity:.5; user-select:none;
-    margin-bottom:1.4em; font-size:.85em; text-align:justify;
+    margin-bottom:1.4em; font-size:calc(var(--page-w) * .027); text-align:justify;
   }
 
   /* ============ PAGE TURN ============ */
@@ -382,14 +383,30 @@
     user-select:none; text-align:center;
   }
 
-  /* ============ MOBILE: single page ============ */
-  @media (max-width:720px){
-    :root{ --page-w: min(76vw, 420px); }
-    .stack{ width:18px; }
-    .page.left{ display:none; }
-    .page.right{ border-radius:4px; box-shadow:inset 8px 0 18px -12px rgba(60,40,10,.5); }
-    .leaf{ display:none !important; } /* fall back to instant/fade on mobile */
-    .zone{ width:26%; }
+  /* ============ MOBILE / PORTRAIT: scrollable pages, like a PDF ============ */
+  .scroll-book{ display:none; }
+
+  @media (orientation: portrait) and (max-width: 940px), (max-width: 720px){
+    :root{ --page-w: min(94vw, 520px); }
+    body{ justify-content:flex-start; padding:3vh 0 8vh; }
+    .book-wrap, .spread-label{ display:none; }
+    .scroll-book{
+      display:block;
+      width:var(--page-w);
+    }
+    .page.m{
+      position:relative;
+      width:100%;
+      height:calc(var(--page-w) * 1.36);
+      background:var(--paper);
+      border-radius:4px;
+      overflow:hidden;
+      margin-bottom:16px;
+      box-shadow:
+        0 12px 26px rgba(0,0,0,.55),
+        inset 0 0 0 1px rgba(90,60,20,.25);
+    }
+    .page.m .folio{ left:50%; right:auto; transform:translateX(-50%); }
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -428,6 +445,8 @@
 </div>
 
 <div class="spread-label" id="spreadLabel"></div>
+
+<div class="scroll-book" id="scrollBook"></div>
 
 <script>
 /* ==========================================================
@@ -580,28 +599,24 @@ function updateStacks(frac){
 let spread = 0; // spread n shows pages [2n, 2n+1]
 let turning = false;
 const maxSpread = Math.ceil(pages.length / 2) - 1;
-const isMobile = () => window.matchMedia('(max-width:720px)').matches;
+const isMobile = () => window.matchMedia('(orientation: portrait) and (max-width: 940px), (max-width: 720px)').matches;
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-/* on mobile we page one page at a time through the right slot */
-let mobilePage = 0;
 
 function inner(html){ return html || '<div class="page-inner" style="position:static"></div>'; }
 
 function render(){
-  if (isMobile()){
-    pageR.parentElement.style.display = '';
-    pageR.innerHTML = ''; // replace whole inner
-    pageR.outerHTML = pageR.outerHTML; // no-op guard
-    document.getElementById('pageR').innerHTML = stripOuter(pages[mobilePage]);
-    label.textContent = `page ${mobilePage+1} of ${pages.length} · tap the edges to turn`;
-    updateStacks(pages.length > 1 ? mobilePage / (pages.length - 1) : 0);
-  } else {
-    document.getElementById('pageL').innerHTML = stripOuter(pages[spread*2]);
-    document.getElementById('pageR').innerHTML = stripOuter(pages[spread*2+1] || '');
-    label.textContent = `spread ${spread+1} of ${maxSpread+1} · click the page edges, or use ← →`;
-    updateStacks(maxSpread > 0 ? spread / maxSpread : 0);
-  }
+  if (isMobile()) return; /* portrait mode is the pre-built scroll stack */
+  document.getElementById('pageL').innerHTML = stripOuter(pages[spread*2]);
+  document.getElementById('pageR').innerHTML = stripOuter(pages[spread*2+1] || '');
+  label.textContent = `spread ${spread+1} of ${maxSpread+1} · click the page edges, or use ← →`;
+  updateStacks(maxSpread > 0 ? spread / maxSpread : 0);
+}
+
+/* build the scrollable page stack once; CSS decides when it's shown */
+function buildScrollBook(){
+  document.getElementById('scrollBook').innerHTML = pages.map(p =>
+    `<div class="page m"><div class="parchment"></div><div class="page-inner">${stripOuter(p)}</div></div>`
+  ).join('');
 }
 
 /* pages are authored with their own .page-inner wrapper for the leaf faces;
@@ -615,15 +630,7 @@ function stripOuter(html){
 }
 
 function go(dir){
-  if (turning) return;
-
-  if (isMobile()){
-    const next = mobilePage + dir;
-    if (next < 0 || next >= pages.length) return;
-    mobilePage = next;
-    render();
-    return;
-  }
+  if (turning || isMobile()) return;
 
   const next = spread + dir;
   if (next < 0 || next > maxSpread) return;
@@ -669,17 +676,8 @@ document.addEventListener('keydown', e=>{
   if (e.key === 'ArrowLeft') go(-1);
 });
 
-/* simple swipe for mobile */
-let tx = null;
-document.getElementById('book').addEventListener('touchstart', e=>{ tx = e.touches[0].clientX; }, {passive:true});
-document.getElementById('book').addEventListener('touchend', e=>{
-  if (tx === null) return;
-  const dx = e.changedTouches[0].clientX - tx;
-  if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
-  tx = null;
-}, {passive:true});
-
 window.addEventListener('resize', render);
+buildScrollBook();
 render();
 </script>
 </body>
