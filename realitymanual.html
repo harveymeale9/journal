@@ -19,8 +19,8 @@
     --ink-faint:#5d4c35;
     --brass:#9c7c3c;
     --rubric:#7a2f1d; /* oxblood red used in medieval rubrication */
-    --page-w: min(46vw, calc((100vh - 150px) / 1.32));
-    --page-w: min(46vw, calc((100dvh - 150px) / 1.32));
+    --page-w: min(46vw, calc((100vh - 118px) / 1.32));
+    --page-w: min(46vw, calc((100dvh - 118px) / 1.32));
     --page-h: calc(var(--page-w) * 1.32);
     --turn-ms: 900ms;
   }
@@ -229,7 +229,7 @@
   /* ============ TYPOGRAPHY OF THE PAGE ============ */
   .running-head{
     font-family:'IM Fell English SC', serif;
-    font-size:calc(var(--page-w) * .015); letter-spacing:.32em; text-indent:.32em;
+    font-size:calc(var(--page-w) * .0165); letter-spacing:.32em; text-indent:.32em;
     text-align:center; color:var(--ink-faint);
     margin-bottom:1.6em;
   }
@@ -243,7 +243,7 @@
 
   .entry-no{
     font-family:'IM Fell English SC', serif;
-    text-align:center; font-size:calc(var(--page-w) * .016); letter-spacing:.4em; text-indent:.4em;
+    text-align:center; font-size:calc(var(--page-w) * .0175); letter-spacing:.4em; text-indent:.4em;
     color:var(--rubric); margin-bottom:.9em;
   }
   h2.entry-title{
@@ -261,7 +261,7 @@
 
   .body-text{
     font-family:'IM Fell English', Georgia, serif;
-    font-size:calc(var(--page-w) * .031);
+    font-size:calc(var(--page-w) * .034);
     line-height:1.62;
     text-align:justify;
     hyphens:auto;
@@ -278,7 +278,7 @@
 
   .marginal{
     font-family:'Cormorant Garamond', serif;
-    font-style:italic; font-size:calc(var(--page-w) * .023);
+    font-style:italic; font-size:calc(var(--page-w) * .0255);
     color:var(--ink-faint);
     border-left:1px solid rgba(122,47,29,.4);
     padding-left:.9em; margin:1.1em 0 1.1em .5em;
@@ -300,11 +300,11 @@
   .title-page .tp-rule{ color:var(--brass); margin:1em 0; letter-spacing:.5em; text-indent:.5em; }
   .title-page .tp-edition{
     font-family:'Cormorant Garamond', serif; font-style:italic;
-    font-size:calc(var(--page-w) * .026); color:var(--ink-faint); line-height:1.7;
+    font-size:calc(var(--page-w) * .029); color:var(--ink-faint); line-height:1.7;
   }
 
   /* contents */
-  .toc{ list-style:none; font-size:calc(var(--page-w) * .028); }
+  .toc{ list-style:none; font-size:calc(var(--page-w) * .0305); }
   .toc li{
     display:flex; align-items:baseline; gap:.5em;
     margin-bottom:.85em; line-height:1.4;
@@ -321,7 +321,7 @@
   }
   .plate-caption{
     font-family:'Cormorant Garamond', serif; font-style:italic;
-    text-align:center; font-size:calc(var(--page-w) * .021); color:var(--ink-faint);
+    text-align:center; font-size:calc(var(--page-w) * .0235); color:var(--ink-faint);
     margin-bottom:1em;
   }
   .sigil-rotate{ transform-origin:50% 50%; animation:sigilspin 60s linear infinite; }
@@ -338,12 +338,12 @@
     letter-spacing:.2em; font-size:calc(var(--page-w) * .032); margin-bottom:1em; color:var(--ink);
   }
   .sealed p{
-    font-size:calc(var(--page-w) * .027); line-height:1.7; color:var(--ink-faint);
+    font-size:calc(var(--page-w) * .03); line-height:1.7; color:var(--ink-faint);
     max-width:26ch; margin:0 auto 1.6em; font-style:italic;
   }
   .sealed button{
     font-family:'IM Fell English SC', serif;
-    letter-spacing:.25em; text-indent:.25em; font-size:calc(var(--page-w) * .022);
+    letter-spacing:.25em; text-indent:.25em; font-size:calc(var(--page-w) * .024);
     background:none; color:var(--rubric);
     border:1px solid var(--rubric); border-radius:2px;
     padding:.9em 1.6em; cursor:pointer;
@@ -357,7 +357,7 @@
   /* blurred teaser text behind the seal */
   .veiled{
     filter:blur(4px); opacity:.5; user-select:none;
-    margin-bottom:1.4em; font-size:calc(var(--page-w) * .027); text-align:justify;
+    margin-bottom:1.4em; font-size:calc(var(--page-w) * .03); text-align:justify;
   }
 
   /* ============ PAGE TURN ============ */
@@ -441,6 +441,7 @@
         inset 0 0 0 1px rgba(90,60,20,.25);
     }
     .page.m .folio{ left:50%; right:auto; transform:translateX(-50%); }
+    .page.m > .page-inner{ position:absolute !important; inset:0; }
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -455,7 +456,6 @@
 
 <header class="site">
   <h1>The Reality Manual</h1>
-  <p>a living grimoire · entries are added as they are inscribed</p>
 </header>
 
 <div class="book-wrap">
@@ -518,7 +518,7 @@ const pages = [
 /* 0 — frontispiece */
 `<div class="page-inner title-page" style="position:static">
   <div>
-    ${sigilSVG.replace('class="plate"','class="plate" style="width:70%"')}
+    ${sigilSVG.replace('class="plate"','class="plate" style="width:84%"')}
     <p class="plate-caption">Frontispiece · The First Sigil</p>
   </div>
 </div>`,
@@ -641,8 +641,8 @@ function inner(html){ return html || '<div class="page-inner" style="position:st
 
 function render(){
   if (isMobile()) return; /* portrait mode is the pre-built scroll stack */
-  document.getElementById('pageL').innerHTML = stripOuter(pages[spread*2]);
-  document.getElementById('pageR').innerHTML = stripOuter(pages[spread*2+1] || '');
+  fillSlot('pageL', pages[spread*2]);
+  fillSlot('pageR', pages[spread*2+1]);
   label.textContent = `spread ${spread+1} of ${maxSpread+1} · click the page edges, or use ← →`;
   updateStacks(maxSpread > 0 ? spread / maxSpread : 0);
 }
@@ -650,18 +650,19 @@ function render(){
 /* build the scrollable page stack once; CSS decides when it's shown */
 function buildScrollBook(){
   document.getElementById('scrollBook').innerHTML = pages.map(p =>
-    `<div class="page m"><div class="parchment"></div><div class="page-inner">${stripOuter(p)}</div></div>`
+    `<div class="page m"><div class="parchment"></div>${p}</div>`
   ).join('');
 }
 
-/* pages are authored with their own .page-inner wrapper for the leaf faces;
-   for the static slots we inject the inside of that wrapper */
-function stripOuter(html){
-  if(!html) return '';
+/* pages are authored with their own .page-inner wrapper (which may carry
+   layout classes like title-page or sealed); inject content AND classes */
+function fillSlot(id, html){
+  const el = document.getElementById(id);
   const tmp = document.createElement('div');
-  tmp.innerHTML = html;
+  tmp.innerHTML = html || '';
   const w = tmp.firstElementChild;
-  return w ? w.innerHTML : html;
+  el.className = w ? w.className : 'page-inner';
+  el.innerHTML = w ? w.innerHTML : '';
 }
 
 function go(dir){
@@ -678,17 +679,17 @@ function go(dir){
 
   if (dir > 0){
     /* leaf front = current right page, leaf back = next left page */
-    leafFront.innerHTML = stripOuter(pages[spread*2+1] || '');
-    leafBack.innerHTML  = stripOuter(pages[next*2] || '');
+    fillSlot('leafFront', pages[spread*2+1]);
+    fillSlot('leafBack', pages[next*2]);
     /* underneath: left stays, right becomes the next right page */
-    document.getElementById('pageR').innerHTML = stripOuter(pages[next*2+1] || '');
+    fillSlot('pageR', pages[next*2+1]);
     leaf.classList.remove('back');
   } else {
     /* turning back: leaf starts flat on the left (rotated -180) and returns.
        front = previous right page, back = current left page */
-    leafFront.innerHTML = stripOuter(pages[next*2+1] || '');
-    leafBack.innerHTML  = stripOuter(pages[spread*2] || '');
-    document.getElementById('pageL').innerHTML = stripOuter(pages[next*2] || '');
+    fillSlot('leafFront', pages[next*2+1]);
+    fillSlot('leafBack', pages[spread*2]);
+    fillSlot('pageL', pages[next*2]);
     leaf.classList.add('back');
   }
 
