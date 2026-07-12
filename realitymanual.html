@@ -63,6 +63,8 @@
     align-items:center;
     justify-content:center;
     min-height:0;
+    width:100%;
+    position:relative;
     text-align:center;
     margin:0;
     user-select:none;
@@ -518,14 +520,49 @@
   }
   .zone:focus-visible{ outline:2px solid var(--brass); outline-offset:-4px; }
   .zone.prev{ left:0; } .zone.next{ right:0; }
-  .zone::after{
-    content:attr(data-hint);
-    position:absolute; bottom:-2.4em; left:50%; transform:translateX(-50%);
-    font-family:'Cormorant Garamond', serif; font-style:italic;
-    font-size:.72rem; color:#8a7452; opacity:0; transition:opacity .3s;
-    white-space:nowrap;
+
+  /* ============ JUMP TO PAGE ============ */
+  .jump{
+    position:absolute;
+    right:calc(2vw + 8px); top:50%;
+    transform:translateY(-50%);
+    z-index:20;
+    display:flex; align-items:baseline; gap:.55em;
+    padding:.5em .9em;
+    background:rgba(24,14,7,.85);
+    border:1px solid rgba(156,124,60,.4);
+    border-radius:3px;
+    font-family:'IM Fell English SC', serif;
+    font-size:.68rem; letter-spacing:.18em; text-indent:.18em;
+    color:var(--brass);
   }
-  .zone:hover::after{ opacity:1; }
+  .jump input{
+    width:3em;
+    background:none; border:none;
+    border-bottom:1px solid rgba(156,124,60,.5);
+    color:var(--paper);
+    font-family:'Cormorant Garamond', serif;
+    font-size:1rem; text-align:center;
+    outline:none;
+    -moz-appearance:textfield; appearance:textfield;
+  }
+  .jump input::-webkit-outer-spin-button,
+  .jump input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+  .jump input:focus{ border-bottom-color:var(--brass); }
+  .jump .total{
+    color:#8a7452; font-family:'Cormorant Garamond', serif;
+    font-size:.92rem; font-style:italic; letter-spacing:.05em; text-indent:0;
+  }
+  .jump button{
+    background:none; border:1px solid rgba(156,124,60,.5); border-radius:2px;
+    color:var(--brass); font-family:'IM Fell English SC', serif;
+    font-size:.62rem; letter-spacing:.2em; text-indent:.2em;
+    padding:.35em .7em; cursor:pointer;
+    transition:background .25s, color .25s;
+  }
+  .jump button:hover, .jump button:focus-visible{
+    background:var(--brass); color:#1c1108; outline:none;
+  }
 
   /* ============ MOBILE / PORTRAIT: scrollable pages, like a PDF ============ */
   .scroll-book{ display:none; }
@@ -553,6 +590,11 @@
     }
     .page.m .folio{ left:50%; right:auto; transform:translateX(-50%); }
     .page.m > .page-inner{ position:absolute !important; inset:0; }
+    .jump{
+      position:fixed;
+      top:auto; right:50%; transform:translateX(50%);
+      bottom:calc(10px + env(safe-area-inset-bottom, 0px));
+    }
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -568,6 +610,12 @@
 
 <header class="site">
   <h1>The Reality Manual</h1>
+  <div class="jump" role="group" aria-label="Jump to a leaf of the book">
+    <span>Leaf</span>
+    <input id="jumpInput" type="number" min="1" inputmode="numeric" aria-label="Leaf number">
+    <span class="total" id="jumpTotal"></span>
+    <button id="jumpGo">Go</button>
+  </div>
 </header>
 
 <div class="book-wrap">
@@ -586,8 +634,8 @@
     </div>
     <div class="stack right" aria-hidden="true"><div class="fill" id="stackR"></div></div>
 
-    <button class="zone prev" id="btnPrev" data-hint="turn back" aria-label="Previous page"></button>
-    <button class="zone next" id="btnNext" data-hint="turn the page" aria-label="Next page"></button>
+    <button class="zone prev" id="btnPrev" aria-label="Previous page"></button>
+    <button class="zone next" id="btnNext" aria-label="Next page"></button>
   </div>
 </div>
 
@@ -968,6 +1016,8 @@ function render(){
   fillSlot('pageL', pages[spread*2]);
   fillSlot('pageR', pages[spread*2+1]);
   updateStacks(maxSpread > 0 ? spread / maxSpread : 0);
+  const ji = document.getElementById('jumpInput');
+  if (document.activeElement !== ji) ji.value = spread*2 + 1;
 }
 
 /* build the scrollable page stack once; CSS decides when it's shown */
@@ -1031,9 +1081,32 @@ function go(dir){
 document.getElementById('btnNext').addEventListener('click', ()=>go(1));
 document.getElementById('btnPrev').addEventListener('click', ()=>go(-1));
 document.addEventListener('keydown', e=>{
+  if (e.target && e.target.tagName === 'INPUT') return;
   if (e.key === 'ArrowRight') go(1);
   if (e.key === 'ArrowLeft') go(-1);
 });
+
+/* jump to leaf */
+const jumpInput = document.getElementById('jumpInput');
+jumpInput.max = pages.length;
+document.getElementById('jumpTotal').textContent = 'of ' + pages.length;
+
+function jumpTo(){
+  let p = parseInt(jumpInput.value, 10);
+  if (isNaN(p)) return;
+  p = Math.min(Math.max(p, 1), pages.length);
+  jumpInput.value = p;
+  jumpInput.blur();
+  if (isMobile()){
+    const el = document.querySelectorAll('#scrollBook .page.m')[p-1];
+    if (el) el.scrollIntoView({behavior: reduced ? 'auto' : 'smooth', block:'start'});
+  } else {
+    spread = Math.floor((p-1)/2);
+    render();
+  }
+}
+document.getElementById('jumpGo').addEventListener('click', jumpTo);
+jumpInput.addEventListener('keydown', e=>{ if (e.key === 'Enter') jumpTo(); });
 
 window.addEventListener('resize', render);
 buildScrollBook();
