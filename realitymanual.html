@@ -594,7 +594,15 @@
       position:fixed;
       top:auto; right:50%; transform:translateX(50%);
       bottom:calc(10px + env(safe-area-inset-bottom, 0px));
+      font-size:.5rem;
+      padding:.32em .6em;
+      gap:.4em;
+      background:rgba(24,14,7,.5);
+      border-color:rgba(156,124,60,.28);
     }
+    .jump input{ font-size:.72rem; width:2.4em; border-bottom-color:rgba(156,124,60,.35); }
+    .jump .total{ font-size:.66rem; }
+    .jump button{ font-size:.46rem; padding:.3em .5em; border-color:rgba(156,124,60,.35); }
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -610,9 +618,9 @@
 
 <header class="site">
   <h1>The Reality Manual</h1>
-  <div class="jump" role="group" aria-label="Jump to a leaf of the book">
-    <span>Leaf</span>
-    <input id="jumpInput" type="number" min="1" inputmode="numeric" aria-label="Leaf number">
+  <div class="jump" role="group" aria-label="Jump to a page of the book">
+    <span>Page</span>
+    <input id="jumpInput" type="number" min="1" inputmode="numeric" aria-label="Page number">
     <span class="total" id="jumpTotal"></span>
     <button id="jumpGo">Go</button>
   </div>
@@ -1038,17 +1046,22 @@ function fillSlot(id, html){
   el.innerHTML = w ? w.innerHTML : '';
 }
 
-function go(dir){
+function go(dir, ms, done){
   if (turning || isMobile()) return;
+  ms = ms || 900;
 
   const next = spread + dir;
   if (next < 0 || next > maxSpread) return;
 
   if (reduced){
-    spread = next; render(); return;
+    spread = next; render();
+    if (done) done();
+    return;
   }
 
   turning = true;
+  leaf.style.animationDuration = ms + 'ms';
+  shade.style.animationDuration = ms + 'ms';
 
   if (dir > 0){
     /* leaf front = current right page, leaf back = next left page */
@@ -1075,7 +1088,8 @@ function go(dir){
     spread = next;
     render();
     turning = false;
-  }, 920);
+    if (done) done();
+  }, ms + 20);
 }
 
 document.getElementById('btnNext').addEventListener('click', ()=>go(1));
@@ -1101,9 +1115,22 @@ function jumpTo(){
     const el = document.querySelectorAll('#scrollBook .page.m')[p-1];
     if (el) el.scrollIntoView({behavior: reduced ? 'auto' : 'smooth', block:'start'});
   } else {
-    spread = Math.floor((p-1)/2);
-    render();
+    riffleTo(Math.floor((p-1)/2));
   }
+}
+
+/* riffle: chain quick page turns toward the target spread,
+   ending on a slower turn so the book settles rather than snaps */
+function riffleTo(target){
+  if (turning || target === spread) return;
+  const dir = target > spread ? 1 : -1;
+  const stepFn = ()=>{
+    if (spread === target) return;
+    const remaining = Math.abs(target - spread);
+    const ms = remaining === 1 ? 650 : Math.max(220, 650 / remaining);
+    go(dir, ms, stepFn);
+  };
+  stepFn();
 }
 document.getElementById('jumpGo').addEventListener('click', jumpTo);
 jumpInput.addEventListener('keydown', e=>{ if (e.key === 'Enter') jumpTo(); });
