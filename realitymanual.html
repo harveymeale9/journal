@@ -6,7 +6,7 @@
 <title>The Reality Manual — Digital Grimoire Prototype</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
 <style>
   :root{
     --desk-dark:#100905;
@@ -19,8 +19,8 @@
     --ink-faint:#5d4c35;
     --brass:#9c7c3c;
     --rubric:#7a2f1d; /* oxblood red used in medieval rubrication */
-    --page-w: min(46vw, calc((100vh - 96px) / 1.32));
-    --page-w: min(46vw, calc((100dvh - 96px) / 1.32));
+    --page-w: min(46vw, calc((100vh - 96px) / 1.32), 800px);
+    --page-w: min(46vw, calc((100dvh - 96px) / 1.32), 800px);
     --page-h: calc(var(--page-w) * 1.32);
     --turn-ms: 900ms;
   }
@@ -334,6 +334,14 @@
     margin:1.2em auto .4em; width:62%;
     display:block;
   }
+  /* raster plates (AI-painted illustrations): multiply blend prints them
+     into the parchment rather than pasting them onto it */
+  .plate-img{
+    display:block;
+    margin:1em auto .3em;
+    mix-blend-mode:multiply;
+    height:auto;
+  }
   .plate-caption{
     font-family:'Cormorant Garamond', serif; font-style:italic;
     text-align:center; font-size:calc(var(--page-w) * .0235); color:var(--ink-faint);
@@ -468,7 +476,7 @@
   .twinkle.t2{ animation-duration:4.8s; animation-delay:1.2s; }
   .twinkle.t3{ animation-duration:6.1s; animation-delay:2.5s; }
   @keyframes twinkle{ 0%,100%{opacity:.2} 50%{opacity:1} }
-  .inscribe{ stroke-dasharray:1; stroke-dashoffset:1; animation:inscribe 10s ease-in-out infinite; }
+  .inscribe{ stroke-dasharray:1; animation:inscribe 10s ease-in-out infinite; animation-fill-mode:both; }
   .inscribe.d2{ animation-delay:1.3s; }
   .inscribe.d3{ animation-delay:2.6s; }
   .inscribe.d4{ animation-delay:3.9s; }
@@ -479,6 +487,21 @@
     80%{stroke-dashoffset:0; opacity:1}
     94%{stroke-dashoffset:0; opacity:0}
     100%{stroke-dashoffset:1; opacity:0}
+  }
+  /* chalk lettering that writes itself left to right, holds, wipes, rewrites */
+  .chalk-write{
+    animation:chalkwrite 10s ease-in-out infinite;
+    animation-fill-mode:both;
+  }
+  .chalk-write.c1{ animation-delay:.6s; }
+  .chalk-write.c2{ animation-delay:2.2s; }
+  .chalk-write.c4{ animation-delay:4.6s; }
+  @keyframes chalkwrite{
+    0%{ clip-path:inset(0 100% 0 0); opacity:1 }
+    22%{ clip-path:inset(0 0 0 0); opacity:1 }
+    80%{ clip-path:inset(0 0 0 0); opacity:1 }
+    94%{ opacity:0 }
+    100%{ clip-path:inset(0 0 0 0); opacity:0 }
   }
   .breathe{ animation:breathe 6s ease-in-out infinite; transform-origin:50% 50%; }
   @keyframes breathe{ 0%,100%{ transform:scale(.95); opacity:.7 } 50%{ transform:scale(1.05); opacity:1 } }
@@ -778,11 +801,12 @@ const pages = [
   <p class="running-head">Contents of the Manual</p>
   <ul class="toc">
     <li><span class="t">I · On the Nature of Attention</span><span class="dots"></span><span class="n">1</span></li>
-    <li><span class="t">II · The Mirror Principle</span><span class="dots"></span><span class="n sealed-mark">sealed</span></li>
-    <li><span class="t">III · Maps Are Not Territory</span><span class="dots"></span><span class="n sealed-mark">sealed</span></li>
-    <li><span class="t">IV · The Economy of Meaning</span><span class="dots"></span><span class="n sealed-mark">sealed</span></li>
-    <li><span class="t">V · On Thresholds</span><span class="dots"></span><span class="n sealed-mark">forthcoming</span></li>
-    <li><span class="t">Appendix · Specimen Leaves</span><span class="dots"></span><span class="n">4</span></li>
+    <li><span class="t">II · On Emotional Well-Being</span><span class="dots"></span><span class="n">3</span></li>
+    <li><span class="t">III · The Mirror Principle</span><span class="dots"></span><span class="n sealed-mark">sealed</span></li>
+    <li><span class="t">IV · Maps Are Not Territory</span><span class="dots"></span><span class="n sealed-mark">sealed</span></li>
+    <li><span class="t">V · The Economy of Meaning</span><span class="dots"></span><span class="n sealed-mark">sealed</span></li>
+    <li><span class="t">VI · On Thresholds</span><span class="dots"></span><span class="n sealed-mark">forthcoming</span></li>
+    <li><span class="t">Appendix · Specimen Leaves</span><span class="dots"></span><span class="n">8</span></li>
   </ul>
   <p class="marginal">Entries marked <span class="xref">sealed</span> open to keyholders. Entries marked <span class="xref">forthcoming</span> are still being inscribed — the Manual is alive.</p>
   <span class="folio">ii</span>
@@ -818,21 +842,83 @@ const pages = [
   ${sigilSVG}
   <p class="plate-caption">Plate I — The aperture turns; the centre holds.<br>(Plates in the living edition move.)</p>
   <div class="body-text">
-    <p>Attention behaves like the aperture drawn above: what widens admits more world and less detail; what narrows admits detail and loses the world. Neither setting is correct. The error is forgetting that there is a setting at all. <span class="xref">See also: Entry IV, The Economy of Meaning.</span></p>
+    <p>Attention behaves like the aperture drawn above: what widens admits more world and less detail; what narrows admits detail and loses the world. Neither setting is correct. The error is forgetting that there is a setting at all. <span class="xref">See also: Entry V, The Economy of Meaning.</span></p>
   </div>
   <span class="folio">2</span>
 </div>`,
 
-/* 6 — sealed page (paywall inside the book) */
+/* 6 — Entry II, first page: opening + the gilded formula plate */
+`<div class="page-inner" style="position:static">
+  <p class="running-head">The Reality Manual</p>
+  <p class="entry-no">Entry the Second</p>
+  <h2 class="entry-title">On Emotional<br>Well-Being</h2>
+  <p class="ornament">✦ ✦ ✦</p>
+  <div class="body-text">
+    <p class="dropcap">Emotional well-being is essentially a measure of the quality of one's emotional states. In other words, it's a measure of what it feels like to be you.</p>
+    <p>Specifically, emotional well-being is measured by the ratio of positive emotional states relative to negative emotional states over a given duration.</p>
+  </div>
+  <img class="plate-img" style="width:86%" src="entry-02-plate-1.webp"
+    alt="Gilded diagram: Emotional Well-Being equals positive emotions over negative emotions, over time — flanked by a sun, an all-seeing eye, a heart, and an hourglass">
+  <p class="plate-caption">Plate — The wager of emotions: what is felt for, against what is felt against, over time.</p>
+  <span class="folio">3</span>
+</div>`,
+
+/* 7 — Entry II, the game */
+`<div class="page-inner" style="position:static">
+  <p class="running-head">Entry II · Well-Being</p>
+  <div class="body-text">
+    <p>A simple way of gauging your own EWB would be to consider your answer if I simply asked you, how's life?</p>
+    <p>If you responded with, "Uhh, kind of shitty lately, to be honest," then it means you are likely experiencing more unwanted emotions than desirable ones. You likely have a low emotional well-being.</p>
+    <p>If you'd responded with, "Absolutely, incredible, couldn't be better!," then you're saying your life feels good, in which case you have a high EWB, congrats.</p>
+    <p>The subconscious mind treats emotional well-being like a computer game.</p>
+    <p>Every time you experience a positive emotion, its score increases by some amount, and every time you experience a negative emotion, its score decreases.</p>
+    <p>The aim of the game is simple: get the highest possible score before the fat lady sings!</p>
+    <p>Remember, this is not necessarily the game you're playing (as the conscious mind), but this is how your subconscious mind is interfacing with reality.</p>
+  </div>
+  <span class="folio">4</span>
+</div>`,
+
+/* 8 — Entry II, Heaven on Earth */
+`<div class="page-inner" style="position:static">
+  <p class="running-head">The Reality Manual</p>
+  <div class="body-text">
+    <p>You (conscious mind) might be concerned with personal growth, being a good/ethical person, achieving material success, etc. But your subconscious has no idea what any of that means. All it's thinking about is, "How do I make my experience of reality feel better?"</p>
+    <p>So if the subconscious' objective in life is to maximize your emotional well-being, what would a highly successful life feel like?</p>
+  </div>
+  <p class="ornament">❦</p>
+  <div class="body-text">
+    <p>The highest possible emotional well-being feels like what I refer to as Heaven on Earth.</p>
+    <p>Heaven on Earth is the experience of only the most intensely positive emotions. There are no negative emotions in Heaven. It's the strongest conceivable expression of pure bliss, love, joy, excitement, etc.</p>
+    <p>Now, you must understand, Heaven on Earth doesn't have a particular location anywhere in the physical world. Your Heaven on Earth could look incredibly different to mine. But wherever your Heaven on Earth is, whatever you're doing, whomever you're with, Heaven on Earth will always feel like perfection.</p>
+  </div>
+  <span class="folio">5</span>
+</div>`,
+
+/* 9 — Entry II, Hell on Earth and the game's aim */
+`<div class="page-inner" style="position:static">
+  <p class="running-head">Entry II · Well-Being</p>
+  <div class="body-text">
+    <p>So the subconscious' goal in life is to maximize your emotional well-being, meaning it's trying to make your experience of reality feel as much like Heaven on Earth as possible.</p>
+    <p>Now, at the other end of this scale of emotional well-being, there's also Hell on Earth. This is a place of intense suffering. It's characterized by the most intensely negative emotions: excruciating heartbreak, devastating despair, and the strongest fear imaginable.</p>
+    <p style="text-align:center; font-style:italic; text-indent:0; margin:1em 0;">You do not want your life to feel like this.</p>
+    <p style="text-indent:0;">When you're severely depressed or suicidal, it means your life feels a lot like Hell on Earth.</p>
+    <p>Right at this very moment, every single one of us participating in the game of life currently resides somewhere between Hell on Earth, and Heaven on Earth. The aim is, of course, to edge ever closer to Heaven!</p>
+  </div>
+  <p class="marginal">Heaven has no address; yours need not resemble mine. Both feel like perfection.</p>
+  <p class="ornament">✦</p>
+  <span class="folio">6</span>
+</div>`,
+
+/* 10 — sealed page (paywall inside the book) */
 `<div class="page-inner sealed" style="position:static">
   <div>
     <div class="seal-glyph">⍟</div>
     <h3>This Entry Is Sealed</h3>
     <p class="veiled">The mirror does not show you the world; it shows you the shape of the instrument doing the looking, which is why every judgment of another person is first a confession of…</p>
-    <p>Entry II and all that follows open to keyholders of the Manual.</p>
+    <p>The sealed entries beyond open to keyholders of the Manual.</p>
     <button onclick="alert('In the real site, this goes to checkout — the license key unlocks every sealed page, forever.')">Obtain the Key · $59</button>
   </div>
-  <span class="folio">3</span>
+  <span class="folio">7</span>
 </div>`,
 
 /* 7 — appendix opener, illuminated frame */
@@ -862,7 +948,7 @@ const pages = [
     laws, lexicons, tables of correspondence,<br>
     and plates that move.</p>
   </div>
-  <span class="folio">4</span>
+  <span class="folio">8</span>
 </div>`,
 
 /* 8 — numbered laws */
@@ -880,7 +966,7 @@ const pages = [
     <li><span class="law-name">Return.</span> What is refused arrives again, wearing new clothes.</li>
     <li><span class="law-name">Silence.</span> The Manual ends where the reader begins.</li>
   </ol>
-  <span class="folio">5</span>
+  <span class="folio">9</span>
 </div>`,
 
 /* 9 — animated celestial chart */
@@ -919,7 +1005,7 @@ const pages = [
   <div class="body-text">
     <p>Orbits may turn at their own periods and in contrary directions; stars may waver; the centre may breathe. Motion of this kind is drawn, not filmed — it costs the page nothing.</p>
   </div>
-  <span class="folio">6</span>
+  <span class="folio">10</span>
 </div>`,
 
 /* 10 — pull quote */
@@ -930,12 +1016,12 @@ const pages = [
     <span class="q-mark">❝</span>
     The map is a rumour;<br>the territory is a visit.
   </div>
-  <p class="pullquote-attr">Entry III · Maps Are Not Territory</p>
+  <p class="pullquote-attr">Entry IV · Maps Are Not Territory</p>
   <div class="rule-orn">❦</div>
   <div class="body-text">
     <p>A saying worth carrying is set apart in this manner, ruled above and below in brass, with its source given in the small capitals of the Manual. Around it, ordinary matter resumes: the page holds one raised voice at a time, and the quiet text beneath it carries on as though nothing had been said.</p>
   </div>
-  <span class="folio">7</span>
+  <span class="folio">11</span>
 </div>`,
 
 /* 11 — self-inscribing sigil */
@@ -954,7 +1040,7 @@ const pages = [
   <div class="body-text">
     <p>Figures may be drawn before the reader's eyes in the order a scribe would draw them — circle first, then the triangles, then the inner work. Use this where the <em>construction</em> of an idea is the lesson.</p>
   </div>
-  <span class="folio">8</span>
+  <span class="folio">12</span>
 </div>`,
 
 /* 12 — table of correspondences */
@@ -971,7 +1057,7 @@ const pages = [
     <tr><td>Return</td><td>Aether</td><td>The hour between</td><td class="glyph">✦</td></tr>
   </table>
   <p class="marginal">Tables rule their rows in dotted ink and their heads in oxblood. They are for matter the eye should compare, not read.</p>
-  <span class="folio">9</span>
+  <span class="folio">13</span>
 </div>`,
 
 /* 13 — moon phases */
@@ -998,7 +1084,7 @@ const pages = [
   <div class="body-text">
     <p>Slow motion suits slow subjects. The shadow above crosses the disc in sixteen seconds and returns; a reader who lingers will notice, and one who does not will lose nothing. Ambient movement should never demand to be watched.</p>
   </div>
-  <span class="folio">10</span>
+  <span class="folio">14</span>
 </div>`,
 
 /* 14 — two-column lexicon */
@@ -1016,7 +1102,7 @@ const pages = [
     <dt>Rubric</dt><dd>Matter set in oxblood: laws, numerals, and the first letters of things.</dd>
     <dt>Sealed</dt><dd>Written, but not yet yours.</dd>
   </dl>
-  <span class="folio">11</span>
+  <span class="folio">15</span>
 </div>`,
 
 /* 15 — ritual steps */
@@ -1031,7 +1117,7 @@ const pages = [
     <li>Choose one object of attention for tomorrow, and one refusal. A refusal unnamed is a door left open.</li>
     <li>Close the book. The practice ends with the closing, not before.</li>
   </ol>
-  <span class="folio">12</span>
+  <span class="folio">16</span>
 </div>`,
 
 /* 16 — kitchen-sink text page */
@@ -1046,10 +1132,110 @@ const pages = [
     <p>When a page has said enough, it says so, and stops.</p>
   </div>
   <p class="ornament">❦</p>
-  <span class="folio">13</span>
+  <span class="folio">17</span>
 </div>`,
 
-/* 17 — colophon */
+/* 17 — the lecturer's slate */
+`<div class="page-inner" style="position:static">
+  <p class="running-head">Appendix · The Formula Form</p>
+  <p class="entry-no">Specimen · The Lecturer's Slate</p>
+  <h2 class="entry-title">A Law, Written<br>as It Is Spoken</h2>
+  <svg class="plate slate-plate" style="width:96%" viewBox="0 0 460 150" role="img" aria-label="A chalk formula writing itself on a slate: probability of winning equals a function of effectiveness of life strategy">
+    <rect x="2" y="2" width="456" height="146" rx="6" fill="#2c2822" stroke="#9c7c3c" stroke-opacity=".55"/>
+    <rect x="9" y="9" width="442" height="132" rx="4" fill="none" stroke="#efe6cf" stroke-opacity=".1"/>
+    <g fill="none" stroke="#efe6cf" stroke-width="2" stroke-linecap="round" stroke-opacity=".85">
+      <path class="inscribe" pathLength="1" d="M420 30 v-9 h-16 M40 120 v9 h16"/>
+    </g>
+    <g fill="#efe6cf" font-family="Caveat, cursive" font-weight="600">
+      <text class="chalk-write c1" x="26" y="84" font-size="23">Probability of Winning</text>
+      <text class="chalk-write c2" x="240" y="84" font-size="25">=</text>
+      <text class="chalk-write c4" x="306" y="68" font-size="17">(Effectiveness of</text>
+      <text class="chalk-write c4" x="314" y="92" font-size="17">Life Strategy)</text>
+    </g>
+    <path class="inscribe d3" pathLength="1" fill="none" stroke="#efe6cf" stroke-width="2.4" stroke-linecap="round"
+      d="M290 114 c-6 9 -18 8 -17 -1 c1 -8 8 -8 11 -27 l8 -44 c2 -11 10 -16 16 -12 c5 3 2 11 -4 9"/>
+  </svg>
+  <p class="plate-caption">Plate V — The lecturer's slate: a law written as it is spoken,<br>then wiped clean to be written again.</p>
+  <div class="body-text">
+    <p>Where a law wants the feel of a lecture — chalk, slate, the hand mid-thought — it is set upon the slate, and the page writes it in real time. <span class="xref">See Law IV, The Economy of Meaning.</span></p>
+  </div>
+  <span class="folio">18</span>
+</div>`,
+
+/* 18 — the threefold instrument (anatomy plate) */
+`<div class="page-inner" style="position:static">
+  <p class="running-head">Appendix · The Anatomical Form</p>
+  <p class="entry-no">Specimen · An Anatomy</p>
+  <h2 class="entry-title">The Threefold<br>Instrument</h2>
+  <svg class="plate" style="width:96%" viewBox="0 0 460 340" role="img" aria-label="Diagram: You, branching by three arrows into the conscious mind, the subconscious mind, and the body">
+    <defs>
+      <pattern id="rmHatch" width="6" height="6" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+        <line x1="0" y1="0" x2="0" y2="6" stroke="#7a2f1d" stroke-width="1.3" opacity=".45"/>
+      </pattern>
+      <marker id="rmArrow" viewBox="0 0 10 10" refX="7.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 z" fill="#2b2116"/>
+      </marker>
+      <clipPath id="rmBrainClip">
+        <path d="M8 46 C5 32 13 17 26 12 C30 4 42 1 49 8 C54 1 66 -1 72 6 C80 0 91 4 95 13 C105 15 113 25 110 37 C113 45 108 53 100 57 C106 60 105 69 97 71 C89 75 81 70 79 64 C73 70 64 71 60 65 C57 71 50 73 46 68 C34 68 20 63 14 56 C9 52 8 49 8 46 Z"/>
+      </clipPath>
+      <g id="rmBrainG" fill="none" stroke="#2b2116" stroke-width="1.6" stroke-linecap="round">
+        <path d="M8 46 C5 32 13 17 26 12 C30 4 42 1 49 8 C54 1 66 -1 72 6 C80 0 91 4 95 13 C105 15 113 25 110 37 C113 45 108 53 100 57 C106 60 105 69 97 71 C89 75 81 70 79 64 C73 70 64 71 60 65 C57 71 50 73 46 68 C34 68 20 63 14 56 C9 52 8 49 8 46 Z"/>
+        <path d="M84 72 C85 78 81 82 77 84"/>
+        <g stroke-width="1.1" stroke-opacity=".8">
+          <path d="M30 20 C36 26 34 32 28 36"/>
+          <path d="M50 14 C56 22 52 30 46 32"/>
+          <path d="M70 12 C76 20 72 28 66 30"/>
+          <path d="M88 20 C92 26 88 34 82 36"/>
+          <path d="M40 44 C50 40 60 44 66 50"/>
+          <path d="M78 46 C86 44 92 48 94 54"/>
+          <path d="M22 48 C36 54 54 56 70 54"/>
+        </g>
+      </g>
+    </defs>
+
+    <text x="230" y="30" text-anchor="middle" font-family="'IM Fell English SC', serif" font-size="26" fill="#2b2116" letter-spacing="3">You</text>
+
+    <g fill="none" stroke="#2b2116" stroke-width="1.8" stroke-linecap="round">
+      <path d="M214 44 C150 82 102 118 92 172" marker-end="url(#rmArrow)"/>
+      <path d="M230 44 L230 174" marker-end="url(#rmArrow)"/>
+      <path d="M246 44 C316 80 372 104 388 152" marker-end="url(#rmArrow)"/>
+    </g>
+
+    <g transform="translate(32,196)">
+      <g clip-path="url(#rmBrainClip)">
+        <path d="M0 -2 H46 C38 26 50 54 42 86 H0 Z" fill="#7a2f1d" fill-opacity=".08"/>
+        <path d="M0 -2 H46 C38 26 50 54 42 86 H0 Z" fill="url(#rmHatch)"/>
+      </g>
+      <use href="#rmBrainG"/>
+    </g>
+
+    <g transform="translate(172,196)">
+      <g clip-path="url(#rmBrainClip)">
+        <path d="M52 -2 H122 V86 H42 C52 54 42 26 52 -2 Z" fill="#7a2f1d" fill-opacity=".08"/>
+        <path d="M52 -2 H122 V86 H42 C52 54 42 26 52 -2 Z" fill="url(#rmHatch)"/>
+      </g>
+      <use href="#rmBrainG"/>
+    </g>
+
+    <g transform="translate(368,168)">
+      <circle cx="22" cy="60" r="57" fill="none" stroke="#9c7c3c" stroke-width=".8" stroke-dasharray="2 4" stroke-opacity=".55"/>
+      <g fill="none" stroke="#2b2116" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="22" cy="10" r="7"/>
+        <path d="M18 17 C16 20 12 21 9 22 C5 24 4 28 4 32 L3 52 C3 56 5 58 5 61 L9 60 C9 56 9 52 9 47 L11 33 C12 40 12 48 13 53 C11 58 10 63 11 68 C11 78 12 88 13 96 L11 106 L19 106 C19 98 20 88 20 78 L22 68 L24 78 C24 88 25 98 25 106 L33 106 L31 96 C32 88 33 78 33 68 C34 63 33 58 31 53 C32 48 32 40 33 33 L35 47 C35 52 35 56 35 60 L39 61 C39 58 41 56 41 52 L40 32 C40 28 39 24 35 22 C32 21 28 20 26 17 Z"/>
+      </g>
+    </g>
+
+    <g font-family="'IM Fell English SC', serif" font-size="14" fill="#5d4c35" text-anchor="middle" letter-spacing="1.5">
+      <text x="92" y="322">Conscious Mind</text>
+      <text x="232" y="322">Subconscious Mind</text>
+      <text x="390" y="322">Body</text>
+    </g>
+  </svg>
+  <p class="plate-caption">Plate VI — The threefold instrument: one self, playing upon two minds and a vessel.</p>
+  <span class="folio">19</span>
+</div>`,
+
+/* 19 — colophon */
 `<div class="page-inner title-page" style="position:static">
   <div>
     <p class="tp-small">Colophon</p>
