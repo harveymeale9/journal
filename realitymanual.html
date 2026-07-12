@@ -495,6 +495,22 @@
   @keyframes turnFwd{ from{transform:rotateY(0)} to{transform:rotateY(-180deg)} }
   @keyframes turnBack{ from{transform:rotateY(-180deg)} to{transform:rotateY(0)} }
 
+  /* flutter: a cascade of leaves in flight at once, used for long jumps */
+  .flits{
+    position:absolute; inset:0;
+    z-index:5; pointer-events:none;
+  }
+  .flit{
+    position:absolute; top:0; bottom:0; left:50%;
+    width:var(--page-w);
+    transform-style:preserve-3d;
+    transform-origin:left center;
+    animation-name:turnFwd;
+    animation-fill-mode:both;
+    animation-timing-function:cubic-bezier(.42,.05,.3,.98);
+  }
+  .flit.rev{ animation-name:turnBack; }
+
   .leaf-face{
     position:absolute; inset:0;
     background:var(--paper);
@@ -1115,22 +1131,66 @@ function jumpTo(){
     const el = document.querySelectorAll('#scrollBook .page.m')[p-1];
     if (el) el.scrollIntoView({behavior: reduced ? 'auto' : 'smooth', block:'start'});
   } else {
-    riffleTo(Math.floor((p-1)/2));
+    flutterTo(Math.floor((p-1)/2));
   }
 }
 
-/* riffle: chain quick page turns toward the target spread,
-   ending on a slower turn so the book settles rather than snaps */
-function riffleTo(target){
+/* flutter: for jumps of 2+ spreads, a cascade of leaves takes flight together —
+   staggered starts, varied speeds, the last leaf slowest so the book settles.
+   Only the first leaf carries away real content and only the last lands with
+   real content; the sheets between are blank parchment, as they'd be in a blur. */
+function flutterTo(target){
   if (turning || target === spread) return;
+  const steps = Math.abs(target - spread);
   const dir = target > spread ? 1 : -1;
-  const stepFn = ()=>{
-    if (spread === target) return;
-    const remaining = Math.abs(target - spread);
-    const ms = remaining === 1 ? 650 : Math.max(220, 650 / remaining);
-    go(dir, ms, stepFn);
-  };
-  stepFn();
+  if (steps === 1){ go(dir); return; }
+  if (reduced){ spread = target; render(); return; }
+
+  turning = true;
+  const K = Math.max(4, Math.min(steps, 7)); /* leaves in flight */
+  const delayStep = 100;
+  const box = document.createElement('div');
+  box.className = 'flits';
+  let lastEnd = 0;
+
+  for (let i = 0; i < K; i++){
+    const last = (i === K - 1);
+    const dur = last ? 820 : 500 + (i % 3) * 65;  /* varied wingbeats, slow settle */
+    const delay = i * delayStep;
+    lastEnd = Math.max(lastEnd, delay + dur);
+    const el = document.createElement('div');
+    el.className = 'flit' + (dir < 0 ? ' rev' : '');
+    el.style.animationDelay = delay + 'ms';
+    el.style.animationDuration = dur + 'ms';
+    el.innerHTML =
+      '<div class="leaf-face front"><div class="parchment"></div><div class="page-inner" id="flitF'+i+'"></div></div>' +
+      '<div class="leaf-face back"><div class="parchment"></div><div class="page-inner" id="flitB'+i+'"></div></div>';
+    box.appendChild(el);
+  }
+  document.querySelector('.pages-wrap').appendChild(box);
+
+  if (dir > 0){
+    fillSlot('flitF0', pages[spread*2+1]);        /* first leaf lifts the current right page */
+    fillSlot('flitB'+(K-1), pages[target*2]);     /* last leaf lands as the target left page */
+    fillSlot('pageR', pages[target*2+1]);         /* waiting underneath the flutter */
+  } else {
+    fillSlot('flitB0', pages[spread*2]);          /* first leaf lifts the current left page */
+    fillSlot('flitF'+(K-1), pages[target*2+1]);   /* last leaf lands as the target right page */
+    fillSlot('pageL', pages[target*2]);
+  }
+
+  /* the gilt blocks drift to their destination while the leaves fly */
+  updateStacks(maxSpread > 0 ? target / maxSpread : 0);
+  shade.style.animationDuration = lastEnd + 'ms';
+  shade.classList.add('on');
+
+  setTimeout(()=>{
+    shade.classList.remove('on');
+    box.remove();
+    spread = target;
+    render();
+    turning = false;
+  }, lastEnd + 60);
 }
 document.getElementById('jumpGo').addEventListener('click', jumpTo);
 jumpInput.addEventListener('keydown', e=>{ if (e.key === 'Enter') jumpTo(); });
