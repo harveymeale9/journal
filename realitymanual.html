@@ -495,21 +495,56 @@
   @keyframes turnFwd{ from{transform:rotateY(0)} to{transform:rotateY(-180deg)} }
   @keyframes turnBack{ from{transform:rotateY(-180deg)} to{transform:rotateY(0)} }
 
-  /* flutter: a cascade of leaves in flight at once, used for long jumps */
+  /* flutter: a cascade of leaves in flight at once, used for long jumps.
+     Perspective lives HERE (on the flits container, direct parent of the
+     leaves) so only the flutter renders in true 3D. */
   .flits{
     position:absolute; inset:0;
     z-index:5; pointer-events:none;
+    perspective:1400px;
+    perspective-origin:50% 42%;
   }
   .flit{
     position:absolute; top:0; bottom:0; left:50%;
     width:var(--page-w);
     transform-style:preserve-3d;
     transform-origin:left center;
-    animation-name:turnFwd;
+    animation-name:flitFwd;
     animation-fill-mode:both;
     animation-timing-function:cubic-bezier(.42,.05,.3,.98);
   }
-  .flit.rev{ animation-name:turnBack; }
+  .flit.rev{ animation-name:flitBack; }
+  /* flutter leaves arc up toward the viewer at the apex */
+  @keyframes flitFwd{
+    0%{ transform:rotateY(0) }
+    50%{ transform:rotateY(-88deg) translateZ(58px) }
+    100%{ transform:rotateY(-180deg) }
+  }
+  @keyframes flitBack{
+    0%{ transform:rotateY(-180deg) }
+    50%{ transform:rotateY(-92deg) translateZ(58px) }
+    100%{ transform:rotateY(0) }
+  }
+  /* fluttering sheets get crisp outlines, flight shadows, and lit paper edges */
+  .flit .leaf-face.front{
+    box-shadow:
+      inset 18px 0 28px -18px rgba(60,40,10,.55),
+      inset 0 0 0 1px rgba(115,86,40,.3),
+      0 14px 30px rgba(12,6,1,.5);
+  }
+  .flit .leaf-face.back{
+    box-shadow:
+      inset -18px 0 28px -18px rgba(60,40,10,.55),
+      inset 0 0 0 1px rgba(115,86,40,.3),
+      0 14px 30px rgba(12,6,1,.5);
+  }
+  .flit .leaf-face::after{
+    content:""; position:absolute; top:0; bottom:0; width:5px; z-index:2;
+  }
+  .flit .leaf-face.front::after{ right:0;
+    background:linear-gradient(270deg, #a98e55, #e6d6a8 45%, rgba(255,248,222,0)); }
+  .flit .leaf-face.back::after{ left:0;
+    background:linear-gradient(90deg, #a98e55, #e6d6a8 45%, rgba(255,248,222,0)); }
 
   .leaf-face{
     position:absolute; inset:0;
@@ -1162,6 +1197,9 @@ function flutterTo(target){
     el.className = 'flit' + (dir < 0 ? ' rev' : '');
     el.style.animationDelay = delay + 'ms';
     el.style.animationDuration = dur + 'ms';
+    /* real fluttering pages are never perfectly aligned */
+    el.style.top = ((i % 3) * 2) + 'px';
+    el.style.bottom = (((i + 1) % 3) * 2) + 'px';
     el.innerHTML =
       '<div class="leaf-face front"><div class="parchment"></div><div class="page-inner" id="flitF'+i+'"></div></div>' +
       '<div class="leaf-face back"><div class="parchment"></div><div class="page-inner" id="flitB'+i+'"></div></div>';
