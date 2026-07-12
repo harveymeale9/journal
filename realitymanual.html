@@ -736,12 +736,14 @@
       color:var(--paper);
     }
     .numpad{
-      top:auto; bottom:calc(100% + 10px);
+      top:auto; bottom:calc(100% + 8px);
       right:50%; transform:translateX(50%);
-      grid-template-columns:repeat(3, 54px);
-      gap:8px;
+      grid-template-columns:repeat(3, 34px);
+      gap:5px;
+      padding:6px;
     }
-    .numpad button{ font-size:1.2rem; padding:.5em 0; }
+    .numpad button{ font-size:.85rem; padding:.3em 0; }
+    .numpad button.np-go{ font-size:.55rem; }
   }
 
   @media (prefers-reduced-motion: reduce){
