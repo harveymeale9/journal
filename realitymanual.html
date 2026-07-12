@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Reality Manual — Digital Grimoire Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --desk-dark:#17110c;
+    --desk:#241a12;
+    --leather:#2e1f16;
+    --leather-edge:#4a3320;
+    --paper:#e9dcbd;
+    --paper-deep:#d9c79f;
+    --ink:#2b2116;
+    --ink-faint:#5d4c35;
+    --brass:#9c7c3c;
+    --rubric:#7a2f1d; /* oxblood red used in medieval rubrication */
+    --page-w: clamp(280px, 42vw, 460px);
+    --page-h: calc(var(--page-w) * 1.36);
+    --turn-ms: 900ms;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+
+  body{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    background:
+      radial-gradient(ellipse 120% 90% at 50% 30%, var(--desk) 0%, var(--desk-dark) 75%);
+    font-family:'IM Fell English', Georgia, serif;
+    color:var(--paper);
+    overflow-x:hidden;
+    padding:4vh 2vw;
+  }
+
+  /* ambient candlelight flicker on the desk */
+  .glow{
+    position:fixed; inset:0; pointer-events:none;
+    background:radial-gradient(ellipse 60% 45% at 50% 42%, rgba(255,190,90,.07), transparent 70%);
+    animation:flicker 7s ease-in-out infinite;
+  }
+  @keyframes flicker{
+    0%,100%{opacity:.85} 40%{opacity:1} 60%{opacity:.75} 80%{opacity:.95}
+  }
+
+  header.site{
+    text-align:center;
+    margin-bottom:3vh;
+    user-select:none;
+  }
+  header.site h1{
+    font-family:'IM Fell English SC', Georgia, serif;
+    font-weight:400;
+    font-size:clamp(1.2rem, 2.6vw, 1.9rem);
+    letter-spacing:.35em;
+    text-indent:.35em;
+    color:var(--brass);
+  }
+  header.site p{
+    font-style:italic;
+    font-size:.85rem;
+    color:#8a7452;
+    margin-top:.4em;
+    letter-spacing:.08em;
+  }
+
+  /* ============ THE BOOK ============ */
+  .book-wrap{
+    perspective:2600px;
+    position:relative;
+  }
+  .book{
+    position:relative;
+    display:flex;
+    align-items:center;
+    height:var(--page-h);
+    /* leather cover peeking out beneath the pages */
+    background:
+      linear-gradient(160deg, var(--leather-edge), var(--leather) 40%, #1d130c);
+    border-radius:6px 10px 10px 6px;
+    padding:14px;
+    box-shadow:
+      0 40px 80px -20px rgba(0,0,0,.85),
+      0 8px 24px rgba(0,0,0,.6),
+      inset 0 0 0 1px rgba(156,124,60,.25);
+  }
+  /* tooled border on the visible cover edge */
+  .book::before{
+    content:""; position:absolute; inset:5px;
+    border:1px solid rgba(156,124,60,.35);
+    border-radius:5px;
+    pointer-events:none;
+  }
+  /* stacked page edges at left and right */
+  .book::after{
+    content:""; position:absolute; top:14px; bottom:14px; left:8px; right:8px;
+    background:
+      repeating-linear-gradient(90deg, transparent 0 3px, rgba(0,0,0,.12) 3px 4px);
+    border-radius:3px;
+    pointer-events:none; opacity:.0;
+  }
+
+  /* ============ GILDED PAGE BLOCK (the tome's thickness) ============ */
+  .pages-wrap{
+    position:relative;
+    display:flex;
+    flex:none;
+    height:calc(var(--page-h) - 28px);
+    z-index:2;
+  }
+  .stack{
+    flex:none;
+    align-self:center;
+    width:34px;                        /* fixed slot: layout never shifts */
+    height:calc(var(--page-h) - 28px); /* flush with the open pages */
+    position:relative;
+  }
+  .stack .fill{
+    position:absolute; top:0; bottom:0;
+    width:26px;                        /* JS varies this, slightly */
+    transition:width var(--turn-ms) cubic-bezier(.45,.05,.3,1);
+    /* gilt edges: fine vertical leaves + top sheen + bottom shade */
+    background:
+      linear-gradient(180deg, rgba(255,246,216,.5), rgba(255,246,216,0) 10%,
+                      rgba(255,236,190,.1) 55%, rgba(60,38,10,.38) 98%),
+      repeating-linear-gradient(90deg,
+        #a3762f 0 1px, #e7c477 1px 2px, #caa04f 2px 3px, #f0d38c 3px 4px);
+    box-shadow:
+      inset 0 5px 8px -6px rgba(255,250,225,.85),
+      inset 0 -7px 10px -7px rgba(35,20,3,.8);
+  }
+  /* a few heavier leaves so the block reads as stacked paper, not texture */
+  .stack .fill::after{
+    content:""; position:absolute; inset:0;
+    background:repeating-linear-gradient(90deg,
+      transparent 0 7px, rgba(110,76,24,.22) 7px 8px, transparent 8px 15px);
+    mix-blend-mode:multiply;
+  }
+  .stack.left .fill{
+    right:0;
+    border-radius:2px 0 0 2px;
+    box-shadow:
+      inset 0 5px 8px -6px rgba(255,250,225,.85),
+      inset 0 -7px 10px -7px rgba(35,20,3,.8),
+      inset -5px 0 6px -5px rgba(55,32,6,.5);
+  }
+  .stack.right .fill{
+    left:0;
+    border-radius:0 2px 2px 0;
+    box-shadow:
+      inset 0 5px 8px -6px rgba(255,250,225,.85),
+      inset 0 -7px 10px -7px rgba(35,20,3,.8),
+      inset 5px 0 6px -5px rgba(55,32,6,.5);
+  }
+
+  .page{
+    position:relative;
+    width:var(--page-w);
+    height:calc(var(--page-h) - 28px);
+    background:var(--paper);
+    overflow:hidden;
+    flex:none;
+  }
+  .page.left{ border-radius:4px 0 0 4px;
+    box-shadow:inset -18px 0 28px -18px rgba(60,40,10,.55), inset 3px 0 6px rgba(0,0,0,.2);}
+  .page.right{ border-radius:0 4px 4px 0;
+    box-shadow:inset 18px 0 28px -18px rgba(60,40,10,.55), inset -3px 0 6px rgba(0,0,0,.2);}
+
+  /* aged paper: stains + grain, all CSS/SVG, no images */
+  .parchment{
+    position:absolute; inset:0;
+    background:
+      radial-gradient(ellipse 40% 30% at 12% 8%, rgba(150,110,50,.16), transparent 70%),
+      radial-gradient(ellipse 30% 24% at 92% 88%, rgba(140,95,40,.18), transparent 70%),
+      radial-gradient(ellipse 55% 45% at 70% 20%, rgba(160,120,60,.08), transparent 70%),
+      radial-gradient(ellipse 120% 120% at 50% 50%, var(--paper) 55%, var(--paper-deep) 100%);
+  }
+  .grain{ position:absolute; inset:0; opacity:.5; mix-blend-mode:multiply; pointer-events:none;}
+
+  .page-inner{
+    position:absolute; inset:0;
+    padding:9% 11% 12%;
+    color:var(--ink);
+    display:flex; flex-direction:column;
+  }
+
+  /* ============ TYPOGRAPHY OF THE PAGE ============ */
+  .running-head{
+    font-family:'IM Fell English SC', serif;
+    font-size:.62rem; letter-spacing:.32em; text-indent:.32em;
+    text-align:center; color:var(--ink-faint);
+    margin-bottom:1.6em;
+  }
+  .folio{
+    position:absolute; bottom:5.5%;
+    font-family:'Cormorant Garamond', serif;
+    font-size:.7rem; letter-spacing:.15em; color:var(--ink-faint);
+  }
+  .page.left .folio, .leaf-face.back .folio{ left:11%; }
+  .page.right .folio, .leaf-face.front .folio{ right:11%; }
+
+  .entry-no{
+    font-family:'IM Fell English SC', serif;
+    text-align:center; font-size:.7rem; letter-spacing:.4em; text-indent:.4em;
+    color:var(--rubric); margin-bottom:.9em;
+  }
+  h2.entry-title{
+    font-family:'IM Fell English SC', serif;
+    font-weight:400; text-align:center;
+    font-size:clamp(1rem, 2vw, 1.45rem);
+    letter-spacing:.12em; line-height:1.25;
+    margin-bottom:.4em;
+  }
+  .ornament{
+    text-align:center; color:var(--brass);
+    font-size:.9rem; margin:.6em 0 1.1em;
+    letter-spacing:.6em; text-indent:.6em;
+  }
+
+  .body-text{
+    font-family:'IM Fell English', Georgia, serif;
+    font-size:clamp(.72rem, 1.25vw, .92rem);
+    line-height:1.62;
+    text-align:justify;
+    hyphens:auto;
+  }
+  .body-text p + p{ text-indent:1.6em; margin-top:.15em; }
+
+  .dropcap::first-letter{
+    font-family:'IM Fell English SC', serif;
+    float:left;
+    font-size:3.4em; line-height:.82;
+    padding:.06em .12em 0 0;
+    color:var(--rubric);
+  }
+
+  .marginal{
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic; font-size:.72em;
+    color:var(--ink-faint);
+    border-left:1px solid rgba(122,47,29,.4);
+    padding-left:.9em; margin:1.1em 0 1.1em .5em;
+  }
+
+  .xref{ font-variant:small-caps; letter-spacing:.06em; color:var(--rubric); font-style:normal; }
+
+  /* title page */
+  .title-page{ text-align:center; justify-content:center; }
+  .title-page .tp-small{
+    font-family:'IM Fell English SC', serif; font-size:.66rem;
+    letter-spacing:.4em; text-indent:.4em; color:var(--ink-faint);
+  }
+  .title-page h1{
+    font-family:'IM Fell English SC', serif; font-weight:400;
+    font-size:clamp(1.4rem, 3vw, 2.2rem); letter-spacing:.14em;
+    margin:.7em 0 .3em; line-height:1.2;
+  }
+  .title-page .tp-rule{ color:var(--brass); margin:1em 0; letter-spacing:.5em; text-indent:.5em; }
+  .title-page .tp-edition{
+    font-family:'Cormorant Garamond', serif; font-style:italic;
+    font-size:.85rem; color:var(--ink-faint); line-height:1.7;
+  }
+
+  /* contents */
+  .toc{ list-style:none; font-size:clamp(.7rem, 1.2vw, .88rem); }
+  .toc li{
+    display:flex; align-items:baseline; gap:.5em;
+    margin-bottom:.85em; line-height:1.4;
+  }
+  .toc .t{ font-variant:small-caps; letter-spacing:.05em; }
+  .toc .dots{ flex:1; border-bottom:1px dotted rgba(93,76,53,.6); transform:translateY(-3px); }
+  .toc .n{ font-family:'Cormorant Garamond', serif; color:var(--ink-faint); }
+  .toc .sealed-mark{ color:var(--rubric); font-size:.85em; }
+
+  /* the animated sigil illustration */
+  .plate{
+    margin:1.2em auto .4em; width:62%;
+    display:block;
+  }
+  .plate-caption{
+    font-family:'Cormorant Garamond', serif; font-style:italic;
+    text-align:center; font-size:.7em; color:var(--ink-faint);
+    margin-bottom:1em;
+  }
+  .sigil-rotate{ transform-origin:50% 50%; animation:sigilspin 60s linear infinite; }
+  .sigil-rotate.rev{ animation-direction:reverse; animation-duration:90s; }
+  .sigil-pulse{ animation:sigilpulse 5s ease-in-out infinite; transform-origin:50% 50%; }
+  @keyframes sigilspin{ to{ transform:rotate(360deg);} }
+  @keyframes sigilpulse{ 0%,100%{opacity:.55} 50%{opacity:1} }
+
+  /* sealed / paywall page */
+  .sealed{ justify-content:center; text-align:center; }
+  .sealed .seal-glyph{ font-size:2.2rem; color:var(--rubric); margin-bottom:.5em;}
+  .sealed h3{
+    font-family:'IM Fell English SC', serif; font-weight:400;
+    letter-spacing:.2em; font-size:1rem; margin-bottom:1em; color:var(--ink);
+  }
+  .sealed p{
+    font-size:.85em; line-height:1.7; color:var(--ink-faint);
+    max-width:26ch; margin:0 auto 1.6em; font-style:italic;
+  }
+  .sealed button{
+    font-family:'IM Fell English SC', serif;
+    letter-spacing:.25em; text-indent:.25em; font-size:.72rem;
+    background:none; color:var(--rubric);
+    border:1px solid var(--rubric); border-radius:2px;
+    padding:.9em 1.6em; cursor:pointer;
+    transition:background .3s, color .3s;
+  }
+  .sealed button:hover, .sealed button:focus-visible{
+    background:var(--rubric); color:var(--paper);
+    outline:none;
+  }
+
+  /* blurred teaser text behind the seal */
+  .veiled{
+    filter:blur(4px); opacity:.5; user-select:none;
+    margin-bottom:1.4em; font-size:.85em; text-align:justify;
+  }
+
+  /* ============ PAGE TURN ============ */
+  .leaf{
+    position:absolute;
+    top:0; bottom:0;
+    left:50%;
+    width:var(--page-w);
+    transform-style:preserve-3d;
+    transform-origin:left center;
+    pointer-events:none;
+    z-index:5;
+    display:none;
+  }
+  .leaf.turning{ display:block; animation:turnFwd var(--turn-ms) cubic-bezier(.45,.05,.3,1) forwards; }
+  .leaf.turning.back{ animation:turnBack var(--turn-ms) cubic-bezier(.45,.05,.3,1) forwards; }
+  @keyframes turnFwd{ from{transform:rotateY(0)} to{transform:rotateY(-180deg)} }
+  @keyframes turnBack{ from{transform:rotateY(-180deg)} to{transform:rotateY(0)} }
+
+  .leaf-face{
+    position:absolute; inset:0;
+    background:var(--paper);
+    backface-visibility:hidden;
+    overflow:hidden;
+  }
+  .leaf-face.front{ border-radius:0 4px 4px 0;
+    box-shadow:inset 18px 0 28px -18px rgba(60,40,10,.55);}
+  .leaf-face.back{ transform:rotateY(180deg); border-radius:4px 0 0 4px;
+    box-shadow:inset -18px 0 28px -18px rgba(60,40,10,.55);}
+  /* moving shadow cast on the book while the leaf turns */
+  .turn-shade{
+    position:absolute; inset:0; pointer-events:none; z-index:4;
+    opacity:0; background:linear-gradient(90deg, transparent 45%, rgba(0,0,0,.28) 50%, transparent 60%);
+  }
+  .turn-shade.on{ animation:shade var(--turn-ms) ease-in-out forwards; }
+  @keyframes shade{ 0%{opacity:0} 35%{opacity:1} 100%{opacity:0} }
+
+  /* click zones */
+  .zone{
+    position:absolute; top:0; bottom:0; width:18%;
+    cursor:pointer; z-index:6; background:none; border:none;
+  }
+  .zone:focus-visible{ outline:2px solid var(--brass); outline-offset:-4px; }
+  .zone.prev{ left:0; } .zone.next{ right:0; }
+  .zone::after{
+    content:attr(data-hint);
+    position:absolute; bottom:-2.4em; left:50%; transform:translateX(-50%);
+    font-family:'Cormorant Garamond', serif; font-style:italic;
+    font-size:.72rem; color:#8a7452; opacity:0; transition:opacity .3s;
+    white-space:nowrap;
+  }
+  .zone:hover::after{ opacity:1; }
+
+  .spread-label{
+    margin-top:2.6vh; font-family:'Cormorant Garamond', serif;
+    font-style:italic; font-size:.8rem; color:#8a7452; letter-spacing:.1em;
+    user-select:none; text-align:center;
+  }
+
+  /* ============ MOBILE: single page ============ */
+  @media (max-width:720px){
+    :root{ --page-w: min(76vw, 420px); }
+    .stack{ width:18px; }
+    .page.left{ display:none; }
+    .page.right{ border-radius:4px; box-shadow:inset 8px 0 18px -12px rgba(60,40,10,.5); }
+    .leaf{ display:none !important; } /* fall back to instant/fade on mobile */
+    .zone{ width:26%; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .leaf{ display:none !important; }
+    .turn-shade{ display:none !important; }
+    .glow, .sigil-rotate, .sigil-pulse{ animation:none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="glow"></div>
+
+<header class="site">
+  <h1>The Reality Manual</h1>
+  <p>a living grimoire · entries are added as they are inscribed</p>
+</header>
+
+<div class="book-wrap">
+  <div class="book" id="book">
+    <div class="stack left" aria-hidden="true"><div class="fill" id="stackL"></div></div>
+    <div class="pages-wrap">
+    <div class="page left"><div class="parchment"></div><svg class="grain" width="100%" height="100%"><filter id="g1"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0.45  0 0 0 0 0.36  0 0 0 0 0.22  0 0 0 0.06 0"/></filter><rect width="100%" height="100%" filter="url(#g1)"/></svg><div class="page-inner" id="pageL"></div></div>
+    <div class="page right"><div class="parchment"></div><svg class="grain" width="100%" height="100%"><filter id="g2"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0.45  0 0 0 0 0.36  0 0 0 0 0.22  0 0 0 0.06 0"/></filter><rect width="100%" height="100%" filter="url(#g2)"/></svg><div class="page-inner" id="pageR"></div></div>
+
+    <div class="leaf" id="leaf">
+      <div class="leaf-face front"><div class="parchment"></div><div class="page-inner" id="leafFront"></div></div>
+      <div class="leaf-face back"><div class="parchment"></div><div class="page-inner" id="leafBack"></div></div>
+    </div>
+    <div class="turn-shade" id="shade"></div>
+    </div>
+    <div class="stack right" aria-hidden="true"><div class="fill" id="stackR"></div></div>
+
+    <button class="zone prev" id="btnPrev" data-hint="turn back" aria-label="Previous page"></button>
+    <button class="zone next" id="btnNext" data-hint="turn the page" aria-label="Next page"></button>
+  </div>
+</div>
+
+<div class="spread-label" id="spreadLabel"></div>
+
+<script>
+/* ==========================================================
+   PAGES are hand-authored "plates": each index is one page.
+   Even index = verso (left), odd = recto (right).
+   To publish a new entry, you append page objects here
+   (in the real site, this array comes from your CMS/files).
+   ========================================================== */
+
+const sigilSVG = `
+<svg class="plate" viewBox="0 0 200 200" role="img" aria-label="Rotating sigil of concentric rings and radiating lines">
+  <g fill="none" stroke="#7a2f1d" stroke-width="1">
+    <g class="sigil-rotate">
+      <circle cx="100" cy="100" r="78" stroke-opacity=".8"/>
+      <circle cx="100" cy="100" r="70" stroke-dasharray="3 5" stroke-opacity=".6"/>
+      <g stroke-opacity=".7">
+        <path d="M100 22 L100 34 M100 166 L100 178 M22 100 L34 100 M166 100 L178 100"/>
+        <path d="M45 45 L53 53 M147 147 L155 155 M155 45 L147 53 M53 147 L45 155"/>
+      </g>
+    </g>
+    <g class="sigil-rotate rev" stroke="#9c7c3c">
+      <polygon points="100,40 152,130 48,130" stroke-opacity=".75"/>
+      <polygon points="100,160 48,70 152,70" stroke-opacity=".75"/>
+    </g>
+    <g class="sigil-pulse">
+      <circle cx="100" cy="100" r="14" stroke="#7a2f1d"/>
+      <circle cx="100" cy="100" r="4" fill="#7a2f1d" stroke="none"/>
+    </g>
+  </g>
+</svg>`;
+
+const pages = [
+
+/* 0 — frontispiece */
+`<div class="page-inner title-page" style="position:static">
+  <div>
+    ${sigilSVG.replace('class="plate"','class="plate" style="width:70%"')}
+    <p class="plate-caption">Frontispiece · The First Sigil</p>
+  </div>
+</div>`,
+
+/* 1 — title page */
+`<div class="page-inner title-page" style="position:static">
+  <div>
+    <p class="tp-small">Herein is set down</p>
+    <h1>The Reality<br>Manual</h1>
+    <p class="tp-rule">✦ ❦ ✦</p>
+    <p class="tp-edition">Being a compendium of observations<br>
+    on the architecture of experience,<br>
+    inscribed entry by entry.<br><br>
+    <em>The Living Edition — grows as it is written</em></p>
+  </div>
+  <span class="folio">i</span>
+</div>`,
+
+/* 2 — contents */
+`<div class="page-inner" style="position:static">
+  <p class="running-head">Contents of the Manual</p>
+  <ul class="toc">
+    <li><span class="t">I · On the Nature of Attention</span><span class="dots"></span><span class="n">1</span></li>
+    <li><span class="t">II · The Mirror Principle</span><span class="dots"></span><span class="n sealed-mark">sealed</span></li>
+    <li><span class="t">III · Maps Are Not Territory</span><span class="dots"></span><span class="n sealed-mark">sealed</span></li>
+    <li><span class="t">IV · The Economy of Meaning</span><span class="dots"></span><span class="n sealed-mark">sealed</span></li>
+    <li><span class="t">V · On Thresholds</span><span class="dots"></span><span class="n sealed-mark">forthcoming</span></li>
+  </ul>
+  <p class="marginal">Entries marked <span class="xref">sealed</span> open to keyholders. Entries marked <span class="xref">forthcoming</span> are still being inscribed — the Manual is alive.</p>
+  <span class="folio">ii</span>
+</div>`,
+
+/* 3 — how to read */
+`<div class="page-inner" style="position:static">
+  <p class="running-head">On the Use of This Book</p>
+  <div class="body-text">
+    <p class="dropcap">This is not a book to be read from beginning to end. It is a compendium: each entry stands alone, states one idea completely, and points toward its kin. Open it anywhere. Follow the references as you would follow corridors.</p>
+    <p>New entries appear as they are finished. What you hold is never the final Manual — only the Manual as of tonight.</p>
+  </div>
+  <p class="ornament">❦</p>
+  <span class="folio">iii</span>
+</div>`,
+
+/* 4 — Entry I, first page */
+`<div class="page-inner" style="position:static">
+  <p class="running-head">The Reality Manual</p>
+  <p class="entry-no">Entry the First</p>
+  <h2 class="entry-title">On the Nature<br>of Attention</h2>
+  <p class="ornament">✦ ✦ ✦</p>
+  <div class="body-text">
+    <p class="dropcap">Whatever you attend to, you enlarge. This is the first law of the Manual, and every later entry is a footnote to it. The world does not arrive whole; it arrives selected, and the instrument of selection is attention — which means the instrument is you.</p>
+    <p>Most struggle is therefore a dispute about aim, not about the world. The anxious mind is not perceiving more danger; it is aiming at danger with great skill.</p>
+  </div>
+  <span class="folio">1</span>
+</div>`,
+
+/* 5 — Entry I, plate page */
+`<div class="page-inner" style="position:static">
+  <p class="running-head">Entry I · Attention</p>
+  ${sigilSVG}
+  <p class="plate-caption">Plate I — The aperture turns; the centre holds.<br>(Plates in the living edition move.)</p>
+  <div class="body-text">
+    <p>Attention behaves like the aperture drawn above: what widens admits more world and less detail; what narrows admits detail and loses the world. Neither setting is correct. The error is forgetting that there is a setting at all. <span class="xref">See also: Entry IV, The Economy of Meaning.</span></p>
+  </div>
+  <span class="folio">2</span>
+</div>`,
+
+/* 6 — sealed page (paywall inside the book) */
+`<div class="page-inner sealed" style="position:static">
+  <div>
+    <div class="seal-glyph">⍟</div>
+    <h3>This Entry Is Sealed</h3>
+    <p class="veiled">The mirror does not show you the world; it shows you the shape of the instrument doing the looking, which is why every judgment of another person is first a confession of…</p>
+    <p>Entry II and all that follows open to keyholders of the Manual.</p>
+    <button onclick="alert('In the real site, this goes to checkout — the license key unlocks every sealed page, forever.')">Obtain the Key · $59</button>
+  </div>
+  <span class="folio">3</span>
+</div>`,
+
+/* 7 — colophon */
+`<div class="page-inner title-page" style="position:static">
+  <div>
+    <p class="tp-small">Colophon</p>
+    <p class="tp-rule">❦</p>
+    <p class="tp-edition">The Manual is inscribed continuously.<br>
+    Keyholders receive each new entry<br>as it is completed.<br><br>
+    The bound tome — the First Edition,<br>printed and gilded — is drawn<br>from these pages once a year.</p>
+  </div>
+  <span class="folio">iv</span>
+</div>`
+];
+
+/* ============ book engine ============ */
+const pageL = document.getElementById('pageL');
+const pageR = document.getElementById('pageR');
+const leaf = document.getElementById('leaf');
+const leafFront = document.getElementById('leafFront');
+const leafBack = document.getElementById('leafBack');
+const shade = document.getElementById('shade');
+const label = document.getElementById('spreadLabel');
+const stackL = document.getElementById('stackL');
+const stackR = document.getElementById('stackR');
+
+/* the tome's thickness: shifts subtly toward the left as you read.
+   Fills sit in fixed-width slots, so the pages themselves never move. */
+function updateStacks(frac){
+  const max = isMobile() ? 15 : 30;
+  const min = isMobile() ? 9  : 20;
+  stackL.style.width = Math.round(min + frac * (max - min)) + 'px';
+  stackR.style.width = Math.round(max - frac * (max - min)) + 'px';
+}
+
+let spread = 0; // spread n shows pages [2n, 2n+1]
+let turning = false;
+const maxSpread = Math.ceil(pages.length / 2) - 1;
+const isMobile = () => window.matchMedia('(max-width:720px)').matches;
+const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* on mobile we page one page at a time through the right slot */
+let mobilePage = 0;
+
+function inner(html){ return html || '<div class="page-inner" style="position:static"></div>'; }
+
+function render(){
+  if (isMobile()){
+    pageR.parentElement.style.display = '';
+    pageR.innerHTML = ''; // replace whole inner
+    pageR.outerHTML = pageR.outerHTML; // no-op guard
+    document.getElementById('pageR').innerHTML = stripOuter(pages[mobilePage]);
+    label.textContent = `page ${mobilePage+1} of ${pages.length} · tap the edges to turn`;
+    updateStacks(pages.length > 1 ? mobilePage / (pages.length - 1) : 0);
+  } else {
+    document.getElementById('pageL').innerHTML = stripOuter(pages[spread*2]);
+    document.getElementById('pageR').innerHTML = stripOuter(pages[spread*2+1] || '');
+    label.textContent = `spread ${spread+1} of ${maxSpread+1} · click the page edges, or use ← →`;
+    updateStacks(maxSpread > 0 ? spread / maxSpread : 0);
+  }
+}
+
+/* pages are authored with their own .page-inner wrapper for the leaf faces;
+   for the static slots we inject the inside of that wrapper */
+function stripOuter(html){
+  if(!html) return '';
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  const w = tmp.firstElementChild;
+  return w ? w.innerHTML : html;
+}
+
+function go(dir){
+  if (turning) return;
+
+  if (isMobile()){
+    const next = mobilePage + dir;
+    if (next < 0 || next >= pages.length) return;
+    mobilePage = next;
+    render();
+    return;
+  }
+
+  const next = spread + dir;
+  if (next < 0 || next > maxSpread) return;
+
+  if (reduced){
+    spread = next; render(); return;
+  }
+
+  turning = true;
+
+  if (dir > 0){
+    /* leaf front = current right page, leaf back = next left page */
+    leafFront.innerHTML = stripOuter(pages[spread*2+1] || '');
+    leafBack.innerHTML  = stripOuter(pages[next*2] || '');
+    /* underneath: left stays, right becomes the next right page */
+    document.getElementById('pageR').innerHTML = stripOuter(pages[next*2+1] || '');
+    leaf.classList.remove('back');
+  } else {
+    /* turning back: leaf starts flat on the left (rotated -180) and returns.
+       front = previous right page, back = current left page */
+    leafFront.innerHTML = stripOuter(pages[next*2+1] || '');
+    leafBack.innerHTML  = stripOuter(pages[spread*2] || '');
+    document.getElementById('pageL').innerHTML = stripOuter(pages[next*2] || '');
+    leaf.classList.add('back');
+  }
+
+  leaf.classList.add('turning');
+  shade.classList.add('on');
+
+  setTimeout(()=>{
+    leaf.classList.remove('turning','back');
+    shade.classList.remove('on');
+    spread = next;
+    render();
+    turning = false;
+  }, 920);
+}
+
+document.getElementById('btnNext').addEventListener('click', ()=>go(1));
+document.getElementById('btnPrev').addEventListener('click', ()=>go(-1));
+document.addEventListener('keydown', e=>{
+  if (e.key === 'ArrowRight') go(1);
+  if (e.key === 'ArrowLeft') go(-1);
+});
+
+/* simple swipe for mobile */
+let tx = null;
+document.getElementById('book').addEventListener('touchstart', e=>{ tx = e.touches[0].clientX; }, {passive:true});
+document.getElementById('book').addEventListener('touchend', e=>{
+  if (tx === null) return;
+  const dx = e.changedTouches[0].clientX - tx;
+  if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+  tx = null;
+}, {passive:true});
+
+window.addEventListener('resize', render);
+render();
+</script>
+</body>
+</html>
