@@ -252,8 +252,15 @@
   .grain{ position:absolute; inset:0; opacity:.5; mix-blend-mode:multiply; pointer-events:none;}
 
   .page-inner{
-    position:absolute; inset:0;
-    padding:9% 11% 12%;
+    position:absolute;
+    /* Reserve a clear strip at the foot of the page for the "x of xx" page
+       indicator. Content and the decorative frame are confined above it (and
+       clipped there rather than at the page edge), so the indicator never sits
+       on top of any text or ornament. The bottom padding is trimmed to
+       compensate, so the text block's effective bottom margin is unchanged. */
+    top:0; left:0; right:0; bottom:7%;
+    padding:9% 11% 3%;
+    overflow:hidden;
     color:var(--ink);
     display:flex; flex-direction:column;
   }
@@ -673,7 +680,7 @@
     font-style:italic;
     /* clamp so the "x of xx" indicator never renders too small to read on
        smaller (tablet) pages, while desktop keeps its page-proportional size */
-    font-size:clamp(14px, calc(var(--page-w) * .0185), 22px);
+    font-size:clamp(12px, calc(var(--page-w) * .0185), 22px);
     letter-spacing:.04em;
     color:var(--ink-faint);
   }
@@ -788,7 +795,7 @@
         inset 0 0 0 1px rgba(90,60,20,.25);
     }
     .page.m .folio{ left:50%; right:auto; transform:translateX(-50%); }
-    .page.m > .page-inner{ position:absolute !important; inset:0; }
+    .page.m > .page-inner{ position:absolute !important; inset:0; padding-bottom:12%; }
     .jump{
       visibility:visible;
       /* .book-wrap sets pointer-events:none on mobile and .jump lives inside
