@@ -657,30 +657,36 @@
   /* ============ JUMP TO PAGE ============ */
   .jump{
     position:absolute;
-    left:50%; bottom:5.5%;
+    left:50%; bottom:2.2%;
     transform:translateX(-50%);
     z-index:20;
-    display:flex; align-items:baseline; gap:.35em;
+    display:flex; align-items:center; gap:.5em;
     font-family:'Cormorant Garamond', serif;
     font-style:italic;
-    font-size:calc(var(--page-w) * .019);
+    font-size:calc(var(--page-w) * .0185);
     letter-spacing:.04em;
     color:var(--ink-faint);
   }
+  .jump::before, .jump::after{
+    content:"·";
+    color:var(--brass); font-style:normal;
+    font-size:1.3em; line-height:1;
+  }
   .jump input{
-    width:2em;
-    background:none; border:none;
-    border-bottom:1px solid var(--ink-faint);
-    color:var(--ink);
-    font-family:'Cormorant Garamond', serif;
-    font-style:italic;
-    font-size:1em; text-align:center;
+    width:1.7em; height:1.7em;
+    margin:0 -.05em;
+    background:radial-gradient(ellipse at center, rgba(156,124,60,.1), transparent 72%);
+    border:1px solid var(--brass);
+    border-radius:50%;
+    color:var(--rubric);
+    font-family:'IM Fell English SC', serif;
+    font-size:.82em; line-height:1; text-align:center;
     outline:none; cursor:pointer;
     -moz-appearance:textfield; appearance:textfield;
   }
   .jump input::-webkit-outer-spin-button,
   .jump input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
-  .jump input:focus{ border-bottom-color:var(--rubric); }
+  .jump input:focus{ border-color:var(--rubric); background:rgba(122,47,29,.08); }
   .jump .total{
     color:var(--ink-faint); font-family:'Cormorant Garamond', serif;
     font-size:1em; font-style:italic; letter-spacing:.04em;
@@ -779,6 +785,7 @@
     .jump span, .jump .total{ display:none; }
     .jump input{
       width:3.4em;
+      height:auto;
       font-size:1rem;
       padding:.22em 0;
       background:rgba(24,14,7,.55);
