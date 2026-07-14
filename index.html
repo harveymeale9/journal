@@ -654,8 +654,7 @@
   /* ============ JUMP TO PAGE ============ */
   .jump{
     position:absolute;
-    right:calc(2vw + 8px); top:50%;
-    transform:translateY(-50%);
+    right:6px; bottom:-16px;
     z-index:20;
     display:flex; align-items:baseline; gap:.55em;
     padding:.5em .9em;
@@ -698,7 +697,7 @@
   /* the number pad: opens beneath the panel when the box is tapped */
   .numpad{
     position:absolute;
-    top:calc(100% + 10px); right:0;
+    bottom:calc(100% + 10px); top:auto; right:0;
     display:none;
     grid-template-columns:repeat(3, 2.9em);
     gap:7px;
@@ -800,25 +799,6 @@
 
 <header class="site">
   <h1>The Reality Manual</h1>
-  <div class="jump" role="group" aria-label="Jump to a page of the book">
-    <span>Page</span>
-    <input id="jumpInput" type="text" readonly inputmode="none" aria-label="Page number">
-    <span class="total" id="jumpTotal"></span>
-    <div class="numpad" id="numpad" aria-label="Number pad">
-      <button type="button" data-k="1">1</button>
-      <button type="button" data-k="2">2</button>
-      <button type="button" data-k="3">3</button>
-      <button type="button" data-k="4">4</button>
-      <button type="button" data-k="5">5</button>
-      <button type="button" data-k="6">6</button>
-      <button type="button" data-k="7">7</button>
-      <button type="button" data-k="8">8</button>
-      <button type="button" data-k="9">9</button>
-      <button type="button" data-k="del">⌫</button>
-      <button type="button" data-k="0">0</button>
-      <button type="button" class="np-go" data-k="go">Go</button>
-    </div>
-  </div>
 </header>
 
 <div class="stage">
@@ -841,6 +821,25 @@
 
     <button class="zone prev" id="btnPrev" aria-label="Previous page"></button>
     <button class="zone next" id="btnNext" aria-label="Next page"></button>
+  </div>
+  <div class="jump" role="group" aria-label="Jump to a page of the book">
+    <span>Page</span>
+    <input id="jumpInput" type="text" readonly inputmode="none" aria-label="Page number">
+    <span class="total" id="jumpTotal"></span>
+    <div class="numpad" id="numpad" aria-label="Number pad">
+      <button type="button" data-k="1">1</button>
+      <button type="button" data-k="2">2</button>
+      <button type="button" data-k="3">3</button>
+      <button type="button" data-k="4">4</button>
+      <button type="button" data-k="5">5</button>
+      <button type="button" data-k="6">6</button>
+      <button type="button" data-k="7">7</button>
+      <button type="button" data-k="8">8</button>
+      <button type="button" data-k="9">9</button>
+      <button type="button" data-k="del">⌫</button>
+      <button type="button" data-k="0">0</button>
+      <button type="button" class="np-go" data-k="go">Go</button>
+    </div>
   </div>
 </div>
 <button class="side-zone" id="sideRight" aria-label="Next page" tabindex="-1"></button>
