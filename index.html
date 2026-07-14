@@ -1534,7 +1534,6 @@ function updateStacks(frac){
 
 let spread = 0; // spread n shows pages [2n, 2n+1]
 let turning = false;
-let flightTarget = null; // where the currently-playing animation is heading, or null if idle
 const maxSpread = Math.ceil(pages.length / 2) - 1;
 const isMobile = () => window.matchMedia('(orientation: portrait) and (max-width: 940px), (max-width: 720px)').matches;
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1582,7 +1581,6 @@ function go(dir, ms, done){
   }
 
   turning = true;
-  flightTarget = next;
   leaf.style.animationDuration = ms + 'ms';
   shade.style.animationDuration = ms + 'ms';
 
@@ -1611,7 +1609,6 @@ function go(dir, ms, done){
     spread = next;
     render();
     turning = false;
-    flightTarget = null;
     if (done) done();
   }, ms + 20);
 }
@@ -1626,43 +1623,37 @@ document.addEventListener('keydown', e=>{
   if (e.key === 'ArrowLeft') requestGo(-1);
 });
 
-/* rapid clicks/keypresses shouldn't be dropped while a turn is mid-flight.
-   Each request is measured against flightTarget — where the animation
-   currently playing will actually land — not against spread, which hasn't
-   updated yet. Without that distinction, a click arriving mid-animation
-   would alias with the animation's own natural endpoint and vanish. Any
-   extra requests queue in pendingTarget and fire the moment the current
-   animation completes, using a single flip for one page or a flutter for
-   a run of several, so every click reliably lands a page turn. */
-let pendingTarget = null;
+/* rapid clicks/keypresses shouldn't be dropped or bundled into a flutter
+   while a turn is mid-flight. desiredTarget is the spread we're ultimately
+   headed toward — set the moment a click arrives and left in place across
+   every intermediate flip, only clearing once we've actually landed on it.
+   Each click nudges it by one; each completed flip checks whether it still
+   has ground to cover and, if so, immediately fires the next single-page
+   flip toward it. That's what keeps N clicks mapped to exactly N flips,
+   however fast they arrive, with no multi-leaf flutter substituted in. */
+let desiredTarget = null;
 
 function requestGo(dir){
   if (isMobile()) return;
-  const inFlight = flightTarget !== null;
-  const base = inFlight ? (pendingTarget !== null ? pendingTarget : flightTarget) : spread;
+  const base = (desiredTarget !== null) ? desiredTarget : spread;
   const target = Math.min(maxSpread, Math.max(0, base + dir));
   if (target === base) return;
-  if (inFlight){
-    pendingTarget = target;
-  } else {
-    startTurn(target);
-  }
+  const wasIdle = (desiredTarget === null);
+  desiredTarget = target;
+  if (wasIdle) stepToward();
 }
 
-function startTurn(target){
-  const diff = target - spread;
-  if (Math.abs(diff) === 1){
-    go(diff, undefined, checkPending);
-  } else {
-    flutterTo(target, checkPending);
-  }
+function stepToward(){
+  if (desiredTarget === null || desiredTarget === spread){ desiredTarget = null; return; }
+  const dir = desiredTarget > spread ? 1 : -1;
+  go(dir, undefined, onStepDone);
 }
 
-function checkPending(){
-  if (pendingTarget !== null){
-    const target = pendingTarget;
-    pendingTarget = null;
-    startTurn(target);
+function onStepDone(){
+  if (desiredTarget !== null && desiredTarget !== spread){
+    stepToward();
+  } else {
+    desiredTarget = null;
   }
 }
 
@@ -1697,7 +1688,6 @@ function flutterTo(target, done){
   if (reduced){ spread = target; render(); if (done) done(); return; }
 
   turning = true;
-  flightTarget = target;
   const K = Math.max(4, Math.min(steps, 7)); /* leaves in flight */
   const delayStep = 100;
   const box = document.createElement('div');
@@ -1748,7 +1738,6 @@ function flutterTo(target, done){
     spread = target;
     render();
     turning = false;
-    flightTarget = null;
     if (done) done();
   }, lastEnd + 60);
 }
