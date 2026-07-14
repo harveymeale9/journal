@@ -697,16 +697,6 @@
     color:var(--ink-faint); font-family:'Cormorant Garamond', serif;
     font-size:1em; font-style:italic; letter-spacing:.04em;
   }
-  .jump button{
-    background:none; border:1px solid rgba(156,124,60,.5); border-radius:2px;
-    color:var(--brass); font-family:'IM Fell English SC', serif;
-    font-size:.62rem; letter-spacing:.2em; text-indent:.2em;
-    padding:.35em .7em; cursor:pointer;
-    transition:background .25s, color .25s;
-  }
-  .jump button:hover, .jump button:focus-visible{
-    background:var(--brass); color:#1c1108; outline:none;
-  }
   .jump input{ cursor:pointer; caret-color:transparent; }
 
   /* the number pad: opens beneath the panel when the box is tapped */
@@ -725,10 +715,12 @@
   }
   .jump.open .numpad{ display:grid; }
   .numpad button{
+    width:2.9em; height:2.9em;
+    display:flex; align-items:center; justify-content:center;
     font-family:'Cormorant Garamond', serif;
     font-size:1.1rem;
     letter-spacing:0; text-indent:0;
-    padding:.42em 0;
+    padding:0;
     background:none;
     border:1px solid rgba(156,124,60,.4);
     border-radius:3px;
@@ -810,8 +802,9 @@
       gap:5px;
       padding:6px;
     }
-    .numpad button{ font-size:.85rem; padding:.3em 0; }
+    .numpad button{ width:34px; height:34px; font-size:.85rem; padding:0; }
     .numpad button.np-go{ font-size:.55rem; }
+    .jump::before, .jump::after{ content:none; }
   }
 
   @media (prefers-reduced-motion: reduce){
