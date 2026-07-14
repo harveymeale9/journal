@@ -108,7 +108,7 @@
   body.ready .book-wrap, body.ready .scroll-book{ opacity:1; }
 
   .book-wrap{
-    perspective:2600px;
+    perspective:max(2600px, calc(var(--page-w) * 3.25));
     position:relative;
   }
   .book{
@@ -574,7 +574,7 @@
   .flits{
     position:absolute; inset:0;
     z-index:5; pointer-events:none;
-    perspective:1400px;
+    perspective:max(1400px, calc(var(--page-w) * 1.75));
     perspective-origin:50% 42%;
   }
   .flit{
@@ -676,6 +676,7 @@
     width:1.7em; height:1.7em;
     margin:0 -.05em;
     display:flex; align-items:center; justify-content:center;
+    overflow:hidden;
     background:radial-gradient(ellipse at center, rgba(156,124,60,.1), transparent 72%);
     border:1px solid var(--brass);
     border-radius:4px;
@@ -699,12 +700,17 @@
   }
   .jump input{ cursor:pointer; caret-color:transparent; }
 
-  /* the number pad: opens beneath the panel when the box is tapped */
+  /* the number pad: opens beneath the panel when the box is tapped.
+     Sized entirely in rem, deliberately decoupled from --page-w — the
+     grid columns and the buttons living inside them must reference the
+     same stable unit, or a large book renders a grid track sized one
+     way and buttons sized another, leaving empty cells and misaligned
+     digits. */
   .numpad{
     position:absolute;
     bottom:calc(100% + 10px); top:auto; right:0;
     display:none;
-    grid-template-columns:repeat(3, 2.9em);
+    grid-template-columns:repeat(3, 2.6rem);
     gap:7px;
     padding:10px;
     background:rgba(24,14,7,.95);
@@ -715,7 +721,7 @@
   }
   .jump.open .numpad{ display:grid; }
   .numpad button{
-    width:2.9em; height:2.9em;
+    width:2.6rem; height:2.6rem;
     display:flex; align-items:center; justify-content:center;
     font-family:'Cormorant Garamond', serif;
     font-size:1.1rem;
@@ -782,7 +788,8 @@
     }
     .jump .total{ display:none; }
     .jump-badge{
-      width:3.4em; height:2.2em;
+      width:56px; height:36px;
+      overflow:hidden;
       background:rgba(24,14,7,.55);
       border:1px solid rgba(156,124,60,.35);
       border-radius:3px;
