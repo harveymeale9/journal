@@ -657,33 +657,33 @@
   /* ============ JUMP TO PAGE ============ */
   .jump{
     position:absolute;
-    right:calc(var(--stack-right-w, 25px) + 22px); bottom:22px;
+    left:50%; bottom:5.5%;
+    transform:translateX(-50%);
     z-index:20;
-    display:flex; align-items:baseline; gap:.55em;
-    padding:.5em .9em;
-    background:rgba(24,14,7,.85);
-    border:1px solid rgba(156,124,60,.4);
-    border-radius:3px;
-    font-family:'IM Fell English SC', serif;
-    font-size:.68rem; letter-spacing:.18em; text-indent:.18em;
-    color:var(--brass);
+    display:flex; align-items:baseline; gap:.35em;
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    font-size:calc(var(--page-w) * .019);
+    letter-spacing:.04em;
+    color:var(--ink-faint);
   }
   .jump input{
-    width:3em;
+    width:2em;
     background:none; border:none;
-    border-bottom:1px solid rgba(156,124,60,.5);
-    color:var(--paper);
+    border-bottom:1px solid var(--ink-faint);
+    color:var(--ink);
     font-family:'Cormorant Garamond', serif;
-    font-size:1rem; text-align:center;
-    outline:none;
+    font-style:italic;
+    font-size:1em; text-align:center;
+    outline:none; cursor:pointer;
     -moz-appearance:textfield; appearance:textfield;
   }
   .jump input::-webkit-outer-spin-button,
   .jump input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
-  .jump input:focus{ border-bottom-color:var(--brass); }
+  .jump input:focus{ border-bottom-color:var(--rubric); }
   .jump .total{
-    color:#8a7452; font-family:'Cormorant Garamond', serif;
-    font-size:.92rem; font-style:italic; letter-spacing:.05em; text-indent:0;
+    color:var(--ink-faint); font-family:'Cormorant Garamond', serif;
+    font-size:1em; font-style:italic; letter-spacing:.04em;
   }
   .jump button{
     background:none; border:1px solid rgba(156,124,60,.5); border-radius:2px;
@@ -819,7 +819,26 @@
     <div class="stack left" aria-hidden="true"><div class="fill" id="stackL"></div></div>
     <div class="pages-wrap">
     <div class="page left"><div class="parchment"></div><svg class="grain" width="100%" height="100%"><filter id="g1"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0.45  0 0 0 0 0.36  0 0 0 0 0.22  0 0 0 0.06 0"/></filter><rect width="100%" height="100%" filter="url(#g1)"/></svg><div class="page-inner" id="pageL"></div></div>
-    <div class="page right"><div class="parchment"></div><svg class="grain" width="100%" height="100%"><filter id="g2"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0.45  0 0 0 0 0.36  0 0 0 0 0.22  0 0 0 0.06 0"/></filter><rect width="100%" height="100%" filter="url(#g2)"/></svg><div class="page-inner" id="pageR"></div></div>
+    <div class="page right"><div class="parchment"></div><svg class="grain" width="100%" height="100%"><filter id="g2"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0.45  0 0 0 0 0.36  0 0 0 0 0.22  0 0 0 0.06 0"/></filter><rect width="100%" height="100%" filter="url(#g2)"/></svg><div class="page-inner" id="pageR"></div>
+      <div class="jump" role="group" aria-label="Jump to a page of the book">
+        <input id="jumpInput" type="text" readonly inputmode="none" aria-label="Page number">
+        <span class="total" id="jumpTotal"></span>
+        <div class="numpad" id="numpad" aria-label="Number pad">
+          <button type="button" data-k="1">1</button>
+          <button type="button" data-k="2">2</button>
+          <button type="button" data-k="3">3</button>
+          <button type="button" data-k="4">4</button>
+          <button type="button" data-k="5">5</button>
+          <button type="button" data-k="6">6</button>
+          <button type="button" data-k="7">7</button>
+          <button type="button" data-k="8">8</button>
+          <button type="button" data-k="9">9</button>
+          <button type="button" data-k="del">⌫</button>
+          <button type="button" data-k="0">0</button>
+          <button type="button" class="np-go" data-k="go">Go</button>
+        </div>
+      </div>
+    </div>
     </div>
 
     <div class="spine" aria-hidden="true"></div>
@@ -828,24 +847,6 @@
       <div class="leaf-face back"><div class="parchment"></div><div class="page-inner" id="leafBack"></div></div>
     </div>
     <div class="turn-shade" id="shade"></div>
-    <div class="jump" role="group" aria-label="Jump to a page of the book">
-      <input id="jumpInput" type="text" readonly inputmode="none" aria-label="Page number">
-      <span class="total" id="jumpTotal"></span>
-      <div class="numpad" id="numpad" aria-label="Number pad">
-        <button type="button" data-k="1">1</button>
-        <button type="button" data-k="2">2</button>
-        <button type="button" data-k="3">3</button>
-        <button type="button" data-k="4">4</button>
-        <button type="button" data-k="5">5</button>
-        <button type="button" data-k="6">6</button>
-        <button type="button" data-k="7">7</button>
-        <button type="button" data-k="8">8</button>
-        <button type="button" data-k="9">9</button>
-        <button type="button" data-k="del">⌫</button>
-        <button type="button" data-k="0">0</button>
-        <button type="button" class="np-go" data-k="go">Go</button>
-      </div>
-    </div>
     <div class="stack right" aria-hidden="true"><div class="fill" id="stackR"></div></div>
 
     <button class="zone prev" id="btnPrev" aria-label="Previous page"></button>
@@ -1537,10 +1538,8 @@ const book = document.getElementById('book');
 function updateStacks(frac){
   const max = isMobile() ? 15 : 30;
   const min = isMobile() ? 9  : 20;
-  const rightW = Math.round(max - frac * (max - min));
   stackL.style.width = Math.round(min + frac * (max - min)) + 'px';
-  stackR.style.width = rightW + 'px';
-  book.style.setProperty('--stack-right-w', rightW + 'px');
+  stackR.style.width = Math.round(max - frac * (max - min)) + 'px';
 }
 
 let spread = 0; // spread n shows pages [2n, 2n+1]
