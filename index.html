@@ -1600,6 +1600,13 @@ function go(dir, ms, done){
     leaf.classList.add('back');
   }
 
+  leaf.classList.remove('turning');
+  shade.classList.remove('on');
+  void leaf.offsetWidth; /* force a reflow so a class that was just removed
+    (e.g. by a chained flip firing in the same tick) is registered as gone
+    before we re-add it — otherwise the browser never sees a real toggle
+    and the CSS animation doesn't restart, it just snaps to its end state */
+
   leaf.classList.add('turning');
   shade.classList.add('on');
 
