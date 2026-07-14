@@ -675,46 +675,52 @@
     left:50%; bottom:2.2%;
     transform:translateX(-50%);
     z-index:20;
-    display:flex; align-items:center; gap:.5em;
+    display:flex; align-items:center; gap:.3em;
     font-family:'Cormorant Garamond', serif;
     font-style:italic;
-    /* clamp so the "x of xx" indicator never renders too small to read on
+    /* clamp so the page-number indicator never renders too small to read on
        smaller (tablet) pages, while desktop keeps its page-proportional size */
     font-size:clamp(12px, calc(var(--page-w) * .0185), 22px);
     letter-spacing:.04em;
     color:var(--ink-faint);
   }
+  /* a hairline running out to an open chevron on each side; ::before is the
+     same graphic mirrored, so both arrowheads point outward (symmetric). */
   .jump::before, .jump::after{
-    content:"·";
-    color:var(--brass); font-style:normal;
-    font-size:1.3em; line-height:1;
+    content:"";
+    width:2.6em; height:.8em;
+    align-self:center;
+    background:center/contain no-repeat
+      url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2036%2012%27%3E%3Cpath%20d%3D%27M1%206%20H27%27%20fill%3D%27none%27%20stroke%3D%27%239c7c3c%27%20stroke-width%3D%271.1%27%20stroke-linecap%3D%27round%27%2F%3E%3Cpath%20d%3D%27M27%202.6%20L34%206%20L27%209.4%27%20fill%3D%27none%27%20stroke%3D%27%239c7c3c%27%20stroke-width%3D%271.1%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%2F%3E%3C%2Fsvg%3E");
+    opacity:.9;
   }
+  .jump::before{ transform:scaleX(-1); }   /* mirror so its chevron points left */
+  /* the number sits in a diamond (rotated square); the input is counter-rotated
+     so the digits stay upright — echoing the central lozenge of the divider. */
   .jump-badge{
-    width:1.7em; height:1.7em;
-    margin:0 -.05em;
+    width:1.55em; height:1.55em;
+    margin:0 .15em;
     display:flex; align-items:center; justify-content:center;
-    overflow:hidden;
+    overflow:visible;
+    transform:rotate(45deg);
     background:radial-gradient(ellipse at center, rgba(156,124,60,.1), transparent 72%);
     border:1px solid var(--brass);
-    border-radius:0;            /* sharp, square edges (desktop/tablet) */
   }
   .jump-badge:focus-within{ border-color:var(--rubric); background:rgba(122,47,29,.08); }
   .jump input{
-    width:100%; height:100%;
+    width:1.9em; height:1.55em;
     margin:0; padding:0;
     background:none; border:none;
     color:var(--rubric);
     font-family:'IM Fell English SC', serif;
     font-size:.82em; line-height:1; text-align:center;
     outline:none; cursor:pointer;
+    transform:rotate(-45deg);   /* keep the number upright inside the diamond */
     -moz-appearance:textfield; appearance:textfield;
   }
   .jump input::-webkit-outer-spin-button,
   .jump input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
-  .jump .total{
-    color:var(--ink-faint); font-family:'Cormorant Garamond', serif;
-    font-size:1em; font-style:italic; letter-spacing:.04em;
-  }
+  .jump .total{ display:none; }   /* just the number now — no "of xx" */
   .jump input{ cursor:pointer; caret-color:transparent; }
 
   /* the number pad: opens beneath the panel when the box is tapped.
@@ -764,6 +770,13 @@
 
   /* ============ MOBILE / PORTRAIT: scrollable pages, like a PDF ============ */
   .scroll-book{ display:none; }
+
+  /* Landscape tablets fall through to the desktop layout, but the indicator
+     reads oversized on a tablet-sized page. Shrink it ~25% here only —
+     desktop (pointer:fine) is untouched. */
+  @media (pointer: coarse) and (orientation: landscape) and (min-width: 721px){
+    .jump{ font-size:clamp(9px, calc(var(--page-w) * .0139), 16px); }
+  }
 
   @media (orientation: portrait) and (max-width: 940px), (max-width: 720px){
     :root{ --page-w: min(94vw, 520px); }
@@ -818,6 +831,7 @@
       border:1px solid rgba(156,124,60,.35);
       border-radius:3px;
       color:var(--paper);
+      transform:none;   /* the diamond rotation is desktop/tablet only */
     }
     .numpad{
       top:auto; bottom:calc(100% + 8px);
@@ -1524,6 +1538,28 @@ const pages = [
 </div>`
 ];
 
+/* ---- stable per-page identity (for "resume where you left off") ----
+   Each page gets a key derived from its CONTENT, not its position, so that
+   inserting/removing pages elsewhere (e.g. extending the contents) doesn't
+   change a page's key. We hash the authored template BEFORE folio numbers are
+   filled in below, since those are position-dependent. Result: if the page
+   you were on moves from #14 to #15, its key is unchanged and we can bring you
+   right back to it rather than to whatever now sits at #14. */
+const PAGE_KEYS = (function(){
+  const hash = (s) => {              // FNV-1a → short base36 string
+    let h = 0x811c9dc5;
+    for (let i = 0; i < s.length; i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193); }
+    return (h >>> 0).toString(36);
+  };
+  const seen = {};
+  return pages.map(html => {
+    let k = hash(html || '');
+    while (seen[k]) k += 'x';         // guarantee uniqueness on the off chance of a clash
+    seen[k] = 1;
+    return k;
+  });
+})();
+
 /* Folio numbers are computed here, not hand-typed in the templates above.
    Each page's <span class="folio" data-num="roman|arabic"></span> gets its
    number filled in based on its position — two independent running counters,
@@ -1584,6 +1620,21 @@ const maxSpread = Math.ceil(pages.length / 2) - 1;
 const isMobile = () => window.matchMedia('(orientation: portrait) and (max-width: 940px), (max-width: 720px)').matches;
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+/* ---- remember-my-place, keyed by page CONTENT (see PAGE_KEYS above) ----
+   We store the key of the page you're looking at, not its raw number, so the
+   position survives edits that shift pages around. Wrapped in try/catch so a
+   blocked/absent localStorage (private mode, sandboxed preview) just no-ops. */
+const LS_POS = 'reality-manual:last-page';
+function savePos(pageIndex){
+  try{ const k = PAGE_KEYS[pageIndex]; if (k) localStorage.setItem(LS_POS, k); }catch(e){}
+}
+function savedPageIndex(){
+  try{
+    const k = localStorage.getItem(LS_POS);
+    return k ? PAGE_KEYS.indexOf(k) : -1;   // -1 if none saved or the page is gone
+  }catch(e){ return -1; }
+}
+
 function inner(html){ return html || '<div class="page-inner" style="position:static"></div>'; }
 
 function render(){
@@ -1593,6 +1644,7 @@ function render(){
   updateStacks(maxSpread > 0 ? spread / maxSpread : 0);
   const ji = document.getElementById('jumpInput');
   if (document.activeElement !== ji) ji.value = spread*2 + 1;
+  savePos(spread*2);   /* remember the (left) page of this spread */
 }
 
 /* build the scrollable page stack once; CSS decides when it's shown */
@@ -1796,6 +1848,7 @@ function syncMobilePage(){
     if (d < bestDist){ bestDist = d; best = i; }
   });
   jumpInput.value = best + 1;
+  savePos(best);   /* remember the page you've scrolled to */
 }
 
 function openPad(){
@@ -1840,8 +1893,6 @@ document.addEventListener('pointerdown', e=>{
   if (jumpBox.classList.contains('open') && !jumpBox.contains(e.target)) closePad(true);
 });
 
-if (isMobile()) jumpInput.value = 1;
-
 /* on mobile, the box tracks the page you've scrolled to (paused while the pad is open) */
 let scrollTick = false;
 window.addEventListener('scroll', ()=>{
@@ -1856,6 +1907,23 @@ window.addEventListener('scroll', ()=>{
 
 window.addEventListener('resize', render);
 buildScrollBook();
+
+/* ---- resume where the reader left off (looked up by content key) ---- */
+(function restorePosition(){
+  const idx = savedPageIndex();
+  if (isMobile()){
+    if (idx < 0){ jumpInput.value = 1; return; }
+    jumpInput.value = idx + 1;
+    /* wait a frame so the scroll stack has laid out before we jump to it */
+    requestAnimationFrame(()=>{
+      const el = document.querySelectorAll('#scrollBook .page.m')[idx];
+      if (el) el.scrollIntoView({ behavior:'auto', block:'start' });
+    });
+  } else if (idx >= 0){
+    spread = Math.min(Math.max(Math.floor(idx/2), 0), maxSpread);
+  }
+})();
+
 render();
 
 /* reveal once fonts are in, so the whole book paints in its final form;
