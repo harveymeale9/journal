@@ -253,6 +253,56 @@ the plate above it, so it reads as a whisper beneath the image rather than a sec
 column of text. It wraps to two lines more readily than it used to; that's fine,
 and it's another line off the budget.
 
+## 9.5 SVG Cropping & Whitespace
+
+**SVG assets must not contain significant internal padding or invisible margins.**
+
+The SVG `viewBox` should be cropped tightly to the outermost geometry so that the
+asset contains artwork, not layout decisions. Whitespace belongs to the page
+composition, not to the illustration itself.
+
+Consequences:
+
+- Sigils, ornaments, diagrams, charts, glyphs, and line-art plates should be
+  exported with a tightly cropped `viewBox`.
+- Internal whitespace should be kept to the absolute minimum required to avoid
+  clipping strokes.
+- Page breathing room is created by the book layout, margins, captions, and
+  surrounding content, never by invisible space embedded inside an SVG.
+- If an illustration appears too small or too large on the page, adjust its
+  placement or width in the layout. Do not solve the problem by re-exporting an
+  SVG with extra empty space around it.
+ - Never use whitespace inside an SVG to centre or position artwork on the page.
+  Positioning is the responsibility of the page layout, not the asset.
+
+**Exception:** full-page compositions in which the whitespace is itself part of
+the artwork may intentionally retain internal space. This should be rare and
+deliberate.
+
+When generating new SVG assets, assume **zero internal margin** unless explicitly
+instructed otherwise.
+
+A useful test:
+
+> If the SVG were placed against a coloured background with a visible bounding
+> box, the artwork should appear to nearly fill that box.
+
+In other words:
+
+```text
+Asset = artwork
+Layout = whitespace
+```
+
+Never:
+
+```text
+Asset = artwork + mystery whitespace
+Layout = more whitespace
+```
+
+The book controls spacing. The SVG supplies the art.
+
 ## 10. Animation
 
 Motion is ambient and eternal — it loops forever, slowly, and never reacts to the
