@@ -10,7 +10,7 @@
    reads oversized on a tablet-sized page. Shrink it ~25% here only —
    desktop (pointer:fine) is untouched. */
 @media (pointer: coarse) and (orientation: landscape) and (min-width: 721px){
-  .jump{ font-size:clamp(9px, calc(var(--page-w) * .0139), 16px); }
+  .jump{ font-size:clamp(10px, calc(var(--page-w) * .0158), 18px); }
 }
 
 @media (orientation: portrait) and (max-width: 940px), (max-width: 720px){

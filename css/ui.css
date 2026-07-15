@@ -4,6 +4,14 @@
    ========================================================== */
 
 /* ============ JUMP TO PAGE ============ */
+/* Reads "12 of 29", flanked by a mirrored pair of brass ornaments.
+   The total comes from state.pages.length (js/jump.js), i.e. from book.json —
+   so it is derived, never typed, and stays honest on the next insert.
+
+   MOBILE IS UNTOUCHED. Everything below is overridden inside the portrait
+   media query in responsive.css: the ornaments get content:none, .total goes
+   display:none, .jump-badge goes display:contents (which erases its rule), and
+   the input takes its own box. Nothing here reaches the phone. */
 .jump{
   position:absolute;
   left:50%; bottom:2.2%;
@@ -14,48 +22,66 @@
   font-style:italic;
   /* clamp so the page-number indicator never renders too small to read on
      smaller (tablet) pages, while desktop keeps its page-proportional size */
-  font-size:clamp(12px, calc(var(--page-w) * .0185), 22px);
+  font-size:clamp(13px, calc(var(--page-w) * .021), 24px);
   letter-spacing:.04em;
   color:var(--ink-faint);
 }
-/* a hairline running out to an open chevron on each side; ::before is the
-   same graphic mirrored, so both arrowheads point outward (symmetric). */
+
+/* The flanking ornament: a hairline through an open lozenge, ending in a
+   detached bead. ::after is the graphic as drawn (bead outermost); ::before is
+   the same graphic mirrored, so the pair is symmetric about the centre — what
+   sits left of the first numeral is the mirror of what sits right of the second.
+
+   The SVG is a MASK, not an image: it is painted #000 and only its alpha is
+   used, with the colour supplied by background-color:var(--brass). So the
+   ornament follows the palette in tokens.css like everything else, instead of
+   hard-coding a hex the way the old chevron did. */
 .jump::before, .jump::after{
   content:"";
-  width:2.6em; height:.8em;
+  width:3.4em; height:1.1em;
+  flex:none;
   align-self:center;
-  background:center/contain no-repeat
-    url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2036%2012%27%3E%3Cpath%20d%3D%27M1%206%20H27%27%20fill%3D%27none%27%20stroke%3D%27%239c7c3c%27%20stroke-width%3D%271.1%27%20stroke-linecap%3D%27round%27%2F%3E%3Cpath%20d%3D%27M27%202.6%20L34%206%20L27%209.4%27%20fill%3D%27none%27%20stroke%3D%27%239c7c3c%27%20stroke-width%3D%271.1%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%2F%3E%3C%2Fsvg%3E");
+  background-color:var(--brass);
+  -webkit-mask:center/contain no-repeat url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2042%2014'%3E%3Cg%20fill='none'%20stroke='%23000'%20stroke-width='1.1'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M2%207%20H12'/%3E%3Cpath%20d='M12%207%20L17%203.2%20L22%207%20L17%2010.8%20Z'/%3E%3Cpath%20d='M22%207%20H34'/%3E%3C/g%3E%3Ccircle%20cx='38.5'%20cy='7'%20r='1.5'%20fill='%23000'/%3E%3C/svg%3E");
+  mask:center/contain no-repeat url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2042%2014'%3E%3Cg%20fill='none'%20stroke='%23000'%20stroke-width='1.1'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M2%207%20H12'/%3E%3Cpath%20d='M12%207%20L17%203.2%20L22%207%20L17%2010.8%20Z'/%3E%3Cpath%20d='M22%207%20H34'/%3E%3C/g%3E%3Ccircle%20cx='38.5'%20cy='7'%20r='1.5'%20fill='%23000'/%3E%3C/svg%3E");
   opacity:.9;
 }
-.jump::before{ transform:scaleX(-1); }   /* mirror so its chevron points left */
-/* the number sits in a diamond (rotated square); the input is counter-rotated
-   so the digits stay upright — echoing the central lozenge of the divider. */
+.jump::before{ transform:scaleX(-1); }   /* mirror: its bead points outward too */
+
+/* The first numeral is the editable one, and it says so by sitting on a ruled
+   blank — the way a ledger leaves a line to be written on. Dashed while idle,
+   solid rubric once the pad is open (jump.js empties the field then, so it
+   reads as a waiting blank rather than a number you must delete). */
 .jump-badge{
-  width:1.55em; height:1.55em;
-  margin:0 .15em;
-  display:flex; align-items:center; justify-content:center;
-  overflow:visible;
-  transform:rotate(45deg);
-  background:radial-gradient(ellipse at center, rgba(156,124,60,.1), transparent 72%);
-  border:1px solid var(--brass);
+  display:inline-flex; align-items:baseline; justify-content:center;
+  padding:0 .3em .12em;
+  border-bottom:1px dashed rgba(156,124,60,.85);
+  transition:border-bottom-color .25s, background .25s;
 }
-.jump-badge:focus-within{ border-color:var(--rubric); background:rgba(122,47,29,.08); }
+.jump-badge:hover{ border-bottom-color:var(--rubric); }
+.jump-badge:focus-within{
+  border-bottom:1px solid var(--rubric);
+  background:rgba(122,47,29,.07);
+}
 .jump input{
-  width:1.9em; height:1.55em;
+  /* fixed width: the field empties when the pad opens, and "of xx" must not
+     shuffle sideways as digits are typed. Wide enough for three. */
+  width:2.1em;
   margin:0; padding:0;
   background:none; border:none;
   color:var(--rubric);
   font-family:'IM Fell English SC', serif;
-  font-size:.82em; line-height:1; text-align:center;
-  outline:none; cursor:pointer;
-  transform:rotate(-45deg);   /* keep the number upright inside the diamond */
+  font-style:normal;
+  font-size:1em; line-height:1.15; text-align:center;
+  letter-spacing:.06em;
+  outline:none; cursor:pointer; caret-color:transparent;
   -moz-appearance:textfield; appearance:textfield;
 }
 .jump input::-webkit-outer-spin-button,
 .jump input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
-.jump .total{ display:none; }   /* just the number now — no "of xx" */
-.jump input{ cursor:pointer; caret-color:transparent; }
+/* "of xx" — the quiet half of the pair: Cormorant italic, ink-faint, no rule
+   under it. The contrast with the rubric numeral above is the affordance. */
+.jump .total{ display:inline; white-space:nowrap; }
 
 /* the number pad: opens beneath the panel when the box is tapped.
    One --np variable drives BOTH the grid track and the button size, so they
@@ -65,7 +91,10 @@
 .numpad{
   --np: clamp(30px, calc(var(--page-w) * .05), 40px);
   position:absolute;
-  bottom:calc(100% + 10px); top:auto; right:0;
+  bottom:calc(100% + 10px); top:auto;
+  /* centred on the whole indicator, not pinned to its right edge: the strip is
+     wider than it was now that the ornaments and "of xx" are in it. */
+  left:50%; right:auto; transform:translateX(-50%);
   display:none;
   grid-template-columns:repeat(3, var(--np));
   gap:6px;
