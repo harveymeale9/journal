@@ -74,8 +74,21 @@ assets/
   images/           raster plates (.webp/.png) — see assets/images/README.md
   svg/              shared vector partials (sigil.svg)
 
+docs/
+  DESIGN-CONVENTIONS.md   the house style: colour, type, spacing, what's forbidden
+  page-template.html      annotated skeleton + every page form, ready to copy
+
 tools/check.py      validates book.json against /pages before you push
 ```
+
+## Writing new pages
+
+Read `docs/DESIGN-CONVENTIONS.md` first, and copy from `docs/page-template.html`.
+Those two files are the brief: hand them to anyone (or any model) writing a page,
+along with the text and images, and the result should need no correction.
+
+The single rule worth memorising: **pages clip, they don't scroll.** ~150 words on
+a plain page, ~115 on an entry opening. Overflow is silently invisible.
 
 ---
 
