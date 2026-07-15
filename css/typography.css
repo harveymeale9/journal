@@ -1,0 +1,145 @@
+/* ==========================================================
+   TYPOGRAPHY — what is printed on the page
+   Running heads, entry titles, body text, dropcaps, marginalia, title page, TOC, plates, sealed page.
+   ========================================================== */
+
+/* ============ TYPOGRAPHY OF THE PAGE ============ */
+.running-head{
+  font-family:'IM Fell English SC', serif;
+  font-size:calc(var(--page-w) * .0165); letter-spacing:.32em; text-indent:.32em;
+  text-align:center; color:var(--ink-faint);
+  margin-bottom:1.6em;
+}
+.folio{
+  display:none; /* the interactive page selector shows the current page
+    number now, so the printed folio is no longer needed anywhere —
+    desktop pages, the flipping leaf's faces, or the mobile scroll view */
+  position:absolute; bottom:5.5%;
+  font-family:'Cormorant Garamond', serif;
+  font-size:calc(var(--page-w) * .016); letter-spacing:.15em; color:var(--ink-faint);
+}
+.page.left .folio, .leaf-face.back .folio{ left:11%; }
+.page.right .folio, .leaf-face.front .folio{ right:11%; }
+
+.entry-no{
+  font-family:'IM Fell English SC', serif;
+  text-align:center; font-size:calc(var(--page-w) * .0175); letter-spacing:.4em; text-indent:.4em;
+  color:var(--rubric); margin-bottom:.9em;
+}
+h2.entry-title{
+  font-family:'IM Fell English SC', serif;
+  font-weight:400; text-align:center;
+  font-size:calc(var(--page-w) * .046);
+  letter-spacing:.12em; line-height:1.25;
+  margin-bottom:.4em;
+}
+.ornament{
+  text-align:center; color:var(--brass);
+  font-size:calc(var(--page-w) * .026); margin:.6em 0 1.1em;
+  letter-spacing:.6em; text-indent:.6em;
+}
+
+.body-text{
+  font-family:'IM Fell English', Georgia, serif;
+  font-size:calc(var(--page-w) * .034);
+  line-height:1.62;
+  text-align:justify;
+  hyphens:auto;
+}
+.body-text p + p{ text-indent:1.6em; margin-top:.15em; }
+
+.dropcap::first-letter{
+  font-family:'IM Fell English SC', serif;
+  float:left;
+  font-size:3.4em; line-height:.82;
+  padding:.06em .12em 0 0;
+  color:var(--rubric);
+}
+
+.marginal{
+  font-family:'Cormorant Garamond', serif;
+  font-style:italic; font-size:calc(var(--page-w) * .0255);
+  color:var(--ink-faint);
+  border-left:1px solid rgba(122,47,29,.4);
+  padding-left:.9em; margin:1.1em 0 1.1em .5em;
+}
+
+.xref{ font-variant:small-caps; letter-spacing:.06em; color:var(--rubric); font-style:normal; }
+
+/* title page */
+.title-page{ text-align:center; justify-content:center; }
+.title-page .tp-small{
+  font-family:'IM Fell English SC', serif; font-size:calc(var(--page-w) * .0155);
+  letter-spacing:.4em; text-indent:.4em; color:var(--ink-faint);
+}
+.title-page h1{
+  font-family:'IM Fell English SC', serif; font-weight:400;
+  font-size:calc(var(--page-w) * .07); letter-spacing:.14em;
+  margin:.7em 0 .3em; line-height:1.2;
+}
+.title-page .tp-rule{ color:var(--brass); margin:1em 0; letter-spacing:.5em; text-indent:.5em; }
+.title-page .tp-edition{
+  font-family:'Cormorant Garamond', serif; font-style:italic;
+  font-size:calc(var(--page-w) * .029); color:var(--ink-faint); line-height:1.7;
+}
+
+/* contents */
+.toc{ list-style:none; font-size:calc(var(--page-w) * .0305); }
+.toc li{
+  display:flex; align-items:baseline; gap:.5em;
+  margin-bottom:.85em; line-height:1.4;
+}
+.toc .t{ font-variant:small-caps; letter-spacing:.05em; }
+.toc .dots{ flex:1; border-bottom:1px dotted rgba(93,76,53,.6); transform:translateY(-3px); }
+.toc .n{ font-family:'Cormorant Garamond', serif; color:var(--ink-faint); }
+.toc .sealed-mark{ color:var(--rubric); font-size:.85em; }
+
+/* the animated sigil illustration */
+.plate{
+  margin:1.2em auto .4em; width:62%;
+  display:block;
+}
+/* raster plates (AI-painted illustrations): multiply blend prints them
+   into the parchment rather than pasting them onto it */
+.plate-img{
+  display:block;
+  margin:1em auto .3em;
+  mix-blend-mode:multiply;
+  height:auto;
+}
+.plate-caption{
+  font-family:'Cormorant Garamond', serif; font-style:italic;
+  text-align:center; font-size:calc(var(--page-w) * .0235); color:var(--ink-faint);
+  margin-bottom:1em;
+}
+/* .sigil-rotate / .sigil-pulse animations live in animations.css */
+
+/* sealed / paywall page */
+.sealed{ justify-content:center; text-align:center; }
+.sealed .seal-glyph{ font-size:calc(var(--page-w) * .07); color:var(--rubric); margin-bottom:.5em;}
+.sealed h3{
+  font-family:'IM Fell English SC', serif; font-weight:400;
+  letter-spacing:.2em; font-size:calc(var(--page-w) * .032); margin-bottom:1em; color:var(--ink);
+}
+.sealed p{
+  font-size:calc(var(--page-w) * .03); line-height:1.7; color:var(--ink-faint);
+  max-width:26ch; margin:0 auto 1.6em; font-style:italic;
+}
+.sealed button{
+  font-family:'IM Fell English SC', serif;
+  letter-spacing:.25em; text-indent:.25em; font-size:calc(var(--page-w) * .024);
+  background:none; color:var(--rubric);
+  border:1px solid var(--rubric); border-radius:2px;
+  padding:.9em 1.6em; cursor:pointer;
+  transition:background .3s, color .3s;
+}
+.sealed button:hover, .sealed button:focus-visible{
+  background:var(--rubric); color:var(--paper);
+  outline:none;
+}
+
+/* blurred teaser text behind the seal */
+.veiled{
+  filter:blur(4px); opacity:.5; user-select:none;
+  margin-bottom:1.4em; font-size:calc(var(--page-w) * .03); text-align:justify;
+}

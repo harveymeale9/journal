@@ -1,0 +1,11 @@
+/* ==========================================================
+   PAGES — styling that belongs to ONE specific page
+   Reusable page forms go in components.css. This file is for
+   the handful of one-off tweaks a single leaf needs.
+   Keep it small: if a rule gets used twice, promote it.
+   ========================================================== */
+
+/* The frontispiece prints the sigil larger than a body plate.
+   This replaces an inline style that used to be patched on in JS,
+   so the sigil can stay a single shared partial (assets/svg/sigil.svg). */
+.frontispiece .plate{ width:84%; }

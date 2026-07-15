@@ -1,0 +1,21 @@
+/* ==========================================================
+   TOKENS — the one place colours, paper size and timings are declared
+   Every other stylesheet reads from these. Change the book's palette here.
+   ========================================================== */
+
+:root{
+  --desk-dark:#100905;
+  --desk:#2c1c0e;
+  --leather:#2e1f16;
+  --leather-edge:#4a3320;
+  --paper:#e9dcbd;
+  --paper-deep:#d9c79f;
+  --ink:#2b2116;
+  --ink-faint:#5d4c35;
+  --brass:#9c7c3c;
+  --rubric:#7a2f1d; /* oxblood red used in medieval rubrication */
+  --page-w: min(46vw, calc((100vh - 96px) / 1.32), 1200px);
+  --page-w: min(46vw, calc((100dvh - 96px) / 1.32), 1200px);
+  --page-h: calc(var(--page-w) * 1.32);
+  --turn-ms: 900ms;
+}

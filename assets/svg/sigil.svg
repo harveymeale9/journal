@@ -1,0 +1,20 @@
+<svg class="plate" viewBox="0 0 200 200" role="img" aria-label="Rotating sigil of concentric rings and radiating lines">
+  <g fill="none" stroke="#7a2f1d" stroke-width="1">
+    <g class="sigil-rotate">
+      <circle cx="100" cy="100" r="78" stroke-opacity=".8"/>
+      <circle cx="100" cy="100" r="70" stroke-dasharray="3 5" stroke-opacity=".6"/>
+      <g stroke-opacity=".7">
+        <path d="M100 22 L100 34 M100 166 L100 178 M22 100 L34 100 M166 100 L178 100"/>
+        <path d="M45 45 L53 53 M147 147 L155 155 M155 45 L147 53 M53 147 L45 155"/>
+      </g>
+    </g>
+    <g class="sigil-rotate rev" stroke="#9c7c3c">
+      <polygon points="100,40 152,130 48,130" stroke-opacity=".75"/>
+      <polygon points="100,160 48,70 152,70" stroke-opacity=".75"/>
+    </g>
+    <g class="sigil-pulse">
+      <circle cx="100" cy="100" r="14" stroke="#7a2f1d"/>
+      <circle cx="100" cy="100" r="4" fill="#7a2f1d" stroke="none"/>
+    </g>
+  </g>
+</svg>

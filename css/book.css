@@ -1,0 +1,168 @@
+/* ==========================================================
+   BOOK — the physical tome: covers, spine, gutter, gilded page block, parchment
+   The object. What's printed ON it lives in typography.css.
+   ========================================================== */
+
+/* ============ THE BOOK ============ */
+/* the book reveals as one piece once fonts and layout are ready,
+   so no element (gutter, shadows, type) pops in after the rest */
+.book-wrap, .scroll-book{ opacity:0; transition:opacity .7s ease; }
+body.ready .book-wrap, body.ready .scroll-book{ opacity:1; }
+
+.book-wrap{
+  perspective:max(2600px, calc(var(--page-w) * 3.25));
+  position:relative;
+}
+.book{
+  position:relative;
+  display:flex;
+  align-items:center;
+  height:var(--page-h);
+  overflow:hidden;
+  /* leather cover peeking out beneath the pages */
+  background:
+    linear-gradient(160deg, var(--leather-edge), var(--leather) 40%, #1d130c);
+  border-radius:6px 10px 10px 6px;
+  padding:14px;
+  box-shadow:
+    0 40px 80px -20px rgba(0,0,0,.85),
+    0 8px 24px rgba(0,0,0,.6),
+    inset 0 0 0 1px rgba(156,124,60,.25);
+}
+/* tooled border on the visible cover edge */
+.book::before{
+  content:""; position:absolute; inset:5px;
+  border:1px solid rgba(156,124,60,.35);
+  border-radius:5px;
+  pointer-events:none;
+}
+/* stacked page edges at left and right */
+.book::after{
+  content:""; position:absolute; top:14px; bottom:14px; left:8px; right:8px;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 3px, rgba(0,0,0,.12) 3px 4px);
+  border-radius:3px;
+  pointer-events:none; opacity:.0;
+}
+
+/* ============ GILDED PAGE BLOCK (the tome's thickness) ============ */
+.pages-wrap{
+  position:relative;
+  display:flex;
+  flex:none;
+  height:calc(var(--page-h) - 28px);
+  z-index:2;
+}
+.stack{
+  flex:none;
+  align-self:center;
+  width:34px;                        /* fixed slot: layout never shifts */
+  height:calc(var(--page-h) - 28px); /* flush with the open pages */
+  position:relative;
+}
+.stack .fill{
+  position:absolute; top:0; bottom:0;
+  width:26px;                        /* JS varies this, slightly */
+  transition:width var(--turn-ms) cubic-bezier(.45,.05,.3,1);
+  /* gilt edges: fine vertical leaves + top sheen + bottom shade */
+  background:
+    linear-gradient(180deg, rgba(255,246,216,.5), rgba(255,246,216,0) 10%,
+                    rgba(255,236,190,.1) 55%, rgba(60,38,10,.38) 98%),
+    repeating-linear-gradient(90deg,
+      #a3762f 0 1px, #e7c477 1px 2px, #caa04f 2px 3px, #f0d38c 3px 4px);
+  box-shadow:
+    inset 0 5px 8px -6px rgba(255,250,225,.85),
+    inset 0 -7px 10px -7px rgba(35,20,3,.8);
+}
+/* a few heavier leaves so the block reads as stacked paper, not texture */
+.stack .fill::after{
+  content:""; position:absolute; inset:0;
+  background:repeating-linear-gradient(90deg,
+    transparent 0 7px, rgba(110,76,24,.22) 7px 8px, transparent 8px 15px);
+  mix-blend-mode:multiply;
+}
+.stack.left .fill{
+  right:0;
+  border-radius:2px 0 0 2px;
+  box-shadow:
+    inset 0 5px 8px -6px rgba(255,250,225,.85),
+    inset 0 -7px 10px -7px rgba(35,20,3,.8),
+    inset -5px 0 6px -5px rgba(55,32,6,.5);
+}
+.stack.right .fill{
+  left:0;
+  border-radius:0 2px 2px 0;
+  box-shadow:
+    inset 0 5px 8px -6px rgba(255,250,225,.85),
+    inset 0 -7px 10px -7px rgba(35,20,3,.8),
+    inset 5px 0 6px -5px rgba(55,32,6,.5);
+}
+
+/* the gutter: pages curving down into the binding at the centre.
+   Sits ABOVE the turning leaves so the valley's shadow stays constant
+   through every turn — a leaf passing the spine passes through its shade. */
+.spine{
+  position:absolute; top:0; bottom:0; left:50%;
+  width:calc(var(--page-w) * .22);
+  transform:translateX(-50%);
+  z-index:7; pointer-events:none;
+  background:linear-gradient(90deg,
+    transparent 0%,
+    rgba(80,48,16,.06) 18%,
+    rgba(62,36,12,.16) 34%,
+    rgba(44,24,7,.34) 44%,
+    rgba(22,11,3,.58) 48.6%,
+    rgba(12,6,1,.68) 50%,
+    rgba(22,11,3,.58) 51.4%,
+    rgba(44,24,7,.34) 56%,
+    rgba(62,36,12,.16) 66%,
+    rgba(80,48,16,.06) 82%,
+    transparent 100%);
+}
+/* faint sheen where each page curls back up out of the valley */
+.spine::before, .spine::after{
+  content:""; position:absolute; top:0; bottom:0; width:1px;
+  background:linear-gradient(180deg,
+    rgba(255,242,205,.0), rgba(255,242,205,.12) 20%,
+    rgba(255,242,205,.12) 80%, rgba(255,242,205,.0));
+}
+.spine::before{ left:26%; }
+.spine::after{ right:26%; }
+
+.page{
+  position:relative;
+  width:var(--page-w);
+  height:calc(var(--page-h) - 28px);
+  background:var(--paper);
+  overflow:hidden;
+  flex:none;
+}
+.page.left{ border-radius:4px 0 0 4px;
+  box-shadow:inset -14px 0 22px -16px rgba(60,40,10,.35);}
+.page.right{ border-radius:0 4px 4px 0;
+  box-shadow:inset 14px 0 22px -16px rgba(60,40,10,.35);}
+
+/* aged paper: stains + grain, all CSS/SVG, no images */
+.parchment{
+  position:absolute; inset:0;
+  background:
+    radial-gradient(ellipse 40% 30% at 12% 8%, rgba(150,110,50,.16), transparent 70%),
+    radial-gradient(ellipse 30% 24% at 92% 88%, rgba(140,95,40,.18), transparent 70%),
+    radial-gradient(ellipse 55% 45% at 70% 20%, rgba(160,120,60,.08), transparent 70%),
+    radial-gradient(ellipse 120% 120% at 50% 50%, var(--paper) 55%, var(--paper-deep) 100%);
+}
+.grain{ position:absolute; inset:0; opacity:.5; mix-blend-mode:multiply; pointer-events:none;}
+
+.page-inner{
+  position:absolute;
+  /* Reserve a clear strip at the foot of the page for the "x of xx" page
+     indicator. Content and the decorative frame are confined above it (and
+     clipped there rather than at the page edge), so the indicator never sits
+     on top of any text or ornament. The bottom padding is trimmed to
+     compensate, so the text block's effective bottom margin is unchanged. */
+  top:0; left:0; right:0; bottom:7%;
+  padding:9% 11% 3%;
+  overflow:hidden;
+  color:var(--ink);
+  display:flex; flex-direction:column;
+}

@@ -1,0 +1,88 @@
+/* ==========================================================
+   RESPONSIVE — tablet tweaks, the mobile scroll mode, reduced motion
+   LOAD LAST. Mobile abandons the 3D book for a scrollable stack of pages.
+   ========================================================== */
+
+/* ============ MOBILE / PORTRAIT: scrollable pages, like a PDF ============ */
+.scroll-book{ display:none; }
+
+/* Landscape tablets fall through to the desktop layout, but the indicator
+   reads oversized on a tablet-sized page. Shrink it ~25% here only —
+   desktop (pointer:fine) is untouched. */
+@media (pointer: coarse) and (orientation: landscape) and (min-width: 721px){
+  .jump{ font-size:clamp(9px, calc(var(--page-w) * .0139), 16px); }
+}
+
+@media (orientation: portrait) and (max-width: 940px), (max-width: 720px){
+  :root{ --page-w: min(94vw, 520px); }
+  body{ height:auto; min-height:100dvh; overflow:visible; justify-content:flex-start; padding:0 0 8vh; }
+  header.site{ flex:0 0 auto; padding:3vh 0 2vh; }
+  .book-wrap{
+    visibility:hidden;
+    perspective:none;
+    position:absolute;
+    width:0; height:0;
+    overflow:hidden;
+    pointer-events:none;
+  }
+  .side-zone{ display:none; }
+  .scroll-book{
+    display:block;
+    width:var(--page-w);
+  }
+  .page.m{
+    position:relative;
+    width:100%;
+    height:calc(var(--page-w) * 1.36);
+    background:var(--paper);
+    border-radius:4px;
+    overflow:hidden;
+    margin-bottom:16px;
+    box-shadow:
+      0 12px 26px rgba(0,0,0,.55),
+      inset 0 0 0 1px rgba(90,60,20,.25);
+  }
+  .page.m .folio{ left:50%; right:auto; transform:translateX(-50%); }
+  .page.m > .page-inner{ position:absolute !important; inset:0; padding-bottom:12%; }
+  .jump{
+    visibility:visible;
+    /* .book-wrap sets pointer-events:none on mobile and .jump lives inside
+       it; without this the (inherited) none makes the box untappable, so the
+       numpad never opens. Re-enable taps for the panel and its children. */
+    pointer-events:auto;
+    position:fixed;
+    top:auto; left:50%; right:auto; transform:translateX(-50%);
+    bottom:calc(10px + env(safe-area-inset-bottom, 0px));
+    background:none; border:none; padding:0; gap:0;
+  }
+  .jump .total{ display:none; }
+  .jump-badge{ display:contents; }
+  .jump input{
+    width:3.4em;
+    height:auto;
+    font-size:1rem;
+    padding:.22em 0;
+    background:rgba(24,14,7,.55);
+    border:1px solid rgba(156,124,60,.35);
+    border-radius:3px;
+    color:var(--paper);
+    transform:none;   /* the diamond rotation is desktop/tablet only */
+  }
+  .numpad{
+    top:auto; bottom:calc(100% + 8px);
+    left:50%; right:auto; transform:translateX(-50%);
+    grid-template-columns:repeat(3, 34px);
+    gap:5px;
+    padding:6px;
+  }
+  .numpad button{ width:34px; height:34px; font-size:.85rem; padding:0; }
+  .numpad button.np-go{ font-size:.55rem; }
+  .jump::before, .jump::after{ content:none; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .leaf{ display:none !important; }
+  .turn-shade{ display:none !important; }
+  .glow{ animation:none !important; }
+  svg *{ animation:none !important; }
+}

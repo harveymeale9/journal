@@ -1,0 +1,108 @@
+/* ==========================================================
+   BASE — reset, the desk it all sits on, ambient glow, site title, stage
+   Global page chrome OUTSIDE the book itself. @keyframes flicker -> animations.css
+   ========================================================== */
+
+*{box-sizing:border-box; margin:0; padding:0;}
+
+body{
+  height:100vh;
+  height:100dvh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  overflow:hidden;
+  background:
+    radial-gradient(ellipse 45% 32% at 16% 84%, rgba(125,62,16,.12), transparent 70%),
+    radial-gradient(ellipse 38% 30% at 86% 14%, rgba(145,78,22,.09), transparent 70%),
+    radial-gradient(ellipse 55% 38% at 72% 92%, rgba(35,16,4,.6), transparent 75%),
+    radial-gradient(ellipse 50% 35% at 8% 10%, rgba(30,13,4,.55), transparent 75%),
+    radial-gradient(ellipse 120% 90% at 50% 34%, var(--desk) 0%, var(--desk-dark) 78%);
+  background-color:var(--desk-dark);
+  font-family:'IM Fell English', Georgia, serif;
+  color:var(--paper);
+  overflow-x:hidden;
+  padding:0 2vw 24px;
+}
+
+/* ambient candlelight flicker on the desk */
+.glow{
+  position:fixed; inset:0; pointer-events:none;
+  background:radial-gradient(ellipse 60% 45% at 50% 42%, rgba(255,165,70,.1), transparent 70%);
+  animation:flicker 7s ease-in-out infinite;
+}
+
+header.site{
+  flex:1 1 auto;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:0;
+  width:100%;
+  position:relative;
+  text-align:center;
+  margin:0;
+  user-select:none;
+}
+header.site h1{
+  font-family:'IM Fell English SC', Georgia, serif;
+  font-weight:400;
+  font-size:clamp(1rem, 0.5rem + 1.1vw, 3rem);
+  letter-spacing:.35em;
+  text-indent:.35em;
+  color:var(--brass);
+}
+header.site p{
+  font-style:italic;
+  font-size:.78rem;
+  color:#8a7452;
+  margin-top:.3em;
+  letter-spacing:.08em;
+}
+
+/* the desk area flanking the book: clicking it turns pages too */
+.stage{
+  display:flex;
+  align-items:stretch;
+  justify-content:center;
+  width:100%;
+}
+.side-zone{
+  flex:1 1 0;
+  cursor:pointer;
+  background:none;
+  border:none;
+  padding:0;
+}
+.side-zone:focus-visible{ outline:2px solid var(--brass); outline-offset:-4px; }
+
+/* ---- load failure notice ----
+   Hidden unless js/main.js couldn't fetch the pages. The commonest cause is
+   opening index.html straight off disk, which browsers block for fetch(). */
+#bookError{ display:none; }
+body.load-failed .stage,
+body.load-failed .scroll-book{ display:none; }
+body.load-failed #bookError{
+  display:block;
+  max-width:46ch;
+  margin:auto;
+  padding:2em;
+  border:1px solid rgba(156,124,60,.4);
+  border-radius:3px;
+  background:rgba(24,14,7,.5);
+  font-family:'Cormorant Garamond', Georgia, serif;
+  color:var(--paper);
+  line-height:1.6;
+  text-align:center;
+}
+#bookError h2{
+  font-family:'IM Fell English SC', Georgia, serif;
+  font-weight:400; color:var(--brass);
+  letter-spacing:.1em; margin-bottom:.7em;
+}
+#bookError p{ margin:.7em 0; }
+#bookError code{
+  font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size:.85em; color:var(--brass);
+  background:rgba(0,0,0,.35); padding:.15em .45em; border-radius:2px;
+}
