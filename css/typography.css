@@ -45,6 +45,20 @@ h2.entry-title{
   line-height:1.62;
   text-align:justify;
   hyphens:auto;
+  /* INK BLEED — the warm halo where ink crept into the paper's fibres.
+     A sub-pixel shadow in the ink's OWN family, never grey: a neutral halo
+     reads as bad antialiasing, a warm one reads as letterpress.
+
+     This is the book's one deliberate px, and it earns it. The bleed is a
+     property of the PRINTING, not of the page's scale — it should stay
+     roughly constant in device pixels while the type grows with --page-w.
+     Conventions §12.3 bans px for type SIZE; a halo is not a size.
+
+     Tune the blur only. Past ~.8px it stops reading as ink and starts
+     reading as a focus problem. text-shadow inherits, so every <p> inside
+     gets it; to bleed the headings and dropcaps too, move this one
+     declaration onto .page-inner in book.css. */
+  text-shadow:0 0 .5px rgba(74,44,20,.5);
 }
 .body-text p + p{ text-indent:1.6em; margin-top:.15em; }
 
