@@ -16,13 +16,15 @@
 @media (orientation: portrait) and (max-width: 940px), (max-width: 720px){
   /* On a phone the leaf's physical width and the unit type scales from stop
      being the same thing. --leaf-w is what you can see; --page-w is the page
-     as the type reads it. We trade the leaf's side margin (11% -> 2.5%) for
-     1.22x type: the measure stays at ~51 characters — identical to desktop —
-     while body text goes 12.5px -> 15.2px on a 390px screen.
-     1.22 is not a taste value: it is 0.95 / 0.78, new column over old. */
+     as the type reads it. We trade the leaf's side margin (11% -> 5%) for
+     1.15x type: the measure stays at ~51 characters — identical to desktop —
+     while body text goes 12.5px -> 14.3px on a 390px screen.
+     1.15 is not a taste value: it is 0.90 / 0.78, new column over old.
+     CHANGE BOTH OR NEITHER: this factor and the side padding further down are
+     the same decision written twice. Move one alone and the measure drifts. */
   :root{
     --leaf-w: min(94vw, 520px);
-    --page-w: calc(var(--leaf-w) * 1.22);
+    --page-w: calc(var(--leaf-w) * 1.15);
   }
   body{ height:auto; min-height:100dvh; overflow:visible; justify-content:flex-start; padding:0 0 8vh; }
   header.site{ flex:0 0 auto; padding:3vh 0 2vh; }
@@ -42,7 +44,7 @@
   .page.m{
     position:relative;
     width:100%;
-    height:calc(var(--page-w) * 1.36);   /* 1.36 PAGE-units = 1.66 leaf-widths */
+    height:calc(var(--page-w) * 1.36);   /* 1.36 PAGE-units = 1.56 leaf-widths */
     background:var(--paper);
     border-radius:4px;
     overflow:hidden;
@@ -52,7 +54,23 @@
       inset 0 0 0 1px rgba(90,60,20,.25);
   }
   .page.m .folio{ left:50%; right:auto; transform:translateX(-50%); }
-  .page.m > .page-inner{ position:absolute !important; inset:0; padding:9% 2.5% 12%; }
+  /* Percentages here resolve against the LEAF, not --page-w: 5% sides = the
+     90% measure, as seen.
+     The foot was 12%, mirroring desktop's reserved indicator strip. On mobile
+     nothing occupies it: .folio is display:none (typography.css) and .jump is
+     position:fixed to the viewport, not the leaf. Reclaiming it to 6% pays for
+     the taller caption below — without it, plate pages clip a line that
+     desktop shows, silently (conventions §0). */
+  .page.m > .page-inner{ position:absolute !important; inset:0; padding:9% 5% 6%; }
+  /* THE TWO EXCEPTIONS TO "ONE SCALE, ONE PAGE".
+     Every other size in the book inflates for free via --page-w above. These
+     two do not survive it: their multipliers were tuned against a ~600px
+     desktop page and fall under a legibility floor at phone size (7.0px and
+     11.8px respectively). Both are lifted to their DESKTOP PIXEL SIZE here —
+     not made bigger than the book, just stopped from shrinking below it.
+     Nothing else belongs in this block. */
+  .page.m .running-head{ font-size:calc(var(--page-w) * .025); }   /* 10.5px */
+  .page.m .plate-caption{ font-size:calc(var(--page-w) * .042); }  /* 17.7px */
   .jump{
     visibility:visible;
     /* .book-wrap sets pointer-events:none on mobile and .jump lives inside
