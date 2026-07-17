@@ -108,20 +108,42 @@ export function fillSlot(id, page){
    fillSlot() for the real slot at that point would still rebuild it from
    the page's HTML string — a DIFFERENT element than the one that was just
    animating — restarting the animation exactly as before, just on the
-   other side of the spread. So instead of rebuilding, MOVE the leaf
-   face's actual DOM nodes into the real slot: same elements, same
-   in-flight animation, no restart. The leaf face is left empty and its
-   data-slug cleared so a future fillSlot() call on it (next turn) doesn't
-   mistake "empty" for "already showing that page" and skip its own fill. */
+   other side of the spread.
+
+   Moving the leaf face's actual DOM nodes into the real slot (rather than
+   rebuilding from the HTML string) gets the CONTENT across for free, but
+   turns out not to be enough on its own: every engine tested here resets
+   a CSS animation's clock on reparenting, same-tick appendChild included
+   — it isn't only innerHTML churn that restarts one. So each animation's
+   currentTime is read off the old elements a moment before the move, and
+   wound forward onto the (new, but visually identical) Animation objects
+   the moved elements get afterward — the clock is carried by hand since
+   the browser won't carry it for us.
+
+   The leaf face is left empty and its data-slug cleared so a future
+   fillSlot() call on it (next turn) doesn't mistake "empty" for "already
+   showing that page" and skip its own fill. */
 export function settleFromLeaf(id, leafFaceId){
   const node = el[id] || document.getElementById(id);
   const source = el[leafFaceId] || document.getElementById(leafFaceId);
   const sourceParent = source.parentElement;
+
+  const carried = [];
+  source.querySelectorAll('*').forEach(child => {
+    child.getAnimations().forEach(anim => carried.push({ child, currentTime: anim.currentTime }));
+  });
+
   const stale = node.parentElement && node.parentElement.querySelector(':scope > .folio');
   if (stale) stale.remove();
   node.className = source.className;
   node.dataset.slug = source.dataset.slug || '';
+  node.innerHTML = '';   /* out with whatever this slot showed before the turn */
   while (source.firstChild) node.appendChild(source.firstChild);
+
+  carried.forEach(({ child, currentTime }) => {
+    child.getAnimations().forEach(anim => { anim.currentTime = currentTime; });
+  });
+
   /* the folio for this page was already lifted out of `source` into
      sourceParent (.leaf-face) back when fillSlot() first filled the leaf */
   const folio = sourceParent && sourceParent.querySelector(':scope > .folio');

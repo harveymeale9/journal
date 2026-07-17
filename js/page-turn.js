@@ -10,12 +10,19 @@ const TURN_MS = 900;   /* keep in step with --turn-ms in css/tokens.css */
 /* Shared by the normal turn-completion timeout and finishTurnNow() (fired
    when a new click cuts an in-flight turn short) — both need to land the
    spread the same way, settleFromLeaf and all, or a rapid-clicked turn
-   would restart an animation that a leisurely one wouldn't. */
+   would restart an animation that a leisurely one wouldn't.
+
+   settleFromLeaf() MUST run before the class removal below, not after:
+   .leaf is display:none whenever .turning isn't set (css/page-turn.css),
+   and display:none cancels every CSS animation inside it outright — by
+   the time a later call read a leaf face's animation currentTime, there
+   would be nothing left to read. Reading (and moving) it out while the
+   leaf is still display:block keeps the clock alive to carry over. */
 function land(dir, next){
-  el.leaf.classList.remove('turning','back');
-  el.shade.classList.remove('on');
   if (dir > 0) settleFromLeaf('pageL', 'leafBack');
   else settleFromLeaf('pageR', 'leafFront');
+  el.leaf.classList.remove('turning','back');
+  el.shade.classList.remove('on');
   state.spread = next;
   render();
   state.turning = false;
