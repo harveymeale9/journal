@@ -27,6 +27,9 @@
     pointer-events:none;
   }
   .side-zone{ display:none; }
+  /* mobile has no browser chrome worth hiding and no desk to give the
+     candle — fullscreen is a desktop/tablet-book feature only. */
+  .fs-toggle{ display:none; }
   /* the candle is desk furniture for the 3D book; portrait has no desk.
      .stage itself isn't hidden here (only its contents collapse), so this
      must be explicit or the candle floats over the scroll stack. .candle-cast

@@ -6,6 +6,7 @@ import { loadBook } from './loader.js';
 import { el, state, cacheDom, isMobile, render, buildScrollBook, savedPageIndex } from './book.js';
 import { requestGo } from './page-turn.js';
 import { initJump, syncMobilePage } from './jump.js';
+import { initFullscreen } from './fullscreen.js';
 
 /* reveal once fonts are in, so the whole book paints in its final form;
    the timeout guarantees reveal even if font loading stalls */
@@ -54,6 +55,10 @@ function showLoadError(err){
        <p>Check that <code>book.json</code> lists only pages that exist in <code>/pages</code>.</p>`;
   document.body.classList.add('load-failed','ready');
 }
+
+/* wired unconditionally, before the book even loads — it's page chrome,
+   not book content, and should still work on the load-error screen */
+initFullscreen();
 
 (async function open(){
   try{
