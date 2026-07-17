@@ -95,9 +95,26 @@ header.site p{
 }
 .fs-toggle:hover, .fs-toggle:focus-visible{ color:var(--paper); border-color:var(--paper); }
 
-/* the title alone fades in fs-mode; the toggle was already fixed to the
-   corner, so there's nothing left to re-anchor when fullscreen opens */
+/* the title fades AND the header shrinks to a deliberate band in fs-mode.
+   Fading alone isn't enough: opacity doesn't remove an element from flow,
+   so header.site — flex:1 1 auto, sized by the h1's own box — would keep
+   reserving its full height (72px at a typical size) at the top of the
+   column even with the h1 invisible, leaving that much dead space between
+   the viewport's top edge and the book. Shrinking it to a FIXED 44px
+   (rather than 0) reserves just enough room for the toggle sitting at
+   top:14px — collapsing all the way to 0 pulls the book's top edge up
+   underneath the toggle instead of merely closing the gap, since the
+   toggle is position:fixed and doesn't push on layout to keep clear of
+   whatever's beneath it. tokens.css's fs-mode --page-w formula subtracts
+   this same 44px, so the two stay in step. The toggle itself survives
+   this untouched: it's position:fixed (declared above, unconditionally),
+   never part of header.site's flow box to begin with. */
 body.fs-mode header.site h1{ opacity:0; pointer-events:none; }
+body.fs-mode header.site{
+  flex:0 0 44px; min-height:44px; height:44px;
+  padding:0; margin:0;
+  overflow:hidden;
+}
 
 /* the desk area flanking the book: clicking it turns pages too */
 .stage{

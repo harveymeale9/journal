@@ -37,12 +37,26 @@
 /* Fullscreen (js/fullscreen.js) hides the title AND the candle (base.css),
    so neither the 96px of title headroom nor the ~8vw of candle gutter the
    normal formula reserves is needed — reclaimed here so the book actually
-   grows to fill the screen instead of just recentring at its old size. The
-   1200px hard cap is raised too: fullscreen is a deliberate "give the book
-   the whole screen" request, not a normal window a reader might also be
-   reading email in. 49vw (not 50) and 16px (not 0) leave a sliver of desk
-   on every edge on purpose — a book with literally nothing around it reads
-   as a rendering bug, not a book. */
+   grows to fill the screen instead of just recentring at its old size.
+   49vw (not 50) leaves a sliver of desk on either side on purpose — a
+   book with literally nothing around it reads as a rendering bug, not a
+   book. The 44px subtracted here MUST match header.site's own fs-mode
+   height (base.css) exactly — that's the real band the fullscreen toggle
+   sits in, and this formula has no way to know that on its own; the two
+   are one measurement kept in two places. 16px is a second, small
+   reserve at the BOTTOM, not part of that band.
+
+   The 1200px cap is DELIBERATELY the same one the normal (non-fullscreen)
+   formula above has always used, not raised further — every page in the
+   book is authored and word-counted against that ceiling (§1 of
+   DESIGN-CONVENTIONS: pages clip, they don't scroll), and pages that were
+   never tuned against anything larger start silently overflowing well
+   before --page-w reaches 2000px (confirmed on the contents page, unrelated
+   to anything on this page, at ~1590px on a 4K display). Fullscreen still
+   gives a real, often dramatic size increase on anything short of a very
+   large monitor — it's only on a genuinely huge display that this cap
+   binds at all — without reopening a book-wide overflow risk this session
+   didn't set out to audit every page against. */
 body.fs-mode{
-  --page-w: min(49vw, calc((100dvh - 16px) / 1.32), 2000px);
+  --page-w: min(49vw, calc((100dvh - 44px - 16px) / 1.32), 1200px);
 }

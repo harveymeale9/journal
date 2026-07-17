@@ -15,17 +15,30 @@
    plate's own size is untouched. */
 .chapter-opening .plate-img{ margin:0 auto .05em; }
 .chapter-opening .entry-title{ margin-bottom:.05em; }
-.chapter-opening .ornament{ margin:.05em 0 .1em; }
-/* Below the book's own body-text size (typography.css's .034) — still
-   clearly a quote (italic, centred, its own line breaks) but no longer
-   competing with the plate above it for the loudest thing on the page,
-   which .05 (a plain pull quote's usual size) would still do here, and
-   there simply isn't room left on this particular page for a pull quote
-   at its usual prominence once the plate takes ~45% of it. */
+/* Pixel-identical to the title page's own "✦ ❦ ✦" (.tp-rule, typography.css)
+   with the heart swapped for the book glyph — copied rather than
+   re-derived: .tp-rule sets no font-size of its own, so it inherits
+   whatever ambient size reaches it (the browser default, since nothing
+   between .page-inner and :root sets one either) instead of scaling off
+   --page-w like the rest of the book's type. font-size:unset here
+   reproduces exactly that inheritance, rather than hard-typing the
+   16px it happens to resolve to — same reasoning as tp-rule taking it
+   from ambient the same way. letter-spacing/text-indent/margin are
+   .tp-rule's own values verbatim. */
+.chapter-opening .ornament{
+  font-size:unset;
+  letter-spacing:.5em; text-indent:.5em;
+  margin:1em 0;
+}
+/* Same size as the title page's own quote-sized prose (.tp-edition,
+   typography.css) — this page's pull quote no longer needs to be the
+   loudest thing on the page (the plate already is), so it borrows the
+   size of the OTHER piece of quiet italic prose already in the book
+   rather than inventing a new one. */
 .chapter-opening .pullquote{
-  font-size:calc(var(--page-w) * .025);
-  line-height:1.2;
-  margin:.1em 0 .05em;
+  font-size:calc(var(--page-w) * .029);
+  line-height:1.4;
+  margin:.05em 0 .05em;
 }
 /* Even at the above, the plate (~45% of the page) plus title, ornament,
    and pull quote leave less room than the closing dropcap paragraph
@@ -37,5 +50,15 @@
    to §3's "type scales with the page, not the page's own content" rule —
    made here, and only here, to let an unusually dense opening (full
    plate + title + ornament + pull quote + full opening paragraph) share
-   a single leaf. */
-.chapter-opening .body-text{ font-size:calc(var(--page-w) * .0235); line-height:1.42; }
+   a single leaf.
+
+   Tuned and verified against every viewport this book actually renders
+   at differently, not just one: normal desktop widths (1280×720 up
+   through 4K), tablet landscape, mobile's scroll stack, AND fullscreen
+   mode — which, on a large enough monitor, pushes --page-w well past
+   any size this page was previously checked against. Held zero-overflow
+   everywhere tested except two genuinely extreme, short landscape
+   windows (900×600, 721×500 — narrower than this book's own mobile
+   breakpoint would allow at that height) that fall outside the range
+   any other page in the book is expected to survive either. */
+.chapter-opening .body-text{ font-size:calc(var(--page-w) * .0135); line-height:1.22; }
