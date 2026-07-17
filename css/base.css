@@ -91,24 +91,28 @@ header.site p{
    book's left edge — so it scales with whatever room is left beside the book
    and can never collide with it. That gutter is wide on a tall window and
    nearly nothing on a short wide one (--page-w is min(46vw, height-derived)),
-   hence the clamp on .candle-body. Hidden outright on mobile: responsive.css. */
+   hence the clamp on .candle-body. It's absolutely positioned and
+   pointer-events:none, so it never enters flex flow and can't nudge the
+   book's own layout no matter its size. top:0/bottom:0 + align-items:center
+   line the flame up with the book's vertical centre rather than standing it
+   on the desk floor. Hidden outright on mobile: responsive.css. */
 .candle{
   position:absolute;
-  bottom:0; left:0;
+  top:0; bottom:0; left:0;
   /* the book's left edge: half a spread (--page-w) plus .book's 14px padding,
      measured out from the centre of the stage */
   right:calc(50% + var(--page-w) + 14px);
   display:flex;
-  align-items:flex-end;
+  align-items:center;
   justify-content:center;
   pointer-events:none;   /* the gutter is a page-turn button; keep it clickable */
   z-index:1;
 }
 .candle-body{
   position:relative;
-  /* 62% of the gutter, but never so small it's a smudge nor so large it
-     towers over the book on an ultrawide desk */
-  width:clamp(54px, 62%, 196px);
+  /* half the previous scale — a small presence filling the gutter, not a
+     second object competing with the book */
+  width:clamp(27px, 31%, 98px);
 }
 .candle-stick{
   display:block;
