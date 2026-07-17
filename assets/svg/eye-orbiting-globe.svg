@@ -8,17 +8,17 @@
   </defs>
 
   <g fill="#A96F58">
-    <use href="#starShape" x="155.15" y="131.11">
-      <animate attributeName="opacity" values="1;0.15;1" dur="141s" begin="0s" repeatCount="indefinite"/>
+    <use href="#starShape" x="155.15" y="131.11" opacity="0">
+      <animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0.0000;0.0641;0.4744;0.5385;1.0000" dur="7.8s" begin="0s" repeatCount="indefinite"/>
     </use>
-    <use href="#starShape" x="44.85" y="131.11" transform="scale(0.85)" transform-origin="44.85 131.11">
-      <animate attributeName="opacity" values="1;0.15;1" dur="154s" begin="5s" repeatCount="indefinite"/>
+    <use href="#starShape" x="44.85" y="131.11" transform="scale(0.85)" transform-origin="44.85 131.11" opacity="0">
+      <animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0.0000;0.0641;0.5385;0.6026;1.0000" dur="7.8s" begin="2s" repeatCount="indefinite"/>
     </use>
-    <use href="#starShape" x="44.85" y="68.89">
-      <animate attributeName="opacity" values="1;0.15;1" dur="167s" begin="9s" repeatCount="indefinite"/>
+    <use href="#starShape" x="44.85" y="68.89" opacity="0">
+      <animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0.0000;0.0494;0.4691;0.5185;1.0000" dur="8.1s" begin="4s" repeatCount="indefinite"/>
     </use>
-    <use href="#starShape" x="155.15" y="68.89" transform="scale(0.85)" transform-origin="155.15 68.89">
-      <animate attributeName="opacity" values="1;0.15;1" dur="179s" begin="13s" repeatCount="indefinite"/>
+    <use href="#starShape" x="155.15" y="68.89" transform="scale(0.85)" transform-origin="155.15 68.89" opacity="0">
+      <animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0.0000;0.0779;0.4805;0.5584;1.0000" dur="7.7s" begin="6s" repeatCount="indefinite"/>
     </use>
   </g>
 
