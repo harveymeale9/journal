@@ -3,7 +3,10 @@
    Styling lives in css/page-turn.css.
    ========================================================== */
 
-import { el, state, isMobile, reduced, fillSlot, settleFromLeaf, primeLeafFace, render, updateStacks } from './book.js?v=1';
+/* dynamic + window.__BUST, not a static import — see js/main.js's own
+   top-of-file note for why (keeps this sharing book.js's SINGLE module
+   instance/state with every other file, while making it fetch fresh) */
+const { el, state, isMobile, reduced, fillSlot, settleFromLeaf, primeLeafFace, render, updateStacks } = await import(`./book.js?v=${window.__BUST}`);
 
 const TURN_MS = 900;   /* keep in step with --turn-ms in css/tokens.css */
 

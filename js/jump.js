@@ -9,8 +9,12 @@
    delegate below.
    ========================================================== */
 
-import { el, state, isMobile, reduced, savePos } from './book.js?v=1';
-import { flutterTo } from './page-turn.js?v=1';
+/* dynamic + window.__BUST, not static imports — see js/main.js's own
+   top-of-file note for why (keeps this sharing book.js's/page-turn.js's
+   SINGLE module instances with every other file, while making both
+   fetch fresh) */
+const { el, state, isMobile, reduced, savePos } = await import(`./book.js?v=${window.__BUST}`);
+const { flutterTo } = await import(`./page-turn.js?v=${window.__BUST}`);
 
 let jumpBox, numpad;
 /* the folio that opened the pad currently open (or null) — see the click

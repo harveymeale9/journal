@@ -2,11 +2,23 @@
    MAIN — load the book, wire the controls, open it
    ========================================================== */
 
-import { loadBook } from './loader.js?v=1';
-import { el, state, cacheDom, isMobile, render, buildScrollBook, savedPageIndex } from './book.js?v=1';
-import { requestGo } from './page-turn.js?v=1';
-import { initJump, syncMobilePage } from './jump.js?v=1';
-import { initFullscreen } from './fullscreen.js?v=1';
+/* Dynamic imports, all keyed to the SAME window.__BUST (set in index.html,
+   before this module ever runs) rather than static `import … from './x.js'`
+   lines — while caching is off (see the note in index.html's <head>), this
+   is what makes every one of this file's own dependencies fetch fresh on
+   every load, not just this file itself. Sharing one token across every
+   file's imports matters: two different query strings for the SAME module
+   (e.g. book.js) would make the browser load and evaluate it TWICE, as two
+   separate module instances with two separate copies of its `state`
+   object — silently breaking the single shared state every file here
+   depends on. See the note in index.html for how to revert to plain
+   static imports once caching goes back on. */
+const B = window.__BUST;
+const { loadBook } = await import(`./loader.js?v=${B}`);
+const { el, state, cacheDom, isMobile, render, buildScrollBook, savedPageIndex } = await import(`./book.js?v=${B}`);
+const { requestGo } = await import(`./page-turn.js?v=${B}`);
+const { initJump, syncMobilePage } = await import(`./jump.js?v=${B}`);
+const { initFullscreen } = await import(`./fullscreen.js?v=${B}`);
 
 /* reveal once fonts are in, so the whole book paints in its final form;
    the timeout guarantees reveal even if font loading stalls */

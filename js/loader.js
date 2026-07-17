@@ -14,7 +14,10 @@ async function resolvePartials(html){
   const names = [...html.matchAll(PARTIAL_RE)].map(m => m[1]);
   await Promise.all([...new Set(names)].map(async name => {
     if (partialCache.has(name)) return;
-    const res = await fetch(`assets/${name}`);
+    /* cache:'no-store' while caching is fully off (see index.html's
+       <head> note) — skips the HTTP cache outright rather than merely
+       revalidating, so an edited partial is never served stale */
+    const res = await fetch(`assets/${name}`, { cache: 'no-store' });
     if (!res.ok) throw new Error(`partial not found: assets/${name}`);
     partialCache.set(name, (await res.text()).trim());
   }));
@@ -46,7 +49,10 @@ function numberFolios(pages){
 const stripNote = (s) => s.replace(/^\s*<!--[\s\S]*?-->\s*/, '');
 
 export async function loadBook(){
-  const res = await fetch('book.json', { cache: 'no-cache' });
+  /* no-store, not just no-cache — while caching is fully off (see
+     index.html's <head> note), skip the HTTP cache outright rather than
+     merely revalidating against it */
+  const res = await fetch('book.json', { cache: 'no-store' });
   if (!res.ok) throw new Error('book.json could not be read');
   const book = await res.json();
 
@@ -55,7 +61,7 @@ export async function loadBook(){
 
   /* pulled in parallel, but kept in the order book.json declares */
   const pages = await Promise.all(order.map(async slug => {
-    const r = await fetch(`pages/${slug}.html`);
+    const r = await fetch(`pages/${slug}.html`, { cache: 'no-store' });
     if (!r.ok) throw new Error(`missing page: pages/${slug}.html`);
     const html = await resolvePartials(stripNote(await r.text()));
     return { slug, html };          // slug IS the page's identity, forever
