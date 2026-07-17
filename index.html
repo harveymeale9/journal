@@ -10,17 +10,26 @@
 <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
 
 <!-- Order matters: tokens first (everything reads from them),
-     responsive last (it overrides). Everything between is independent. -->
-<link rel="stylesheet" href="css/tokens.css">
-<link rel="stylesheet" href="css/base.css">
-<link rel="stylesheet" href="css/book.css">
-<link rel="stylesheet" href="css/typography.css">
-<link rel="stylesheet" href="css/components.css">
-<link rel="stylesheet" href="css/animations.css">
-<link rel="stylesheet" href="css/page-turn.css">
-<link rel="stylesheet" href="css/ui.css">
-<link rel="stylesheet" href="css/pages.css">
-<link rel="stylesheet" href="css/responsive.css">
+     responsive last (it overrides). Everything between is independent.
+
+     TEMPORARY while we're actively iterating on CSS: every link below carries
+     ?cb=N. Browsers and any CDN in front of the site (GitHub Pages' own, or
+     Cloudflare if the domain is proxied through it) key their cache on the
+     full URL including the query string, so bumping N forces a genuinely
+     fresh fetch on the next push instead of a stale cached file. Bump every
+     number below by 1 (they don't need to match each other) whenever a CSS
+     change isn't showing up after a normal refresh. Remove the ?cb=N suffixes
+     entirely once we're done iterating and want normal caching back. -->
+<link rel="stylesheet" href="css/tokens.css?cb=1">
+<link rel="stylesheet" href="css/base.css?cb=1">
+<link rel="stylesheet" href="css/book.css?cb=1">
+<link rel="stylesheet" href="css/typography.css?cb=1">
+<link rel="stylesheet" href="css/components.css?cb=1">
+<link rel="stylesheet" href="css/animations.css?cb=1">
+<link rel="stylesheet" href="css/page-turn.css?cb=1">
+<link rel="stylesheet" href="css/ui.css?cb=1">
+<link rel="stylesheet" href="css/pages.css?cb=1">
+<link rel="stylesheet" href="css/responsive.css?cb=1">
 </head>
 <body>
 <div class="glow"></div>
