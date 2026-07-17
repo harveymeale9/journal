@@ -153,11 +153,27 @@ body.ready .book-wrap, body.ready .scroll-book{ opacity:1; }
    normally. The dark shadow gradient above is left untouched — it reads
    fine (even flatteringly) over a photograph, it's specifically the
    BRIGHT sheen that clashed. Extend the selector list here if a future
-   page ever needs the same treatment. */
+   page ever needs the same treatment.
+
+   #leafFront / #leafBack are included for the same reason #pageL/#pageR
+   are: book.js's fillSlot() copies a page's classList onto WHICHEVER slot
+   it fills, and page-turn.js's go() fills the outgoing page into the
+   flipping leaf's face and overwrites the real pageL/pageR slot with the
+   INCOMING page in the same tick — so mid-turn, the class briefly lives
+   on the leaf, not the static slot. Checking #pageL/#pageR alone made
+   this rule turn itself back off the instant a turn away from
+   chapter-opening began, while the leaf was still visibly showing that
+   page's plate for the ~900ms of the turn — the sheen would flash back on
+   over the photograph for the duration of the animation, a seam visible
+   only while turning, gone the moment the turn settled. */
 .book:has(#pageL.chapter-opening) .spine::before,
 .book:has(#pageL.chapter-opening) .spine::after,
 .book:has(#pageR.chapter-opening) .spine::before,
-.book:has(#pageR.chapter-opening) .spine::after{
+.book:has(#pageR.chapter-opening) .spine::after,
+.book:has(#leafFront.chapter-opening) .spine::before,
+.book:has(#leafFront.chapter-opening) .spine::after,
+.book:has(#leafBack.chapter-opening) .spine::before,
+.book:has(#leafBack.chapter-opening) .spine::after{
   opacity:0;
 }
 

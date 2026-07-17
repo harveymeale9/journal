@@ -12,12 +12,21 @@
 @media (pointer: coarse) and (orientation: landscape) and (min-width: 721px){
   .jump{ font-size:clamp(10px, calc(var(--page-w) * .0158), 18px); }
   .folio{ font-size:calc(var(--page-w) * .04125); }
+  /* .running-head needs MORE than tablet's own page-w scaling gives it —
+     .0165 * 2.2, not the desktop/default 1.55x (typography.css). Scoped
+     off in fullscreen: fs-mode's own --page-w is already bigger, and at
+     that size the plain 1.55x default reads correctly — this 2.2x is
+     specifically for tablet's smaller NORMAL page-w. */
+  body:not(.fs-mode) .running-head{ font-size:calc(var(--page-w) * .0363); }
 }
 
 @media (orientation: portrait) and (max-width: 940px), (max-width: 720px){
   :root{ --page-w: min(94vw, 520px); }
   body{ height:auto; min-height:100dvh; overflow:visible; justify-content:flex-start; padding:0 0 8vh; }
   header.site{ flex:0 0 auto; padding:3vh 0 2vh; }
+  /* Same 2.2x-of-baseline boost as tablet's own (non-fullscreen) override
+     above — .0165 * 2.2, not the desktop/default 1.55x (typography.css). */
+  .running-head{ font-size:calc(var(--page-w) * .0363); }
   .book-wrap{
     visibility:hidden;
     perspective:none;

@@ -4,9 +4,13 @@
    ========================================================== */
 
 /* ============ TYPOGRAPHY OF THE PAGE ============ */
+/* .0165 * 1.55 — the baseline size read too small on every device; 55%
+   larger is the desktop/default figure. Tablet (non-fullscreen) and
+   mobile need MORE than that on top, not just inherited page-w scaling —
+   see their own overrides in responsive.css. */
 .running-head{
   font-family:'IM Fell English SC', serif;
-  font-size:calc(var(--page-w) * .0165); letter-spacing:.32em; text-indent:.32em;
+  font-size:calc(var(--page-w) * .0256); letter-spacing:.32em; text-indent:.32em;
   text-align:center; color:var(--ink-faint);
   margin-bottom:1.6em;
 }

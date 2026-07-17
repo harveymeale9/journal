@@ -34,8 +34,7 @@ Others inherit an answer from their culture, religion, family, or peers.
 [/BODY]
 [/PAGE 2]
 
-[UNPAGED — remaining Chapter I text, not yet laid out as pages. Order below is the reading order; page breaks and word budgets still need deciding when this continues.]
-
+[PAGE 3 · pages/nature-of-the-manual-a-clear-answer.html — built]
 [BODY]
 Yet, if the purpose of one's existence remains unclear, how could one ever develop a robust strategy for achieving it?
 The Reality Manual is arguably the only text in existence that establishes a clear, practical, and satisfactory answer to this question:
@@ -43,6 +42,9 @@ What does successful participation in physical reality actually look like?
 In other words, what does it mean to win at the game of life?
 Many texts offer guidance regarding how one ought to approach the game. Some contain profound insights. Others contain extraordinary wisdom. Yet they are often intertwined with mythology, cultural inheritance, historical circumstance, unverifiable metaphysical claims, moral prescriptions, and ideas whose relevance to modern life is uncertain. The result is that the signal is frequently buried beneath the noise, leaving the reader to excavate the principle from the surrounding doctrine.
 [/BODY]
+[/PAGE 3]
+
+[UNPAGED — remaining Chapter I text, not yet laid out as pages. Order below is the reading order; page breaks and word budgets still need deciding when this continues.]
 
 [INLINE IMAGE]
 https://realitymanual.com/assets/images/AlchemicalBookIllustrationDigital.webp
