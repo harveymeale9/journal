@@ -57,7 +57,11 @@ export function updateStacks(frac){
 }
 
 /* pages are authored with their own .page-inner wrapper (which may carry
-   layout classes like title-page or sealed); inject content AND classes */
+   layout classes like title-page or sealed); inject content AND classes.
+   The folio is then lifted out of the clipped, padded page-inner and into
+   its parent (.page), which is exactly the reserved 7% strip book.css sets
+   aside for it — the folio was never meant to compete with body text for
+   the page's clipped space. */
 export function fillSlot(id, page){
   const node = el[id] || document.getElementById(id);
   const tmp = document.createElement('div');
@@ -65,6 +69,8 @@ export function fillSlot(id, page){
   const w = tmp.firstElementChild;
   node.className = w ? w.className : 'page-inner';
   node.innerHTML = w ? w.innerHTML : '';
+  const folio = node.querySelector('.folio');
+  if (folio && node.parentElement) node.parentElement.appendChild(folio);
 }
 
 export function render(){
@@ -76,9 +82,15 @@ export function render(){
   savePos(state.spread*2);   /* remember the (left) page of this spread */
 }
 
-/* build the scrollable page stack once; CSS decides when it's shown */
+/* build the scrollable page stack once; CSS decides when it's shown.
+   Same lift as fillSlot above: each leaf's folio moves out of its
+   .page-inner and onto the .page.m itself, into the reserved strip. */
 export function buildScrollBook(){
   el.scrollBook.innerHTML = state.pages.map(p =>
     `<div class="page m" data-slug="${p.slug}"><div class="parchment"></div>${p.html}</div>`
   ).join('');
+  el.scrollBook.querySelectorAll('.page.m').forEach(page=>{
+    const folio = page.querySelector('.folio');
+    if (folio) page.appendChild(folio);
+  });
 }

@@ -2,6 +2,11 @@
    JUMP — the page badge and its numpad
    The input is readonly and we type for it, so no native keyboard
    ever opens and the layout never shifts. Styling: css/ui.css.
+
+   The badge itself stays invisible until opened (see .jump / .jump.open
+   in ui.css) — the number a reader actually sees is the folio printed on
+   each page. Tapping any folio is what opens this pad; see the click
+   delegate below.
    ========================================================== */
 
 import { el, state, isMobile, reduced, savePos } from './book.js';
@@ -59,6 +64,11 @@ export function initJump(){
 
   el.jumpInput.addEventListener('focus', openPad);
   el.jumpInput.addEventListener('click', openPad);
+
+  /* tapping a folio printed on any page opens the same pad the badge does */
+  document.addEventListener('click', e=>{
+    if (e.target.closest('.folio')) el.jumpInput.focus();
+  });
 
   numpad.addEventListener('click', e=>{
     const b = e.target.closest('button');

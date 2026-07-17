@@ -1,17 +1,21 @@
 /* ==========================================================
-   UI — the jump-to-page badge and its numpad
-   The only conventional interface in the book; kept apart from the book's own styling.
+   UI — the jump-to-page numpad
+   The only conventional interface in the book; kept apart from the book's
+   own styling.
    ========================================================== */
 
 /* ============ JUMP TO PAGE ============ */
-/* Reads "12 of 29", flanked by a mirrored pair of brass ornaments.
-   The total comes from state.pages.length (js/jump.js), i.e. from book.json —
-   so it is derived, never typed, and stays honest on the next insert.
+/* The badge itself (a "12 of 29" ledger line plus its numpad) is invisible
+   and non-interactive until opened. The number a reader actually sees is
+   the folio printed on every page (typography.css) — tapping any folio
+   calls el.jumpInput.focus(), which is what opens this pad (jump.js).
+   The total comes from state.pages.length (js/jump.js), i.e. from
+   book.json — so it is derived, never typed, and stays honest on the next
+   insert.
 
-   MOBILE IS UNTOUCHED. Everything below is overridden inside the portrait
-   media query in responsive.css: the ornaments get content:none, .total goes
-   display:none, .jump-badge goes display:contents (which erases its rule), and
-   the input takes its own box. Nothing here reaches the phone. */
+   Desktop and mobile now share this rule set exactly; the only mobile-only
+   overrides left (responsive.css) are position:fixed and a shrunken numpad,
+   both needed because mobile has no book chrome to anchor to. */
 .jump{
   position:absolute;
   left:50%; bottom:2.2%;
@@ -25,6 +29,13 @@
   font-size:clamp(13px, calc(var(--page-w) * .021), 24px);
   letter-spacing:.04em;
   color:var(--ink-faint);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .2s ease;
+}
+.jump.open{
+  opacity:1;
+  pointer-events:auto;
 }
 
 /* The first numeral is the editable one, and it says so by sitting on a ruled
@@ -72,7 +83,7 @@
   position:absolute;
   bottom:calc(100% + 10px); top:auto;
   /* centred on the whole indicator, not pinned to its right edge: the strip is
-     wider than it was now that the ornaments and "of xx" are in it. */
+     wider than it was now that "of xx" sits in it. */
   left:50%; right:auto; transform:translateX(-50%);
   display:none;
   grid-template-columns:repeat(3, var(--np));

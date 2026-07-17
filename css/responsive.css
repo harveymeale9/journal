@@ -14,18 +14,7 @@
 }
 
 @media (orientation: portrait) and (max-width: 940px), (max-width: 720px){
-  /* On a phone the leaf's physical width and the unit type scales from stop
-     being the same thing. --leaf-w is what you can see; --page-w is the page
-     as the type reads it. We trade the leaf's side margin (11% -> 5%) for
-     1.15x type: the measure stays at ~51 characters — identical to desktop —
-     while body text goes 12.5px -> 14.3px on a 390px screen.
-     1.15 is not a taste value: it is 0.897 / 0.78, new column over old.
-     CHANGE BOTH OR NEITHER: this factor and the side padding further down are
-     the same decision written twice. Move one alone and the measure drifts. */
-  :root{
-    --leaf-w: min(94vw, 520px);
-    --page-w: calc(var(--leaf-w) * 1.15);
-  }
+  :root{ --page-w: min(94vw, 520px); }
   body{ height:auto; min-height:100dvh; overflow:visible; justify-content:flex-start; padding:0 0 8vh; }
   header.site{ flex:0 0 auto; padding:3vh 0 2vh; }
   .book-wrap{
@@ -39,12 +28,12 @@
   .side-zone{ display:none; }
   .scroll-book{
     display:block;
-    width:var(--leaf-w);   /* the stack is physical — NOT the inflated unit */
+    width:var(--page-w);
   }
   .page.m{
     position:relative;
     width:100%;
-    height:calc(var(--page-w) * 1.36);   /* 1.36 PAGE-units = 1.56 leaf-widths */
+    height:calc(var(--page-w) * 1.36);
     background:var(--paper);
     border-radius:4px;
     overflow:hidden;
@@ -53,62 +42,21 @@
       0 12px 26px rgba(0,0,0,.55),
       inset 0 0 0 1px rgba(90,60,20,.25);
   }
-  .page.m .folio{ left:50%; right:auto; transform:translateX(-50%); }
-  /* PARITY GEOMETRY. Percentages resolve against the LEAF, not --page-w,
-     so every number here is a leaf-percentage derived from a desktop
-     page-percentage by multiplying by the 1.15 factor above.
-
-     5.15% sides  -> a column of 89.7% of the leaf = EXACTLY .78 of --page-w,
-                     which is desktop's measure to three digits. It is not
-                     "90ish": it is derived, and it is why the phone measures
-                     the same ~51 characters as a desktop.
-     9% head      -> .0783 of --page-w, against desktop's .09. Slightly
-                     tighter; that difference is deliberate headroom.
-     5% foot      -> .0435 of --page-w, against desktop's .1224 (a 7% inset
-                     of the page plus 3% padding). Desktop reserves that strip
-                     for the "x of xx" indicator. Mobile has nothing to
-                     reserve: .folio is display:none (typography.css) and
-                     .jump is position:fixed to the VIEWPORT, not the leaf.
-
-     Net: the phone holds 22.5 body lines against desktop's 20.1. That 2.4
-     line surplus is not slack — it is what pays for the two enlarged
-     elements below, which cost up to ~2.2 lines on a plate page. Desktop
-     stays the binding constraint, so a page authored to desktop's budget
-     shows in full on every device. Spend this surplus and that stops being
-     true. */
-  .page.m > .page-inner{ position:absolute !important; inset:0; padding:9% 5.15% 5%; }
-  /* THE TWO EXCEPTIONS TO "ONE SCALE, ONE PAGE".
-     Every other size in the book inflates for free via --page-w above. These
-     two do not survive it: their multipliers were tuned against a ~600px
-     desktop page and fall under a legibility floor at phone size (7.0px and
-     11.8px respectively). Both are lifted to their DESKTOP PIXEL SIZE here —
-     not made bigger than the book, just stopped from shrinking below it.
-     Nothing else belongs in this block. */
-  .page.m .running-head{ font-size:calc(var(--page-w) * .025); }   /* 10.5px */
-  .page.m .plate-caption{ font-size:calc(var(--page-w) * .042); }  /* 17.7px */
+  /* Cancels the inline style="position:static" every page fragment ships
+     with — .page-inner then falls back to book.css's own rule, which
+     reserves the same 7% bottom strip mobile now shares with desktop. */
+  .page.m > .page-inner{ position:absolute !important; }
   .jump{
+    /* .jump lives inside .book-wrap, which is hidden and unclickable on
+       mobile (above); escape both so the badge can still show and be
+       tapped once a folio opens it. opacity/pointer-events stay governed
+       by .jump / .jump.open in ui.css — identical open/closed logic to
+       desktop, just anchored to the viewport instead of the book chrome. */
     visibility:visible;
-    /* .book-wrap sets pointer-events:none on mobile and .jump lives inside
-       it; without this the (inherited) none makes the box untappable, so the
-       numpad never opens. Re-enable taps for the panel and its children. */
-    pointer-events:auto;
     position:fixed;
     top:auto; left:50%; right:auto; transform:translateX(-50%);
     bottom:calc(10px + env(safe-area-inset-bottom, 0px));
     background:none; border:none; padding:0; gap:0;
-  }
-  .jump .total{ display:none; }
-  .jump-badge{ display:contents; }
-  .jump input{
-    width:3.4em;
-    height:auto;
-    font-size:1rem;
-    padding:.22em 0;
-    background:rgba(24,14,7,.55);
-    border:1px solid rgba(156,124,60,.35);
-    border-radius:3px;
-    color:var(--paper);
-    transform:none;   /* the diamond rotation is desktop/tablet only */
   }
   .numpad{
     top:auto; bottom:calc(100% + 8px);
@@ -119,7 +67,6 @@
   }
   .numpad button{ width:34px; height:34px; font-size:.85rem; padding:0; }
   .numpad button.np-go{ font-size:.55rem; }
-  .jump::before, .jump::after{ content:none; }
 }
 
 @media (prefers-reduced-motion: reduce){

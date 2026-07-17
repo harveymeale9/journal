@@ -21,33 +21,20 @@ async function resolvePartials(html){
   return html.replace(PARTIAL_RE, (_, name) => partialCache.get(name));
 }
 
-/* Folio numbers are computed from position, never hand-typed. Two running
-   counters — roman for front matter, arabic for the body. Reorder pages
-   freely in book.json; the numbers fall back into line on the next load. */
+/* Folio numbers are computed from position, never hand-typed — printed
+   directly as "N of total", which is also what the jump badge's numpad
+   understands, so a tapped folio and the pad always agree on what "13"
+   means. Reorder pages freely in book.json; the numbers fall back into
+   line on the next load. */
 function numberFolios(pages){
-  const toRoman = (n) => {
-    const table = [[1000,'m'],[900,'cm'],[500,'d'],[400,'cd'],[100,'c'],[90,'xc'],
-      [50,'l'],[40,'xl'],[10,'x'],[9,'ix'],[5,'v'],[4,'iv'],[1,'i']];
-    let out = '';
-    for (const [val, sym] of table){ while (n >= val){ out += sym; n -= val; } }
-    return out;
-  };
-  let romanN = 0, arabicN = 0;
-  for (const page of pages){
-    if (page.html.includes('data-num="roman"')){
-      romanN++;
-      page.html = page.html.replace(
-        '<span class="folio" data-num="roman"></span>',
-        '<span class="folio">' + toRoman(romanN) + '</span>'
-      );
-    } else if (page.html.includes('data-num="arabic"')){
-      arabicN++;
-      page.html = page.html.replace(
-        '<span class="folio" data-num="arabic"></span>',
-        '<span class="folio">' + arabicN + '</span>'
-      );
-    }
-  }
+  const total = pages.length;
+  pages.forEach((page, i) => {
+    const n = i + 1;
+    const label = `<span class="folio" data-page="${n}">${n} of ${total}</span>`;
+    page.html = page.html
+      .replace('<span class="folio" data-num="roman"></span>', label)
+      .replace('<span class="folio" data-num="arabic"></span>', label);
+  });
   return pages;
 }
 
