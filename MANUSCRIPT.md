@@ -63,7 +63,7 @@ Nothing is to be accepted merely because it appears in this book.
 The reader is asked only to observe reality carefully enough to determine for themselves why the claims of the Manual are accurate.
 [/BODY]
 
-[ILLUSTRATION NEEDED · small SVG eye spinning around the reality glyph]
+[ANIMATION https://realitymanual.com/assets/svg/eye-orbiting-globe.svg]
 
 [BODY]
 The Reality Manual demonstrates that many questions commonly assumed to be unanswerable are, in fact, resolved through careful observation.
@@ -73,7 +73,7 @@ Concepts normally regarded as abstract philosophy are translated into actionable
 That knowledge forms the basis of an approach to reality capable of guiding an individual through the full spectrum of human experience.
 [/BODY]
 
-[ORNAMENT · ✦ ✦ ✦]
+[ORNAMENT · ✦ ✦ ✦ ** star heart star]
 
 [BODY]
 The Manual begins by establishing the single objective toward which all successful participation in this reality is directed, explaining in plain language what it is you are actually here to do.
@@ -86,7 +86,7 @@ The Manual does not.
 It advances a different proposition: that suffering is not an intrinsic property of reality, but a consequence of ignorance regarding the nature of reality itself. That ignorance generates confusion, that confusion generates a sense of futility, and that futility is the source of all human suffering.
 [/BODY]
 
-[ILLUSTRATION NEEDED · ignorance → confusion → fear → futility → suffering (tear) → jailed]
+[ILLUSTRATION https://realitymanual.com/assets/images/IgnoranceToImprisonmentDigital.webp]
 
 [BODY]
 For how could one move confidently through a reality that appears chaotic, unpredictable, and fundamentally unknowable? How could one act decisively if success seemed arbitrary? How could one experience peace while believing oneself trapped inside a game whose rules remain hidden?
@@ -94,7 +94,7 @@ The Reality Manual proposes that the opposite is true. That reality is intelligi
 For the individual who understands the game, reality ceases to appear hostile. It ceases to appear arbitrary. It ceases to appear unfair. What once seemed like a prison reveals itself to be a playground.
 [/BODY]
 
-[ILLUSTRATION NEEDED · concentric circular arrangement: inner circle is ignorance, confusion, fear, futility, suffering, jail scape, then a library scape with manuals with angel wings floating around, then on the outside is a beautiful nature scape]
+[ILLUSTRATION https://realitymanual.com/assets/images/ConcentricCirclesPrisonToFreedomDigital.webp]
 
 [BODY]
 The central promise of this text is that one’s experience of reality becomes profoundly different once it is properly understood.
