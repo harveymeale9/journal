@@ -5,9 +5,37 @@
    Keep it small: if a rule gets used twice, promote it.
    ========================================================== */
 
-/* (Empty, and that's correct.)
-
-   This file used to hold `.frontispiece .plate{ width:84% }` — which existed
-   only to print the sigil LARGER than a 62% body plate. Plates now fill the
-   measure by default (typography.css), so that rule would make the frontispiece
-   the one plate in the book that DOESN'T. Removed. */
+/* nature-of-the-manual-opening: the chapter plate at full width lands at
+   ~45% of the page's own height (its 4:3 source image, at the standard
+   measure width, just happens to fall there) — the tallest plate in the
+   book by a wide margin, since every other page carries a plate ALONGSIDE
+   a normal word budget rather than a plate, a pull quote, AND a dropcap
+   opening all at once. Everything below it is tightened only far enough
+   to give the opening paragraph room to breathe on the same page — the
+   plate's own size is untouched. */
+.chapter-opening .plate-img{ margin:0 auto .05em; }
+.chapter-opening .entry-title{ margin-bottom:.05em; }
+.chapter-opening .ornament{ margin:.05em 0 .1em; }
+/* Below the book's own body-text size (typography.css's .034) — still
+   clearly a quote (italic, centred, its own line breaks) but no longer
+   competing with the plate above it for the loudest thing on the page,
+   which .05 (a plain pull quote's usual size) would still do here, and
+   there simply isn't room left on this particular page for a pull quote
+   at its usual prominence once the plate takes ~45% of it. */
+.chapter-opening .pullquote{
+  font-size:calc(var(--page-w) * .025);
+  line-height:1.2;
+  margin:.1em 0 .05em;
+}
+/* Even at the above, the plate (~45% of the page) plus title, ornament,
+   and pull quote leave less room than the closing dropcap paragraph
+   needs at the book's standard .034 body size — margins alone can't
+   close that gap without either shrinking the plate below "not a tiny
+   little illustration" or splitting the paragraph onto a second page,
+   both explicitly ruled out. This is the one page in the book where the
+   body text itself is scaled down, as a deliberate, isolated exception
+   to §3's "type scales with the page, not the page's own content" rule —
+   made here, and only here, to let an unusually dense opening (full
+   plate + title + ornament + pull quote + full opening paragraph) share
+   a single leaf. */
+.chapter-opening .body-text{ font-size:calc(var(--page-w) * .0235); line-height:1.42; }
