@@ -34,11 +34,15 @@
   --cursor-point: url('../assets/svg/cursor-point.svg') 2 2, pointer;
 }
 
-/* Fullscreen (js/fullscreen.js) hides the title, so the 96px it reserves
-   above the book — headroom for that title — is dead space; reclaimed here
-   down to a token 24px so the book grows into it. The 1200px hard cap is
-   raised too: fullscreen is a deliberate "give the book the whole screen"
-   request, not a normal window a reader might also be reading email in. */
+/* Fullscreen (js/fullscreen.js) hides the title AND the candle (base.css),
+   so neither the 96px of title headroom nor the ~8vw of candle gutter the
+   normal formula reserves is needed — reclaimed here so the book actually
+   grows to fill the screen instead of just recentring at its old size. The
+   1200px hard cap is raised too: fullscreen is a deliberate "give the book
+   the whole screen" request, not a normal window a reader might also be
+   reading email in. 49vw (not 50) and 16px (not 0) leave a sliver of desk
+   on every edge on purpose — a book with literally nothing around it reads
+   as a rendering bug, not a book. */
 body.fs-mode{
-  --page-w: min(46vw, calc((100dvh - 24px) / 1.32), 1600px);
+  --page-w: min(49vw, calc((100dvh - 16px) / 1.32), 2000px);
 }

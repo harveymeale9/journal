@@ -39,7 +39,6 @@ header.site{
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:1.4em;
   min-height:0;
   width:100%;
   position:relative;
@@ -65,19 +64,26 @@ header.site p{
 }
 
 /* ============ FULLSCREEN TOGGLE ============
-   Sits beside the title, not the book — deliberately plain UI chrome (see
-   ui.css's own banner comment on that split) rather than book typography,
-   set in the same small-caps face as the folio/jump control so the two
-   "controls, not prose" elements agree with each other. Desktop/tablet
-   only: js/fullscreen.js also hides it outright when the Fullscreen API
-   itself isn't available (iOS Safari), so it never sits there inert. */
+   Pinned to the browser window's own top-right corner at all times (not
+   just in fs-mode) — deliberately plain UI chrome (see ui.css's own
+   banner comment on that split) rather than book typography, set in the
+   same small-caps face as the folio/jump control so the two
+   "controls, not prose" elements agree with each other. Same brass as the
+   title itself: it's the one other piece of text sitting directly on the
+   desk background, and --ink-faint (meant for parchment) read too dark
+   against it to be legible. Desktop/tablet only: js/fullscreen.js also
+   hides it outright when the Fullscreen API itself isn't available (iOS
+   Safari), so it never sits there inert. */
 .fs-toggle{
   -webkit-appearance:none; appearance:none;   /* strip native <button> chrome before anything below applies */
+  position:fixed;
+  top:14px; right:18px;
+  z-index:50;
   font-family:'IM Fell English SC', Georgia, serif;
   font-size:clamp(.7rem, .55rem + .3vw, .95rem);
   letter-spacing:.15em;
   text-indent:.15em;
-  color:var(--ink-faint);
+  color:var(--brass);
   background:none;
   border:none;
   border-bottom:1px dashed rgba(156,124,60,.85);
@@ -85,19 +91,13 @@ header.site p{
   padding:0 0 .15em;
   line-height:normal;
   cursor:var(--cursor-point);
-  transition:color .2s, border-color .2s, top .35s ease, right .35s ease;
+  transition:color .2s, border-color .2s;
 }
-.fs-toggle:hover, .fs-toggle:focus-visible{ color:var(--brass); border-color:var(--brass); }
+.fs-toggle:hover, .fs-toggle:focus-visible{ color:var(--paper); border-color:var(--paper); }
 
-/* Title fades away; the toggle re-parents itself to the corner of the
-   viewport first (fullscreen.js) so it stays reachable to switch back —
-   losing the only way back out would strand a reader who can't find F11. */
+/* the title alone fades in fs-mode; the toggle was already fixed to the
+   corner, so there's nothing left to re-anchor when fullscreen opens */
 body.fs-mode header.site h1{ opacity:0; pointer-events:none; }
-body.fs-mode .fs-toggle{
-  position:fixed;
-  top:14px; right:18px;
-  z-index:50;
-}
 
 /* the desk area flanking the book: clicking it turns pages too */
 .stage{
@@ -115,15 +115,6 @@ body.fs-mode .fs-toggle{
   padding:0;
 }
 .side-zone:focus-visible{ outline:2px solid var(--brass); outline-offset:-4px; }
-
-/* In fullscreen, the book moves flush to the right edge so the candle gets
-   the whole gutter on the left instead of being squeezed centre-book (see
-   .candle's own fs-mode override below). #sideLeft is left free to keep
-   growing — it, alone, absorbs all the freed space, which is what pushes
-   book-wrap to the right — while #sideRight's grow is zeroed so none of
-   that space goes to its right instead. justify-content on .stage never
-   has to change: with only one side still growing, centering is moot. */
-body.fs-mode #sideRight{ flex:0 0 0; }
 
 /* ============ THE CANDLE ============
    Desk furniture, not part of the book — which is why it lives here in
@@ -184,12 +175,10 @@ body.fs-mode #sideRight{ flex:0 0 0; }
   z-index:1;
   container-type:inline-size;   /* lets the query below read the true gutter width */
 }
-/* book-wrap is flush against .stage's right edge in fullscreen (#sideRight
-   above), so the book's left edge is no longer "50% + half a spread" from
-   centre — it's a full spread's width in from .stage's own right edge. */
-body.fs-mode .candle{
-  right:calc(2 * var(--page-w) + 28px);
-}
+/* Fullscreen drops the candle outright rather than repositioning it — the
+   book is centred and grown to fill the screen instead (tokens.css), which
+   leaves no gutter worth standing furniture in even on the left alone. */
+body.fs-mode .candle{ display:none; }
 /* Below this the reserved 28px-per-side margin above would eat nearly the
    whole candle, so it's hidden outright instead of shown-but-tiny. Tune by
    eye, same as every other fit-and-finish number in this file. */
