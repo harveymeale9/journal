@@ -17,17 +17,19 @@ body.ready .book-wrap, body.ready .scroll-book{ opacity:1; }
   position:relative;
   display:flex;
   align-items:center;
-  /* the PAGE plus its binding. --page-h is now the page alone, so the 14px
-     padding is added here instead of being subtracted from every page below. */
-  height:calc(var(--page-h) + 28px);
+  height:var(--page-h);
   overflow:hidden;
   /* leather cover peeking out beneath the pages */
   background:
     linear-gradient(160deg, var(--leather-edge), var(--leather) 40%, #1d130c);
   border-radius:6px 10px 10px 6px;
   padding:14px;
+  /* the big shadow is thrown to the RIGHT: the candle stands at the left of
+     the desk (base.css), so the tome casts away from it. The x-offset is the
+     only thing that changed here — zero it out to put the book back on a
+     light source directly overhead. */
   box-shadow:
-    0 40px 80px -20px rgba(0,0,0,.85),
+    26px 40px 80px -20px rgba(0,0,0,.85),
     0 8px 24px rgba(0,0,0,.6),
     inset 0 0 0 1px rgba(156,124,60,.25);
 }
@@ -52,14 +54,14 @@ body.ready .book-wrap, body.ready .scroll-book{ opacity:1; }
   position:relative;
   display:flex;
   flex:none;
-  height:var(--page-h);
+  height:calc(var(--page-h) - 28px);
   z-index:2;
 }
 .stack{
   flex:none;
   align-self:center;
-  width:34px;              /* fixed slot: layout never shifts */
-  height:var(--page-h);    /* flush with the open pages */
+  width:34px;                        /* fixed slot: layout never shifts */
+  height:calc(var(--page-h) - 28px); /* flush with the open pages */
   position:relative;
 }
 .stack .fill{
@@ -134,7 +136,7 @@ body.ready .book-wrap, body.ready .scroll-book{ opacity:1; }
 .page{
   position:relative;
   width:var(--page-w);
-  height:var(--page-h);   /* exactly 1.32 page-units, on every screen */
+  height:calc(var(--page-h) - 28px);
   background:var(--paper);
   overflow:hidden;
   flex:none;
@@ -144,7 +146,7 @@ body.ready .book-wrap, body.ready .scroll-book{ opacity:1; }
 .page.right{ border-radius:0 4px 4px 0;
   box-shadow:inset 14px 0 22px -16px rgba(60,40,10,.35);}
 
-/* aged paper: stains + mottle + foxing + grain, all CSS/SVG, no images */
+/* aged paper: stains + grain, all CSS/SVG, no images */
 .parchment{
   position:absolute; inset:0;
   background:
@@ -153,46 +155,6 @@ body.ready .book-wrap, body.ready .scroll-book{ opacity:1; }
     radial-gradient(ellipse 55% 45% at 70% 20%, rgba(160,120,60,.08), transparent 70%),
     radial-gradient(ellipse 120% 120% at 50% 50%, var(--paper) 55%, var(--paper-deep) 100%);
 }
-
-/* ---- MOTTLE AND FOXING ----
-   The gradients above are LOW frequency — broad tonal drift, ~40% of the page.
-   Real ageing lives a band higher: irregular blooms about a tenth of the page
-   (mottle) and fine rust speckle (foxing). No number of gradients gets there;
-   the mechanism is fractal noise.
-
-   Each layer is an SVG turbulence used as a MASK, not an image: the SVG is
-   painted black and only its alpha is read, with the colour supplied by
-   background-color. That is the only way the tint can come from tokens.css —
-   a data-URI SVG is a separate document and cannot see var(). Same trick, and
-   the same reason, as the brass ornament in ui.css.
-
-   PAINTED OVER, NOT MULTIPLIED. multiply can only drive channels down, which
-   drops luminance without adding saturation — a warm stain multiplied through
-   cream lands on mud. Painting over keeps the hue.
-
-   Cost is one rasterisation per unique leaf size, reused across all 29 leaves
-   — these are mask images, not live filters.
-
-   To retune: opacity is intensity; baseFrequency is blotch size (smaller =
-   larger blooms); the last feColorMatrix value is coverage (nearer 0 = more). */
-
-/* the fine rust speckle — sits under the mottle */
-.parchment::before{
-  content:""; position:absolute; inset:0; pointer-events:none;
-  background-color:var(--foxing);
-  opacity:.40;
-  -webkit-mask:center/cover no-repeat url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='600'%20height='792'%3E%3Cfilter%20id='f'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.085'%20numOctaves='2'%20seed='3'/%3E%3CfeColorMatrix%20type='matrix'%20values='0%200%200%200%200%200%200%200%200%200%200%200%200%200%200%201%200%200%200%20-0.66'/%3E%3C/filter%3E%3Crect%20width='600'%20height='792'%20filter='url(%23f)'/%3E%3C/svg%3E");
-  mask:center/cover no-repeat url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='600'%20height='792'%3E%3Cfilter%20id='f'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.085'%20numOctaves='2'%20seed='3'/%3E%3CfeColorMatrix%20type='matrix'%20values='0%200%200%200%200%200%200%200%200%200%200%200%200%200%200%201%200%200%200%20-0.66'/%3E%3C/filter%3E%3Crect%20width='600'%20height='792'%20filter='url(%23f)'/%3E%3C/svg%3E");
-}
-/* the broad tonal blotch */
-.parchment::after{
-  content:""; position:absolute; inset:0; pointer-events:none;
-  background-color:var(--mottle);
-  opacity:.34;
-  -webkit-mask:center/cover no-repeat url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='600'%20height='792'%3E%3Cfilter%20id='m'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.010'%20numOctaves='4'%20seed='11'/%3E%3CfeColorMatrix%20type='matrix'%20values='0%200%200%200%200%200%200%200%200%200%200%200%200%200%200%201%200%200%200%20-0.30'/%3E%3C/filter%3E%3Crect%20width='600'%20height='792'%20filter='url(%23m)'/%3E%3C/svg%3E");
-  mask:center/cover no-repeat url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='600'%20height='792'%3E%3Cfilter%20id='m'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.010'%20numOctaves='4'%20seed='11'/%3E%3CfeColorMatrix%20type='matrix'%20values='0%200%200%200%200%200%200%200%200%200%200%200%200%200%200%201%200%200%200%20-0.30'/%3E%3C/filter%3E%3Crect%20width='600'%20height='792'%20filter='url(%23m)'/%3E%3C/svg%3E");
-}
-
 .grain{ position:absolute; inset:0; opacity:.5; mix-blend-mode:multiply; pointer-events:none;}
 
 .page-inner{

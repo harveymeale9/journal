@@ -66,6 +66,7 @@ header.site p{
   align-items:stretch;
   justify-content:center;
   width:100%;
+  position:relative;   /* the anchor for .candle and .candle-cast below */
 }
 .side-zone{
   flex:1 1 0;
@@ -75,6 +76,122 @@ header.site p{
   padding:0;
 }
 .side-zone:focus-visible{ outline:2px solid var(--brass); outline-offset:-4px; }
+
+/* ============ THE CANDLE ============
+   Desk furniture, not part of the book — which is why it lives here in
+   base.css beside .glow, and why its colours are the only palette entries
+   outside the book's own (see tokens.css).
+
+   The stick is a raster plate with a real alpha channel, so no blend mode:
+   .plate-img's multiply exists to print INTO parchment, and would erase a
+   candle standing on a near-black desk. The flame is CSS because a flame
+   that repeats is a flame you notice repeating.
+
+   .candle spans exactly the left gutter — from the stage's left edge to the
+   book's left edge — so it scales with whatever room is left beside the book
+   and can never collide with it. That gutter is wide on a tall window and
+   nearly nothing on a short wide one (--page-w is min(46vw, height-derived)),
+   hence the clamp on .candle-body. Hidden outright on mobile: responsive.css. */
+.candle{
+  position:absolute;
+  bottom:0; left:0;
+  /* the book's left edge: half a spread (--page-w) plus .book's 14px padding,
+     measured out from the centre of the stage */
+  right:calc(50% + var(--page-w) + 14px);
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  pointer-events:none;   /* the gutter is a page-turn button; keep it clickable */
+  z-index:1;
+}
+.candle-body{
+  position:relative;
+  /* 62% of the gutter, but never so small it's a smudge nor so large it
+     towers over the book on an ultrawide desk */
+  width:clamp(54px, 62%, 196px);
+}
+.candle-stick{
+  display:block;
+  width:100%; height:auto;
+}
+
+/* The flame sits at the wick, which the artwork puts at 49.56% across and
+   0.61% down — i.e. hard against the top edge. So the flame is anchored to
+   the top of the image and burns upward OUT of it; bottom:97.4% drops its
+   base just far enough to overlap the wick rather than hover above it.
+   Every number here is measured off that file — re-crop it and they move. */
+.flame{
+  position:absolute;
+  left:49.56%;
+  bottom:97.4%;
+  width:12.5%;
+  aspect-ratio:.42;
+  transform:translateX(-50%);
+  transform-origin:50% 100%;   /* it leans from the wick, not its middle */
+  animation:flame-dance 9s ease-in-out infinite;
+}
+.flame-body{
+  position:absolute; inset:0;
+  /* a teardrop: the vertical radii (78%) draw the taper, the horizontal
+     (50%) the girth. Not a rotated square — that only reads as a flame at
+     one aspect ratio, and this one is taller than it is wide. */
+  border-radius:50% 50% 42% 42% / 78% 78% 22% 22%;
+  background:radial-gradient(ellipse 70% 55% at 50% 74%,
+    var(--flame-core) 0%,
+    var(--flame) 45%,
+    var(--flame-deep) 76%,
+    rgba(201,84,26,0) 100%);
+  filter:blur(1px);
+}
+/* the hot core, low in the flame where the wax actually burns */
+.flame-core{
+  position:absolute;
+  left:50%; bottom:8%;
+  width:46%; height:46%;
+  transform:translateX(-50%);
+  border-radius:50% 50% 42% 42% / 74% 74% 26% 26%;
+  background:radial-gradient(ellipse 70% 60% at 50% 70%,
+    var(--flame-core) 0%,
+    rgba(255,215,130,.55) 58%,
+    rgba(255,190,90,0) 100%);
+  filter:blur(1.2px);
+  /* its own clock, deliberately not a divisor of the flame's 9s — the core
+     and the body must never be seen to breathe in step */
+  animation:flame-core 5.5s ease-in-out infinite;
+}
+/* the light the flame throws into the air immediately around it */
+.flame-halo{
+  position:absolute;
+  left:49.56%;
+  bottom:97.4%;
+  width:130%;
+  aspect-ratio:1;
+  transform:translate(-50%, 38%);
+  border-radius:50%;
+  background:radial-gradient(circle at 50% 50%,
+    rgba(255,166,72,.4) 0%,
+    rgba(255,140,50,.13) 34%,
+    rgba(255,130,40,0) 68%);
+  animation:flame-halo 9s ease-in-out infinite;
+}
+
+/* The light the candle throws ON THE BOOK. Centred on the gutter — i.e. on
+   the candle itself — so the left page catches more of it than the right,
+   and it guts on the same beats the flame does (same 9s clock).
+   screen, not multiply: this is light being added to the scene. Kept low,
+   because parchment screened too hard goes white, and nothing here is white. */
+.candle-cast{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  z-index:2;
+  mix-blend-mode:screen;
+  background:radial-gradient(ellipse 62% 66% at calc((50% - var(--page-w) - 14px) / 2) 46%,
+    rgba(255,170,78,.15) 0%,
+    rgba(255,150,60,.05) 42%,
+    transparent 66%);
+  animation:candle-cast 9s ease-in-out infinite;
+}
 
 /* ---- load failure notice ----
    Hidden unless js/main.js couldn't fetch the pages. The commonest cause is

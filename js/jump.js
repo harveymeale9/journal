@@ -65,9 +65,20 @@ export function initJump(){
   el.jumpInput.addEventListener('focus', openPad);
   el.jumpInput.addEventListener('click', openPad);
 
-  /* tapping a folio printed on any page opens the same pad the badge does */
+  /* tapping a folio opens the pad positioned right above THAT number, not
+     a fixed spot that happens to land near the right page. Desktop only —
+     mobile's .jump is fixed to the viewport, and there's no left/right
+     page distinction there to get wrong in the first place. */
   document.addEventListener('click', e=>{
-    if (e.target.closest('.folio')) el.jumpInput.focus();
+    const folioEl = e.target.closest('.folio');
+    if (!folioEl) return;
+    if (!isMobile()){
+      const anchor = jumpBox.offsetParent || document.body;
+      const fr = folioEl.getBoundingClientRect();
+      const ar = anchor.getBoundingClientRect();
+      jumpBox.style.left = (fr.left + fr.width / 2 - ar.left) + 'px';
+    }
+    el.jumpInput.focus();
   });
 
   numpad.addEventListener('click', e=>{

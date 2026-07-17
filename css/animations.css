@@ -7,6 +7,54 @@
   0%,100%{opacity:.85} 40%{opacity:1} 60%{opacity:.75} 80%{opacity:.95}
 }
 
+/* ---- the candle on the desk (classes in base.css) ----
+   A real flame is mostly steady and occasionally guts. So this is NOT a
+   loop of constant wobble: 0-24% and 38-64% are near-still, and the motion
+   lives in two brief flurries. The stillness is what sells the flicker —
+   a flame that never rests reads as a GIF.
+   All three of flame/halo/cast share the 9s clock and the same beats, so
+   the light on the book dips at the instant the flame does. The core runs
+   on its own 5.5s (base.css) and drifts against them forever. */
+@keyframes flame-dance{
+  0%       { transform:translateX(-50%) scale(1,1)        rotate(0deg); }
+  12%      { transform:translateX(-50%) scale(1.01,1.02)  rotate(.6deg); }
+  24%      { transform:translateX(-50%) scale(1,1)        rotate(0deg); }
+  28%      { transform:translateX(-50%) scale(.93,1.09)   rotate(-2.2deg); }
+  31%      { transform:translateX(-50%) scale(1.05,.94)   rotate(1.6deg); }
+  34%      { transform:translateX(-50%) scale(.98,1.03)   rotate(-.6deg); }
+  38%      { transform:translateX(-50%) scale(1,1)        rotate(0deg); }
+  55%      { transform:translateX(-50%) scale(1.01,1.02)  rotate(-.5deg); }
+  64%      { transform:translateX(-50%) scale(1,1)        rotate(0deg); }
+  67%      { transform:translateX(-50%) scale(1.06,1.05)  rotate(2.4deg); }
+  70%      { transform:translateX(-50%) scale(.92,.95)    rotate(-1.4deg); }
+  73%      { transform:translateX(-50%) scale(1.03,1.02)  rotate(.8deg); }
+  77%,100% { transform:translateX(-50%) scale(1,1)        rotate(0deg); }
+}
+@keyframes flame-core{
+  0%,100% { opacity:.9;  transform:translateX(-50%) scaleY(1); }
+  30%     { opacity:1;   transform:translateX(-50%) scaleY(1.06); }
+  55%     { opacity:.82; transform:translateX(-50%) scaleY(.95); }
+  78%     { opacity:.97; transform:translateX(-50%) scaleY(1.03); }
+}
+@keyframes flame-halo{
+  0%, 24%  { opacity:.85; transform:translate(-50%,38%) scale(1); }
+  29%      { opacity:.6;  transform:translate(-50%,38%) scale(.9); }
+  33%      { opacity:.95; transform:translate(-50%,38%) scale(1.05); }
+  38%, 64% { opacity:.85; transform:translate(-50%,38%) scale(1); }
+  68%      { opacity:1;   transform:translate(-50%,38%) scale(1.08); }
+  71%      { opacity:.62; transform:translate(-50%,38%) scale(.92); }
+  76%,100% { opacity:.85; transform:translate(-50%,38%) scale(1); }
+}
+@keyframes candle-cast{
+  0%, 24%  { opacity:.9; }
+  29%      { opacity:.62; }
+  33%      { opacity:1; }
+  38%, 64% { opacity:.9; }
+  68%      { opacity:1; }
+  71%      { opacity:.66; }
+  76%,100% { opacity:.9; }
+}
+
 /* ---- the sigil ---- */
 .sigil-rotate{ transform-origin:50% 50%; animation:sigilspin 60s linear infinite; }
 .sigil-rotate.rev{ animation-direction:reverse; animation-duration:90s; }

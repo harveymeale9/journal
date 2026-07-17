@@ -17,8 +17,12 @@
    never collide with body text. Tapping it opens the same jump pad the old
    floating badge did (see jump.js + .jump in ui.css). */
 .folio{
-  position:absolute; left:0; right:0; bottom:0; height:7%;
+  /* left:50%+transform, not left:0/right:0 — the box must hug the text, not
+     span the whole strip, or the entire margin becomes a click target. */
+  position:absolute; left:50%; bottom:0; height:7%;
+  transform:translateX(-50%);
   display:flex; align-items:center; justify-content:center;
+  padding:0 .5em;
   font-family:'Cormorant Garamond', serif; font-style:italic;
   /* 25% larger than the book's usual .0165 baseline — a deliberate exception
      to §3's "type scales with the page" rule, made because this is a UI

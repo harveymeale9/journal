@@ -27,6 +27,10 @@
     pointer-events:none;
   }
   .side-zone{ display:none; }
+  /* the candle is desk furniture for the 3D book; portrait has no desk.
+     .stage itself isn't hidden here (only its contents collapse), so this
+     must be explicit or the candle floats over the scroll stack. */
+  .candle, .candle-cast{ display:none; }
   .scroll-book{
     display:block;
     width:var(--page-w);
@@ -79,4 +83,7 @@
   .turn-shade{ display:none !important; }
   .glow{ animation:none !important; }
   svg *{ animation:none !important; }
+  /* the candle stops burning but stays lit — a flame whose meaning only
+     appears once it moves is broken for a reader who's turned motion off */
+  .flame, .flame-core, .flame-halo, .candle-cast{ animation:none !important; }
 }

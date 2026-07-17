@@ -69,6 +69,12 @@ export function fillSlot(id, page){
   const w = tmp.firstElementChild;
   node.className = w ? w.className : 'page-inner';
   node.innerHTML = w ? w.innerHTML : '';
+  /* the previous occupant of this slot left its folio behind in the parent
+     (it was moved OUT of node, so clearing node.innerHTML above never
+     touched it) — drop it before attaching this page's own folio, or they
+     stack up across every turn/jump and overlap. */
+  const stale = node.parentElement && node.parentElement.querySelector('.folio');
+  if (stale) stale.remove();
   const folio = node.querySelector('.folio');
   if (folio && node.parentElement) node.parentElement.appendChild(folio);
 }

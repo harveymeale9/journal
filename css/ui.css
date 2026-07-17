@@ -44,13 +44,14 @@
    reads as a waiting blank rather than a number you must delete). */
 .jump-badge{
   display:inline-flex; align-items:baseline; justify-content:center;
-  padding:0 .3em .12em;
-  border-bottom:1px dashed rgba(156,124,60,.85);
-  transition:border-bottom-color .25s, background .25s;
+  padding:.1em .4em .12em;
+  border:1px dashed rgba(156,124,60,.85);
+  border-radius:3px;
+  transition:border-color .25s, background .25s;
 }
-.jump-badge:hover{ border-bottom-color:var(--rubric); }
+.jump-badge:hover{ border-color:var(--rubric); }
 .jump-badge:focus-within{
-  border-bottom:1px solid var(--rubric);
+  border:1px solid var(--rubric);
   background:rgba(122,47,29,.07);
 }
 .jump input{
