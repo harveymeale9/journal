@@ -108,7 +108,7 @@
 /* click zones */
 .zone{
   position:absolute; top:0; bottom:0; width:18%;
-  cursor:pointer; z-index:6; background:none; border:none;
+  cursor:var(--cursor-point); z-index:6; background:none; border:none;
 }
 .zone:focus-visible{ outline:2px solid var(--brass); outline-offset:-4px; }
 .zone.prev{ left:0; } .zone.next{ right:0; }

@@ -24,6 +24,14 @@
   --page-w: min(46vw, calc((100dvh - 96px) / 1.32), 1200px);
   --page-h: calc(var(--page-w) * 1.32);
   --turn-ms: 900ms;
+  /* the custom pointer: an arrow silhouette (assets/svg/cursor*.svg), onyx
+     for the ordinary cursor and oxblood for anything clickable, so hovering
+     a folio or button reads as an affordance shift rather than the OS's
+     generic hand. Hotspot 2 2 sits at the drawn tip in both files. Each
+     ends with a real fallback keyword (auto / pointer) for the rare
+     browser that won't load an SVG cursor. */
+  --cursor: url('../assets/svg/cursor.svg') 2 2, auto;
+  --cursor-point: url('../assets/svg/cursor-point.svg') 2 2, pointer;
 }
 
 /* Fullscreen (js/fullscreen.js) hides the title, so the 96px it reserves

@@ -60,6 +60,9 @@ function showLoadError(err){
    not book content, and should still work on the load-error screen */
 initFullscreen();
 
+/* no reason for a reader to right-click their way into "Inspect" */
+document.addEventListener('contextmenu', e => e.preventDefault());
+
 (async function open(){
   try{
     cacheDom();

@@ -65,7 +65,7 @@
   font-style:normal;
   font-size:1em; line-height:1.15; text-align:center;
   letter-spacing:.06em;
-  outline:none; cursor:pointer; caret-color:transparent;
+  outline:none; cursor:var(--cursor-point); caret-color:transparent;
   -moz-appearance:textfield; appearance:textfield;
 }
 .jump input::-webkit-outer-spin-button,
@@ -108,7 +108,7 @@
   border:1px solid rgba(156,124,60,.4);
   border-radius:3px;
   color:var(--paper);
-  cursor:pointer;
+  cursor:var(--cursor-point);
 }
 .numpad button:hover, .numpad button:focus-visible{
   background:rgba(156,124,60,.25); color:var(--paper); outline:none;

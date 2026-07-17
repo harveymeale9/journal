@@ -5,6 +5,8 @@
 
 *{box-sizing:border-box; margin:0; padding:0;}
 
+html{ cursor:var(--cursor); }
+
 body{
   height:100vh;
   height:100dvh;
@@ -79,7 +81,7 @@ header.site p{
   border:none;
   border-bottom:1px dashed rgba(156,124,60,.85);
   padding:0 0 .15em;
-  cursor:pointer;
+  cursor:var(--cursor-point);
   transition:color .2s, border-color .2s, top .35s ease, right .35s ease;
 }
 .fs-toggle:hover, .fs-toggle:focus-visible{ color:var(--brass); border-color:var(--brass); }
@@ -104,7 +106,7 @@ body.fs-mode .fs-toggle{
 }
 .side-zone{
   flex:1 1 0;
-  cursor:pointer;
+  cursor:var(--cursor-point);
   background:none;
   border:none;
   padding:0;

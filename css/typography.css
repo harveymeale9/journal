@@ -31,7 +31,7 @@
      budget above it. Tablet/mobile go further still — see responsive.css. */
   font-size:calc(var(--page-w) * .020625); letter-spacing:.1em;
   color:var(--ink-faint);
-  cursor:pointer; transition:color .2s;
+  cursor:var(--cursor-point); transition:color .2s;
 }
 .folio:hover{ color:var(--rubric); }
 /* Only the numeral gets the "ruled blank" treatment — the same dashed
@@ -170,7 +170,7 @@ h2.entry-title{
   letter-spacing:.25em; text-indent:.25em; font-size:calc(var(--page-w) * .024);
   background:none; color:var(--rubric);
   border:1px solid var(--rubric); border-radius:2px;
-  padding:.9em 1.6em; cursor:pointer;
+  padding:.9em 1.6em; cursor:var(--cursor-point);
   transition:background .3s, color .3s;
 }
 .sealed button:hover, .sealed button:focus-visible{
