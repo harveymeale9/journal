@@ -61,9 +61,25 @@ export function updateStacks(frac){
    The folio is then lifted out of the clipped, padded page-inner and into
    its parent (.page), which is exactly the reserved 7% strip book.css sets
    aside for it — the folio was never meant to compete with body text for
-   the page's clipped space. */
+   the page's clipped space.
+
+   Skips the rebuild entirely if the slot already shows this exact page
+   (tracked via data-slug): page-turn.js's go() pre-fills the slot that
+   will be revealed UNDERNEATH the flipping leaf partway through the turn,
+   so the turn never ends on a bare/stale page — but render() then runs
+   again once the turn completes and, being a generic "make both slots
+   match the current spread" function, would otherwise redraw that SAME
+   slot a second time for no visual reason. innerHTML churn tears down and
+   rebuilds every element inside, which restarts any CSS animation (an SVG
+   plate, say) from frame zero — so a reader would see it play for an
+   instant during the turn, snap back to the start the moment the leaf
+   settles, then play through properly. Skipping a no-op refill fixes that
+   at the source rather than special-casing it in page-turn.js. */
 export function fillSlot(id, page){
   const node = el[id] || document.getElementById(id);
+  const slug = page && page.slug;
+  if (slug && node.dataset.slug === slug) return;
+  node.dataset.slug = slug || '';
   const tmp = document.createElement('div');
   tmp.innerHTML = (page && page.html) || '';
   const w = tmp.firstElementChild;
