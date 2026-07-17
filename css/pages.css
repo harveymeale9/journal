@@ -36,14 +36,18 @@
    has a frame — everything else bleeds, but a photograph dropping
    straight onto typeset text with no line between them read as a
    layout error rather than a deliberate edge. */
-/* Bottom margin is the gap before "Chapter I" (.entry-no) — widened from
-   an earlier, tighter .9em so the title doesn't crowd the plate's own
-   brass bottom rule. */
+/* Bottom margin is the gap before "Chapter I" (.entry-no) — calc(var(--page-w)
+   * .024), NOT a bare em: <img> has no font-size of its own to make an em
+   mean anything page-relative, so an em value here quietly inherits the
+   browser's ambient default (~16px, but that varies by device/browser/user
+   zoom) instead of scaling with the page like every other gap on this leaf
+   — which is exactly why this gap used to render a visibly different size
+   on desktop, tablet, and mobile despite being "the same" value everywhere. */
 .chapter-opening .chapter-bleed{
   display:block;
   width:var(--page-w);
   height:calc(var(--page-w) * 1.32 * .35);
-  margin:calc(var(--page-w) * -.09) 0 1.8em calc(var(--page-w) * -.11);
+  margin:calc(var(--page-w) * -.09) 0 calc(var(--page-w) * .049) calc(var(--page-w) * -.11);
   object-fit:cover;
   object-position:65% 60%;
   border-bottom:1px solid var(--brass);
