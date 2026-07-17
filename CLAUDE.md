@@ -153,7 +153,7 @@ Do not redesign approved assets unless explicitly requested.
 | Delete a page | Remove the slug from `order`/`drafts`, delete the file. |
 | Rename a page's subject | Rename the file *and* its slug in `order`. |
 
-Page numbers, folio numerals (roman for front/back matter, arabic for the body), the "N of total" count, and the reader's saved reading position are all derived from `order` at load time — never hand-typed.
+Page numbers, folio numerals, the "N of total" count, and the reader's saved reading position are all derived from `order` at load time — never hand-typed. Every page counts straight through, 1, 2, 3…, title page and contents included; there's no separate roman-numeral front matter.
 
 **Pages come in facing pairs on desktop** (even index = left page, odd index = right page). Inserting one page shifts every later page to the opposite side of the spread — never design a page assuming a specific neighbour, and never build content that depends on being seen alongside the page before/after it.
 
@@ -207,7 +207,7 @@ Rules that make this load correctly:
 
 - **No `<html>`, `<head>`, or `<body>` tags** — it's inlined into the running book, not rendered standalone.
 - **Exactly one `.page-inner` wrapper per file**, with `style="position:static"`.
-- **Exactly one `<span class="folio" data-num="arabic"></span>` (or `data-num="roman"`)**, empty, as the last element. `loader.js` fills in the actual numeral based on the page's position in `order` — never type a numeral by hand.
+- **Exactly one `<span class="folio" data-num="arabic"></span>`**, empty, as the last element. `loader.js` fills in the actual numeral based on the page's position in `order` — never type a numeral by hand.
 - **The leading HTML comment is a note to editors, not markup** — `loader.js` strips it before the fragment reaches the DOM.
 - **Shared markup** (e.g. the sigil) lives under `assets/` and is pulled in with `{{> svg/sigil.svg }}`, which `loader.js` inlines literally into the page HTML. Use a partial (not `<img>`) for anything the stylesheet needs to animate — CSS can't reach inside an externally-referenced `<img src="....svg">`. Use plain `<img>` for static raster plates.
 

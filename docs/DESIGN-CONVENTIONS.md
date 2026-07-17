@@ -129,7 +129,9 @@ rather than inventing a class — an unstyled class renders as naked text.
 - `.entry-no` — `Entry the Third`. Openings only.
 - `h2.entry-title` — the entry's name. Openings only. `<br>` to balance the lines.
 - `.folio` — **always** `<span class="folio" data-num="arabic"></span>`, empty.
-  Never type a numeral. `roman` for front/back matter. One per page, last thing.
+  Never type a numeral. Every page counts straight through — 1, 2, 3… — title
+  page and contents included; there's no separate front-matter numbering.
+  One per page, last thing.
 
 **Prose**
 - `.body-text` — wraps all prose. Contains `<p>`s.

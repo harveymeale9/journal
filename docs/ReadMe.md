@@ -93,9 +93,10 @@ where they sit — so nothing is ever renumbered.
 | Delete a page           | Remove the slug, delete the file.                               |
 | Rename a page's subject | Rename the file *and* its slug in `order`.                      |
  
-Page numbers, folio numerals (roman for front/back matter, arabic for the body),
-the "of 29" total, and the reader's saved place all follow from `order`
-automatically. **Never hand-type a page number anywhere.**
+Page numbers, folio numerals, the "of 29" total, and the reader's saved place
+all follow from `order` automatically — every page counts straight through,
+1, 2, 3…, title page and contents included; there's no separate front-matter
+numbering. **Never hand-type a page number anywhere.**
  
 ---
  
@@ -191,8 +192,7 @@ The top comment is stripped before the page reaches the DOM — it's a note to
 whoever opens the file.
  
 `<span class="folio" data-num="arabic">` is a *placeholder*. Leave it empty;
-`loader.js` fills in the numeral based on position. Use `data-num="roman"` for
-front and back matter.
+`loader.js` fills in the numeral based on position.
  
 Then add `entry-03-mirror-principle-opening` to `order` in `book.json`, and run
 `python3 tools/check.py`.
