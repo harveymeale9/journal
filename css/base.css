@@ -87,18 +87,34 @@ header.site p{
    candle standing on a near-black desk. The flame is CSS because a flame
    that repeats is a flame you notice repeating.
 
-   .candle spans exactly the left gutter — from the stage's left edge to the
-   book's left edge — so it scales with whatever room is left beside the book
-   and can never collide with it. That gutter is wide on a tall window and
-   nearly nothing on a short wide one (--page-w is min(46vw, height-derived)),
-   hence the clamp on .candle-body. It's absolutely positioned and
-   pointer-events:none, so it never enters flex flow and can't nudge the
-   book's own layout no matter its size. top:0/bottom:0 + align-items:center
-   line the flame up with the book's vertical centre rather than standing it
-   on the desk floor. Hidden outright on mobile: responsive.css. */
+   .candle spans the WHOLE true gutter — from the actual browser edge to the
+   book's left edge — so justify-content:center centres it in the space the
+   reader actually sees, not just the space inside .stage. left:-2vw reaches
+   back across body's own side padding (base.css `body{padding:0 2vw ...}`)
+   to that true edge; .stage itself doesn't clip (no overflow set), so the
+   reach-back renders fine. It's absolutely positioned and pointer-events:none,
+   so it never enters flex flow and can't nudge the book's own layout no
+   matter its size. top:0/bottom:0 + align-items:center line the flame up
+   with the book's vertical centre rather than standing it on the desk floor.
+
+   Sized off the BOOK, not the gutter: .candle-body's width TARGETS 60% of
+   --page-h, converted through the artwork's own pixel ratio (457×1310, so
+   height*457/1310 ≈ height*.2093) — so the candle is the same proportion of
+   the book on a small window and a huge monitor alike. That target is
+   wrapped in min(…, 100%): 100% here is .candle's OWN width, which by
+   construction (left/right above) already equals the true gutter, so on a
+   window where the gutter is thinner than 60%-of-book would need — width and
+   height don't shrink together, a short-but-not-narrow window can pinch the
+   gutter hard even at a generous viewport width — the candle yields to the
+   gutter instead of overflowing past the browser edge or over the book.
+
+   Only shown once the gutter has real room to spare: responsive.css hides
+   it below a width floor, rather than relying on the shrink-to-fit above
+   alone, because a candle pinched down to a sliver reads as clutter, not
+   furniture, even when it technically fits. */
 .candle{
   position:absolute;
-  top:0; bottom:0; left:0;
+  top:0; bottom:0; left:-2vw;
   /* the book's left edge: half a spread (--page-w) plus .book's 14px padding,
      measured out from the centre of the stage */
   right:calc(50% + var(--page-w) + 14px);
@@ -110,8 +126,8 @@ header.site p{
 }
 .candle-body{
   position:relative;
-  /* a real presence in the gutter without crowding the book */
-  width:clamp(42px, 48%, 155px);
+  width:min(calc(var(--page-h) * .2093), 96%);
+  height:auto;
 }
 .candle-stick{
   display:block;
