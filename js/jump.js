@@ -13,6 +13,9 @@ import { el, state, isMobile, reduced, savePos } from './book.js?v=1';
 import { flutterTo } from './page-turn.js?v=1';
 
 let jumpBox, numpad;
+/* the folio that opened the pad currently open (or null) — see the click
+   delegate and closePad() below, and .folio-editing in typography.css */
+let activeFolio = null;
 
 export function syncMobilePage(){
   const els = document.querySelectorAll('#scrollBook .page.m');
@@ -45,6 +48,7 @@ function openPad(){
 }
 function closePad(restore){
   jumpBox.classList.remove('open');
+  if (activeFolio){ activeFolio.classList.remove('folio-editing'); activeFolio = null; }
   if (restore){
     if (isMobile()) syncMobilePage();
     else el.jumpInput.value = state.spread*2 + 1;
@@ -95,6 +99,14 @@ export function initJump(){
     const targetX = Math.min(Math.max(fr.left + fr.width / 2, half), window.innerWidth - half);
     jumpBox.style.left = targetX + 'px';
     jumpBox.style.top = fr.top + 'px';
+    /* the badge renders right on top of the folio that opened it — hide
+       THAT folio's own permanent "N of total" text while it's open, or
+       the reader sees both at once (the badge's editable copy and the
+       page's own printed one) stacked in the same small area. Restored
+       in closePad(). */
+    if (activeFolio && activeFolio !== folioEl) activeFolio.classList.remove('folio-editing');
+    activeFolio = folioEl;
+    activeFolio.classList.add('folio-editing');
   });
 
   numpad.addEventListener('click', e=>{

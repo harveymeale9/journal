@@ -34,6 +34,15 @@
   cursor:var(--cursor-point); transition:color .2s;
 }
 .folio:hover{ color:var(--rubric); }
+/* The folio that opened the jump pad (jump.js tracks it as activeFolio)
+   hides while that pad is open — the pad's own badge renders right where
+   this folio sits, an editable copy of the same "N of total", so leaving
+   both visible reads as two numbers stacked on each other rather than one
+   becoming editable. opacity, not display:none, so the vacated space still
+   holds the layout (this element is otherwise absolutely positioned and
+   wouldn't affect flow either way, but a display toggle would still
+   restart its transition on every open/close for no benefit). */
+.folio.folio-editing{ opacity:0; }
 /* Only the numeral gets the "ruled blank" treatment — the same dashed
    underline .jump-badge (ui.css) sits on while idle — so it, not the quiet
    "of n" beside it, reads as the part you can tap to edit. Hovering the
