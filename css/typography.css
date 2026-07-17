@@ -82,6 +82,14 @@ h2.entry-title{
   width:1.05em; height:.78em;
   display:inline-block;
   vertical-align:-0.05em;
+  /* explicit, EQUAL margin on both sides — not left to letter-spacing,
+     which is what the flanking ✦ ✦ normally rely on for their own
+     spacing. letter-spacing only inserts trailing space after actual
+     TEXT characters; how (or whether) it treats the boundary next to an
+     inline-replaced element like this SVG is inconsistent enough across
+     engines that leaning on it here produced a visibly bigger gap on one
+     side than the other. Margin sidesteps the question entirely. */
+  margin:0 .5em;
 }
 
 .body-text{

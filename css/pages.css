@@ -8,15 +8,31 @@
 /* nature-of-the-manual-opening: the chapter plate bleeds off the text
    measure entirely — full PAGE width, spine to outer trim, not just the
    78%-of-page-w column every other plate in the book fills (typography.css
-   §9: "plates fill the measure"). Deliberately breaking that convention
-   for this one page: .page-inner's own 11%-of-page-w left/right padding
-   is what normally keeps a plate inside the measure, so cancelling it
-   with an equal negative margin is what lets the image reach both page
-   edges — margin-left pulls it back out to the spine side, and an
-   explicit width of the full --page-w (not "100%", which is the
-   NARROWER content-box width after padding) carries it the rest of the
-   way to the outer edge on its own; margin-right needs no matching value
-   because that explicit width already lands exactly there.
+   §9: "plates fill the measure"), and all the way to the page's own TOP
+   edge too, not just its sides. Deliberately breaking that convention for
+   this one page: .page-inner's own 9%/11%-of-page-w top/left/right padding
+   is what normally keeps a plate inside the measure, so cancelling it with
+   a matching negative margin is what lets the image reach those edges —
+   margin-top and margin-left pull it back out to the top and spine sides.
+
+   The RIGHT edge bleeds the full way (no matching margin-right needed —
+   width alone carries it there, see below) — but the LEFT edge stops
+   6% short of the true spine centreline rather than reaching it exactly.
+   That's not a leftover margin, it's deliberate: .spine (book.css) paints
+   its sheen highlight — a thin, warm-white line meant to catch light on
+   bare parchment — at z-index:7, ABOVE the page content's own z-index:2,
+   because for ORDINARY pages that sheen has to sit on top of the plain
+   parchment near the gutter for it to be visible at all. This is the
+   first plate in the book to ever reach that far, and the sheen line
+   drawn over a dark photograph reads as a stray white seam rather than a
+   glint on paper. Lowering .spine's z-index would fix this page but
+   erase the effect from every other page in the book (spine's shadow
+   gradient needs to sit ON TOP of ordinary pages' own parchment
+   background to read at all — moving it under would hide it completely,
+   not just soften it). Pulling the image back those few percent, measured
+   to clear the sheen line with a small margin (it sits ~5.3% of --page-w
+   in from the page edge), was the trade that didn't cost the rest of the
+   book its own effect.
 
    Held to a fixed 35% of the page's own HEIGHT (not width-driven
    aspect-ratio auto sizing, which is what every other plate in the book
@@ -25,15 +41,25 @@
    letterboxes it down to the target box. object-position favours the
    lower-right, where the open manuscript and candle — the actual subject
    — sit in the source photo; the top third is mostly bookshelf and can
-   afford to be the part a wide, short crop trims first. */
+   afford to be the part a wide, short crop trims first. The 1px brass
+   rule along the bottom edge is the one place this plate still admits it
+   has a frame — everything else bleeds, but a photograph dropping
+   straight onto typeset text with no line between them read as a
+   layout error rather than a deliberate edge. */
 .chapter-opening .chapter-bleed{
   display:block;
-  width:var(--page-w);
+  width:calc(var(--page-w) * .94);
   height:calc(var(--page-w) * 1.32 * .35);
-  margin:0 0 .3em calc(var(--page-w) * -.11);
+  margin:calc(var(--page-w) * -.09) 0 .9em calc(var(--page-w) * -.05);
   object-fit:cover;
   object-position:65% 60%;
+  border-bottom:1px solid var(--brass);
 }
+/* 50% larger than .entry-no's book-wide default (typography.css) — the
+   plate now separates it from the title by real space (above), so it can
+   afford, and needs, more presence to still read as a heading rather
+   than a caption underneath the image. */
+.chapter-opening .entry-no{ font-size:calc(var(--page-w) * .02625); }
 .chapter-opening .entry-title{ margin-bottom:.05em; }
 /* Pixel-identical to the title page's own "✦ ❦ ✦" (.tp-rule, typography.css)
    with the heart swapped for the book glyph — copied rather than
@@ -58,7 +84,7 @@
 .chapter-opening .pullquote{
   font-size:calc(var(--page-w) * .029);
   line-height:1.4;
-  margin:.05em 0 .05em;
+  margin:.05em 0 .5em;
 }
 /* Even with the plate at 35% of the page (down from an earlier
    full-measure ~45% version), the plate plus title, ornament, and pull
