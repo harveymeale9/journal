@@ -3,7 +3,7 @@
    Styling lives in css/page-turn.css.
    ========================================================== */
 
-import { el, state, isMobile, reduced, fillSlot, settleFromLeaf, render, updateStacks } from './book.js?v=1';
+import { el, state, isMobile, reduced, fillSlot, settleFromLeaf, primeLeafFace, render, updateStacks } from './book.js?v=1';
 
 const TURN_MS = 900;   /* keep in step with --turn-ms in css/tokens.css */
 
@@ -56,23 +56,19 @@ export function go(dir, ms, done){
   el.leaf.style.animationDuration = ms + 'ms';
   el.shade.style.animationDuration = ms + 'ms';
 
-  const p = state.pages;
-  if (dir > 0){
-    /* leaf front = current right page, leaf back = next left page */
-    fillSlot('leafFront', p[state.spread*2+1]);
-    fillSlot('leafBack', p[next*2]);
-    /* underneath: left stays, right becomes the next right page */
-    fillSlot('pageR', p[next*2+1]);
-    el.leaf.classList.remove('back');
-  } else {
-    /* turning back: leaf starts flat on the left (rotated -180) and returns.
-       front = previous right page, back = current left page */
-    fillSlot('leafFront', p[next*2+1]);
-    fillSlot('leafBack', p[state.spread*2]);
-    fillSlot('pageL', p[next*2]);
-    el.leaf.classList.add('back');
-  }
+  if (dir > 0) el.leaf.classList.remove('back');
+  else el.leaf.classList.add('back');
 
+  /* The leaf is forced back to display:block BEFORE its faces are filled
+     below, not after: .leaf is display:none whenever .turning isn't set
+     (css/page-turn.css), and display:none cancels every CSS animation
+     inside it outright. primeLeafFace() (below) has to prime an animation
+     clock into whichever face the leaf starts on — doing that BEFORE this
+     toggle would just have the toggle wipe it out a moment later, which is
+     exactly what was happening before this reordering. None of this is
+     visible: everything below still runs synchronously in the same tick,
+     so the leaf's stale content from the LAST turn is never actually
+     painted before this turn's fillSlot() calls replace it. */
   el.leaf.classList.remove('turning');
   el.shade.classList.remove('on');
   void el.leaf.offsetWidth; /* force a reflow so a class that was just removed
@@ -82,6 +78,32 @@ export function go(dir, ms, done){
 
   el.leaf.classList.add('turning');
   el.shade.classList.add('on');
+
+  const p = state.pages;
+  if (dir > 0){
+    /* leaf front = current right page, leaf back = next left page */
+    fillSlot('leafFront', p[state.spread*2+1]);
+    /* leafFront just became a fresh, frame-zero DUPLICATE of what pageR is
+       still showing (it's about to be overwritten below) — sync its
+       animation clock to pageR's real one before that happens, or the
+       leaf's first-visible face (this is the forward-turn case, leaf
+       starts flat/front-facing per turnFwd in page-turn.css) jumps the
+       instant the turn begins. See primeLeafFace's own comment in book.js. */
+    primeLeafFace('pageR', 'leafFront');
+    fillSlot('leafBack', p[next*2]);
+    /* underneath: left stays, right becomes the next right page */
+    fillSlot('pageR', p[next*2+1]);
+  } else {
+    /* turning back: leaf starts flat on the left (rotated -180) and returns.
+       front = previous right page, back = current left page */
+    fillSlot('leafFront', p[next*2+1]);
+    fillSlot('leafBack', p[state.spread*2]);
+    /* same fix, mirrored: leafBack duplicates pageL, and a backward turn's
+       leaf starts BACK-facing (turnBack), so leafBack is what's visible
+       from frame one — sync it before pageL gets overwritten below. */
+    primeLeafFace('pageL', 'leafBack');
+    fillSlot('pageL', p[next*2]);
+  }
 
   state.turnTimeout = setTimeout(()=>{
     land(dir, next);

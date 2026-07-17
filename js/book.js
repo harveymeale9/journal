@@ -152,6 +152,45 @@ export function settleFromLeaf(id, leafFaceId){
   source.dataset.slug = '';
 }
 
+/* The other half again — settleFromLeaf() (above) fixes the END of a
+   turn; this fixes the START. .leaf's initially-visible face (leafBack
+   for a backward turn, leafFront for a forward one — turnBack/turnFwd in
+   page-turn.css start from opposite rotations) is filled, via fillSlot(),
+   with a fresh DUPLICATE of content that's SIMULTANEOUSLY still showing,
+   unchanged, in a real slot (pageL for a backward turn, pageR for
+   forward — the leaf doesn't take over that slot until the turn
+   completes, see go() in page-turn.js). fillSlot() builds that duplicate
+   from the page's raw HTML string, which starts any CSS animation inside
+   it at frame zero. The instant the leaf appears (z-index above the real
+   pages), that fresh, frame-zero copy covers the original mid-animation
+   — a visible jump from wherever the real one was to zero, at the exact
+   moment a turn begins.
+
+   Call right after fillSlot() builds that leaf face and before the real
+   slot's own content is overwritten — reads each animated element's
+   currentTime off the REAL slot (still showing that content, still
+   ticking) and winds the newly-built leaf face's matching element
+   forward to match. Copies rather than moves, unlike settleFromLeaf:
+   the real slot has to go on showing that content untouched, in case the
+   turn never completes (finishTurnNow() can cut one short, or in
+   principle it could be interrupted). Matching is positional — leafFace
+   was just built from the exact same HTML string as source's current
+   content, so both element trees have identical shape. */
+export function primeLeafFace(sourceId, leafFaceId){
+  const source = el[sourceId] || document.getElementById(sourceId);
+  const leafFace = el[leafFaceId] || document.getElementById(leafFaceId);
+  const sourceEls = source.querySelectorAll('*');
+  const leafEls = leafFace.querySelectorAll('*');
+  sourceEls.forEach((srcEl, i) => {
+    const anims = srcEl.getAnimations();
+    if (!anims.length) return;
+    const leafEl = leafEls[i];
+    if (!leafEl) return;
+    const currentTime = anims[0].currentTime;
+    leafEl.getAnimations().forEach(anim => { anim.currentTime = currentTime; });
+  });
+}
+
 export function render(){
   if (isMobile()) return; /* portrait mode is the pre-built scroll stack */
   fillSlot('pageL', state.pages[state.spread*2]);
