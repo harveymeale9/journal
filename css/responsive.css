@@ -43,7 +43,14 @@
   .page.m{
     position:relative;
     width:100%;
-    height:calc(var(--page-w) * 1.36);
+    /* var(--page-h), not a separate hand-typed 1.36 — mobile used to use
+       its own, different multiplier here, so the SAME page held visibly
+       more (or less) content on a phone than on desktop purely because
+       the container shape didn't match, not because anything about the
+       content changed. Reusing --page-h (page-w * 1.32 everywhere, see
+       tokens.css) is what makes a page's fixed word count fit the same
+       way regardless of device. */
+    height:var(--page-h);
     background:var(--paper);
     border-radius:4px;
     overflow:hidden;
@@ -56,6 +63,12 @@
      with — .page-inner then falls back to book.css's own rule, which
      reserves the same 7% bottom strip mobile now shares with desktop. */
   .page.m > .page-inner{ position:absolute !important; }
+  /* book.css's 11%-each-side padding (78% text measure) reads fine on a
+     two-page desktop spread but leaves a phone-sized column cramped.
+     7.5% each side widens the mobile text block to ~85% of the page,
+     easier to read one-handed. Top/bottom untouched — only the sides
+     were too tight. */
+  .page.m > .page-inner{ padding-left:7.5%; padding-right:7.5%; }
   /* 2.5x the book's .0165 baseline (desktop only goes to 1.25x, typography.css)
      — mobile's page is physically small enough that a merely-proportional
      size reads illegibly tiny. Still just the glyph: height:7% is unchanged. */

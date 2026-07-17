@@ -17,7 +17,12 @@ body.ready .book-wrap, body.ready .scroll-book{ opacity:1; }
   position:relative;
   display:flex;
   align-items:center;
-  height:var(--page-h);
+  /* the PAGE plus its binding. --page-h is the page alone — tokens.css's
+     --page-w formula already reserves this same 28px (.book's own
+     top+bottom padding, below) before computing it, so page-h itself
+     stays a clean, unadjusted var(--page-w) * 1.32 with nothing further
+     to subtract anywhere downstream. */
+  height:calc(var(--page-h) + 28px);
   overflow:hidden;
   /* leather cover peeking out beneath the pages */
   background:
@@ -54,14 +59,14 @@ body.ready .book-wrap, body.ready .scroll-book{ opacity:1; }
   position:relative;
   display:flex;
   flex:none;
-  height:calc(var(--page-h) - 28px);
+  height:var(--page-h);
   z-index:2;
 }
 .stack{
   flex:none;
   align-self:center;
-  width:34px;                        /* fixed slot: layout never shifts */
-  height:calc(var(--page-h) - 28px); /* flush with the open pages */
+  width:34px;              /* fixed slot: layout never shifts */
+  height:var(--page-h);    /* flush with the open pages */
   position:relative;
 }
 .stack .fill{
@@ -159,7 +164,7 @@ body.ready .book-wrap, body.ready .scroll-book{ opacity:1; }
 .page{
   position:relative;
   width:var(--page-w);
-  height:calc(var(--page-h) - 28px);
+  height:var(--page-h);   /* exactly 1.32 page-units, on every screen — see tokens.css */
   background:var(--paper);
   overflow:hidden;
   flex:none;

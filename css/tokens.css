@@ -25,8 +25,22 @@
   --flame-core:#ffe6a8;
   --flame:#ff9c33;
   --flame-deep:#c9541a;
-  --page-w: min(46vw, calc((100vh - 96px) / 1.32), 1200px);
-  --page-w: min(46vw, calc((100dvh - 96px) / 1.32), 1200px);
+  /* --page-w is the PAGE's width, and the unit every size in the book is a
+     multiple of. --page-h is the PAGE's height — NOT the book's, which is
+     page-h PLUS the 28px binding padding (book.css: .book{padding:14px},
+     top and bottom). That 28px comes off HERE, in the formula that derives
+     --page-w from the viewport, rather than being subtracted from --page-h
+     downstream on .page/.pages-wrap/.stack — subtracting a FIXED pixel
+     amount from an already-scaled number makes the page's real height in
+     page-units drift with screen size (it measured 1.274 on a laptop-sized
+     window and 1.297 on a large display, in the version of this file that
+     did that), which quietly broke the one promise this whole system is
+     built on: that a page holds the same amount of content on every
+     screen. Baking the 28px into the WIDTH-deriving calc keeps --page-h a
+     clean, exact var(--page-w) * 1.32 everywhere downstream, with nothing
+     left to subtract. */
+  --page-w: min(46vw, calc((100vh - 96px - 28px) / 1.32), 1200px);
+  --page-w: min(46vw, calc((100dvh - 96px - 28px) / 1.32), 1200px);
   --page-h: calc(var(--page-w) * 1.32);
   --turn-ms: 900ms;
   /* the custom pointer: an arrow silhouette (assets/svg/cursor*.svg), onyx
@@ -61,7 +75,27 @@
    gives a real, often dramatic size increase on anything short of a very
    large monitor — it's only on a genuinely huge display that this cap
    binds at all — without reopening a book-wide overflow risk this session
-   didn't set out to audit every page against. */
+   didn't set out to audit every page against.
+
+   The extra -28px here is the SAME book-binding correction the base
+   formula above applies — fullscreen still renders the real .book with
+   its 14px top/bottom padding, so it needs it too. Missing the first time
+   this rule was written (the base formula had already lost its own -28px
+   to an earlier regression by then, so there was nothing to copy it
+   from), and --page-h drifting between fullscreen and normal desktop
+   sizing was a real, if smaller, instance of the same cross-device
+   inconsistency the base formula's own comment describes. */
 body.fs-mode{
-  --page-w: min(49vw, calc((100dvh - 44px - 16px) / 1.32), 1200px);
+  --page-w: min(49vw, calc((100dvh - 44px - 16px - 28px) / 1.32), 1200px);
+  /* --page-h itself must be redeclared here too, not just --page-w. Custom
+     properties substitute their var() references at the element where THEY
+     are declared, using that same element's own cascade — so --page-h's
+     one declaration at :root permanently resolves var(--page-w) against
+     :root's OWN formula, even on a descendant (body.fs-mode) that overrides
+     --page-w. Without this line, .page silently got a fullscreen WIDTH
+     paired with a base-formula HEIGHT (computed from a different --page-w
+     entirely) — not a rounding error, two unrelated numbers. Repeating the
+     same calc(var(--page-w) * 1.32) here forces it to re-resolve against
+     body.fs-mode's own --page-w instead of leaking :root's. */
+  --page-h: calc(var(--page-w) * 1.32);
 }
