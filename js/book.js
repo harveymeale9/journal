@@ -72,8 +72,11 @@ export function fillSlot(id, page){
   /* the previous occupant of this slot left its folio behind in the parent
      (it was moved OUT of node, so clearing node.innerHTML above never
      touched it) — drop it before attaching this page's own folio, or they
-     stack up across every turn/jump and overlap. */
-  const stale = node.parentElement && node.parentElement.querySelector('.folio');
+     stack up across every turn/jump and overlap. Scoped to a DIRECT child of
+     parentElement: a plain '.folio' query would also match THIS page's own
+     folio, which at this point is still nested inside node (not yet lifted),
+     and delete it before it's ever moved out. */
+  const stale = node.parentElement && node.parentElement.querySelector(':scope > .folio');
   if (stale) stale.remove();
   const folio = node.querySelector('.folio');
   if (folio && node.parentElement) node.parentElement.appendChild(folio);

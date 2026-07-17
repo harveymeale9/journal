@@ -68,17 +68,36 @@ export function initJump(){
   /* tapping a folio opens the pad positioned right above THAT number, not
      a fixed spot that happens to land near the right page. Desktop only —
      mobile's .jump is fixed to the viewport, and there's no left/right
-     page distinction there to get wrong in the first place. */
+     page distinction there to get wrong in the first place.
+
+     .jump lives once, inside .page.right (index.html) — so a folio tapped
+     on the LEFT page sits outside that page's bounds entirely. Left
+     unclamped, the naive offset lands negative and .page.right's own
+     overflow:hidden clips the whole pad, invisible. Clamped here to half
+     the NUMPAD's own rendered width (it, not the slimmer jump-badge, is
+     the widest thing that has to stay on-page — both share the same
+     centre, via left:50%/translateX(-50%)), the pad slides as close to the
+     tapped number as it can while staying fully on the right page — for a
+     right-page folio that's exactly the same spot as before; for a
+     left-page one it settles at that page's inner edge, right next to the
+     spine the number was tapped across.
+
+     focus() runs FIRST, deliberately: it fires openPad() synchronously
+     (see the 'focus' listener below), which adds .open and switches numpad
+     to display:grid — only then does numpad.offsetWidth report its real
+     size rather than 0. */
   document.addEventListener('click', e=>{
     const folioEl = e.target.closest('.folio');
     if (!folioEl) return;
+    el.jumpInput.focus();
     if (!isMobile()){
       const anchor = jumpBox.offsetParent || document.body;
       const fr = folioEl.getBoundingClientRect();
       const ar = anchor.getBoundingClientRect();
-      jumpBox.style.left = (fr.left + fr.width / 2 - ar.left) + 'px';
+      const half = (numpad.offsetWidth || jumpBox.offsetWidth || 80) / 2;
+      const target = fr.left + fr.width / 2 - ar.left;
+      jumpBox.style.left = Math.min(Math.max(target, half), ar.width - half) + 'px';
     }
-    el.jumpInput.focus();
   });
 
   numpad.addEventListener('click', e=>{

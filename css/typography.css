@@ -34,6 +34,19 @@
   cursor:pointer; transition:color .2s;
 }
 .folio:hover{ color:var(--rubric); }
+/* Only the numeral gets the "ruled blank" treatment — the same dashed
+   underline .jump-badge (ui.css) sits on while idle — so it, not the quiet
+   "of n" beside it, reads as the part you can tap to edit. Hovering the
+   folio recolours it to rubric right alongside the rest of the label. */
+.folio-n{
+  /* margin, not a relied-on space in the markup: .folio is a flex row, and
+     flex trims leading whitespace off an anonymous text item, which silently
+     ate the gap before "of" here. */
+  margin-right:.28em;
+  padding-bottom:.05em;
+  border-bottom:1px dashed rgba(156,124,60,.85);
+}
+.folio:hover .folio-n{ border-color:var(--rubric); }
 
 .entry-no{
   font-family:'IM Fell English SC', serif;
