@@ -43,6 +43,16 @@
    zoom) instead of scaling with the page like every other gap on this leaf
    — which is exactly why this gap used to render a visibly different size
    on desktop, tablet, and mobile despite being "the same" value everywhere. */
+/* Faint hairline mount, all four sides — box-shadow does NOT paint over an
+   opaque <img>'s own raster content (replaced-element content sits above
+   it in paint order), confirmed by testing an 8px inset red box-shadow
+   here that rendered completely invisible. A real `border` is the only
+   thing that reads: at low opacity it's just enough to keep the top edge
+   (which used to bleed straight into the book's dark leather with nothing
+   marking where photograph ends and page begins) from disappearing,
+   without reading as a picture frame. Bottom stays the stronger, fully
+   opaque brass — the one edge meant to be seen clearly, since it's also
+   the page's own transition into text. */
 .chapter-opening .chapter-bleed{
   display:block;
   width:var(--page-w);
@@ -50,7 +60,30 @@
   margin:calc(var(--page-w) * -.09) 0 calc(var(--page-w) * .049) calc(var(--page-w) * -.11);
   object-fit:cover;
   object-position:65% 60%;
+  border:1px solid rgba(156,124,60,.5);
   border-bottom:1px solid var(--brass);
+}
+/* The image-to-text transition: a small ❦ (echoing .rule-orn's own glyph
+   elsewhere on this page) centred on the plate's bottom rule, softened
+   into it by a radial paper-coloured glow rather than a hard-edged badge.
+   Positioned absolutely against .page-inner (the nearest positioned
+   ancestor) using the SAME height*.33 formula .chapter-bleed's own height
+   is built from, rather than relying on flex flow — being a sibling AFTER
+   the image in the flex column would put it below the image's own
+   margin-bottom gap (near "Chapter I"), not on the boundary line itself.
+   Taken out of flow entirely, so it can't disturb any of the gap tuning
+   elsewhere on this page. */
+.chapter-opening .chapter-bleed-mark{
+  position:absolute;
+  left:50%; top:calc(var(--page-w) * 1.32 * .33);
+  transform:translate(-50%,-50%);
+  width:1.9em; height:1.9em;
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  background:radial-gradient(circle, var(--paper) 58%, rgba(233,220,189,0) 100%);
+  color:var(--brass);
+  font-size:calc(var(--page-w) * .02);
+  pointer-events:none;
 }
 /* 50% larger than .entry-no's book-wide default (typography.css) — the
    plate now separates it from the title by real space (above), so it can
