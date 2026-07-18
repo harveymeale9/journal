@@ -211,8 +211,18 @@
    separately, wouldn't follow .torn-edge's clip-path anyway: drop-shadow
    is cast from the element's actual (clipped) silhouette, box-shadow
    from its rectangular box. Two shadows: a dark one to ground it above
-   the parchment, a warm pale one to read as a glow rather than a stain. */
+   the parchment, a warm pale one to read as a glow rather than a stain.
+
+   mix-blend-mode:normal overrides the book-wide .plate-img default
+   (multiply, which prints a plate INTO the parchment) — combining that
+   blend mode with an animated filter/mask/clip-path on the same element
+   was producing a flickering rectangular seam at the plate's original
+   (pre-mask) edge, the browser's blend-compositing layer visibly
+   re-settling each frame. Dropping the blend fixes the seam, and reads
+   better besides: a plate meant to float ABOVE the page, glowing,
+   shouldn't be printing itself down into the surface underneath it. */
 .heavenly-plate{
+  mix-blend-mode:normal;
   filter:
     drop-shadow(0 10px 16px rgba(20,12,4,.28))
     drop-shadow(0 0 22px rgba(255,248,222,.5));
