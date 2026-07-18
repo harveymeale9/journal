@@ -50,11 +50,20 @@
    real `border` is the only thing that reads. Kept deliberately simple
    (no gradient bars, no sheen) after those read badly at mobile's much
    smaller plate size — one hairline, same weight and colour on every
-   side, on every device. */
+   side, on every device.
+
+   Top/right/left border sits OUTSIDE the image as normal (content-box,
+   the browser default) — a 1px ring added beyond the photo's own edge.
+   The BOTTOM edge is different: height is shaved by 1px here so the
+   border-bottom lands INSIDE that reclaimed pixel, overlapping the
+   photo's own last row instead of hanging as a separate band below it.
+   box-sizing:border-box would do this for all four sides at once, but
+   only the bottom was asked to move — shrinking just the height (not
+   the sizing model) moves only that one edge. */
 .chapter-opening .chapter-bleed{
   display:block;
   width:var(--page-w);
-  height:calc(var(--page-w) * 1.32 * .33);
+  height:calc(var(--page-w) * 1.32 * .33 - 1px);
   margin:calc(var(--page-w) * -.09) 0 calc(var(--page-w) * .049) calc(var(--page-w) * -.11);
   object-fit:cover;
   object-position:65% 60%;
