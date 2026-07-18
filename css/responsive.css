@@ -18,14 +18,6 @@
      that size the plain 1.55x default reads correctly — this 2.2x is
      specifically for tablet's smaller NORMAL page-w. */
   body:not(.fs-mode) .running-head{ font-size:calc(var(--page-w) * .0254); }
-  /* the chapter-opening plate's foot bar (pages.css) reads noticeably
-     thicker on a tablet-sized page than the same 4px does on desktop —
-     1px thinner here only, with top recalculated so it still sits flush
-     on the plate's true bottom edge. */
-  .chapter-opening .chapter-bleed-sheen{
-    height:3px;
-    top:calc(var(--page-w) * 1.32 * .33 - 3px);
-  }
 }
 
 @media (orientation: portrait) and (max-width: 940px), (max-width: 720px){
@@ -123,8 +115,4 @@
   /* the candle stops burning but stays lit — a flame whose meaning only
      appears once it moves is broken for a reader who's turned motion off */
   .flame, .flame-core, .flame-halo, .candle-cast{ animation:none !important; }
-  /* the chapter plate's gold sheen (pages.css) — the bar itself stays, a
-     plain static brass line, just as a photograph must "still read
-     correctly as a fully static image" per this rule's own convention */
-  .chapter-bleed-sheen::after{ animation:none !important; }
 }

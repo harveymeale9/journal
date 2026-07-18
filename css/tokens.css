@@ -18,7 +18,7 @@
   --ink:#2b2116;
   --ink-faint:#5d4c35;
   --brass:#9c7c3c;
-  /* the BRIGHT gold used only by the chapter-opening plate's frame/sheen —
+  /* the BRIGHT gold used only by the chapter-opening plate's frame —
      matches the lightest highlight step in the gilt page-edge trim's own
      gradient (.stack .fill, book.css: #f0d38c), not the ornament brass
      above, which reads as a dull, dark mustard at this size. */
