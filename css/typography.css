@@ -189,6 +189,123 @@ h2.entry-title{
   height:auto;
   flex:none;
 }
+/* THE DEFAULT WAY TO PLACE A RASTER PLATE ON A PAGE, arrived at over
+   several rounds (a spotlight, then a sweeping shimmer band, then
+   discrete sparkle glints — all tried and rejected before this settled):
+   wrap the <img class="plate-img"> in a <div class="plate-frame">. That
+   wrapper is what actually carries the "floating leaf of parchment"
+   look — a soft torn edge, a corners-only misty fade, a warm glow, a
+   slow float, a darkening vignette, and a flickering candlelight wash —
+   automatically, on the <img> and via its own ::before/::after, with no
+   extra classes to remember. A bare <img class="plate-img"> with no
+   wrapper still exists and still means the plain, flat, multiply-into-
+   the-parchment look — the chapter-opening plate's own full-bleed
+   .chapter-bleed (pages.css) is one, predates this convention, and has
+   its own different border treatment entirely; that's a deliberate
+   exception, not something every plain plate-img should now also grow
+   torn edges. .plate-frame is for the ordinary case: an illustration
+   sitting in the text column. */
+.plate-frame{
+  position:relative;
+  display:block;
+  margin:calc(var(--page-w) * .012) auto;
+}
+/* Waviness on all four sides — traced clockwise from the top-left: top
+   edge, right edge, bottom edge (right to left), left edge (bottom to
+   top). Percentages throughout, so it scales with whichever plate it's
+   on at every page-w. Kept deliberately faint (~0.8% amplitude) after
+   two earlier passes at ~1.6% and ~3% both read as too much.
+
+   mask-image: a corners-only fade — a single centred radial reaches the
+   corners first and leaves each edge's midpoint closer to full strength
+   (an all-round version, feathering every edge evenly via two
+   intersected linear gradients, was tried and reverted). Reads alpha
+   here, not colour — the black/transparent stops only encode opacity.
+
+   filter:drop-shadow, not box-shadow — box-shadow does not paint over an
+   <img>'s own raster content (confirmed on .chapter-bleed, pages.css,
+   testing an 8px inset red box-shadow that rendered completely
+   invisible), and separately wouldn't follow the clip-path anyway:
+   drop-shadow is cast from the element's actual (clipped) silhouette,
+   box-shadow from its rectangular box. Two shadows: a dark one to
+   ground the plate above the parchment, a warm pale one to read as a
+   glow rather than a stain.
+
+   mix-blend-mode:normal overrides .plate-img's own multiply above —
+   combining multiply with an animated filter/mask/clip-path on the same
+   element produced a flickering rectangular seam at the plate's
+   original (pre-mask) edge, the browser's blend-compositing layer
+   visibly re-settling each frame. Dropping the blend fixes the seam,
+   and reads better besides: a plate meant to float above the page,
+   glowing, shouldn't be printing itself down into the surface
+   underneath it.
+
+   animation: two of them, not one class each — plate-float (keyframes
+   in animations.css) only ever touches `transform`, glow-pulse only
+   ever touches `filter`, so they run independently without fighting
+   over a property. Both disabled under prefers-reduced-motion
+   (responsive.css): setting `animation:none` here cancels both at once,
+   since both are declared through this one property. glow-pulse's
+   resting keyframe matches the static filter value above exactly, so
+   the fallback (motion off) still shows the same glow, just not
+   pulsing. */
+.plate-frame img{
+  display:block; width:100%; margin:0;
+  clip-path:polygon(
+    0% .3%, 14% .7%, 28% .25%, 42% .65%, 56% .3%, 70% .75%, 84% .2%, 100% .45%,
+    99.7% 14%, 99.25% 28%, 99.8% 42%, 99.3% 56%, 99.75% 70%, 99.2% 84%, 99.6% 100%,
+    86% 99.7%, 72% 99.25%, 58% 99.8%, 44% 99.3%, 30% 99.75%, 16% 99.2%, 0% 99.55%,
+    .25% 86%, .7% 72%, .2% 58%, .75% 44%, .3% 30%, .65% 16%
+  );
+  mask-image:radial-gradient(ellipse at center, black 55%, transparent 100%);
+  -webkit-mask-image:radial-gradient(ellipse at center, black 55%, transparent 100%);
+  mix-blend-mode:normal;
+  filter:
+    drop-shadow(0 10px 16px rgba(20,12,4,.28))
+    drop-shadow(0 0 22px rgba(255,248,222,.5));
+  animation:
+    plate-float 9s ease-in-out infinite,
+    glow-pulse 5s ease-in-out infinite;
+}
+/* For a plate with body text before AND after it instead of a caption —
+   the tighter default above reads as crowded there. */
+.plate-frame-loose{ margin:calc(var(--page-w) * .045) auto; }
+/* A vignette — darkens toward the edges, the opposite job from the
+   mask-image above (which fades toward TRANSPARENT, not dark, and only
+   at the corners). Plain normal blend, no special compositing needed: a
+   dark, partly-opaque wash reads as a shadow through ordinary alpha
+   compositing. Tinted --foxing (tokens.css: "the fine rust speckle"),
+   not black — a burnt, aged brown reads as the page's own damage/age
+   rather than a flat photographic vignette. ::before, not ::after
+   (that's the candlelight below) — paint order for a positioned
+   ::before/::after pair against a non-positioned sibling <img> is: img
+   first, then ::before, then ::after, so this sits between the plate
+   and the candlelight, which is the right order (light flickers on top
+   of an already-vignetted image, not the other way round). */
+.plate-frame::before{
+  content:"";
+  position:absolute; inset:0;
+  background:radial-gradient(ellipse at center,
+    transparent 55%, rgba(150,100,40,.45) 100%);
+  pointer-events:none;
+}
+/* Candlelight: one soft warm wash, off-centre like real light falling
+   from one side, not several discrete points — screen blend lightens
+   what's under it rather than sitting on top as a flat tint.
+   plate-candlelight (animations.css), not the book's shared @keyframes
+   flicker — that one's .75–1 range read as invisible once the gradient
+   itself was subtle too, so this has its own wider swing, same
+   irregular mostly-steady-with-flares shape. Disabled under
+   prefers-reduced-motion (responsive.css), same as .glow itself. */
+.plate-frame::after{
+  content:"";
+  position:absolute; inset:0;
+  background:radial-gradient(ellipse at 42% 34%,
+    rgba(255,195,100,.55) 0%, rgba(255,195,100,0) 68%);
+  mix-blend-mode:screen;
+  pointer-events:none;
+  animation:plate-candlelight 7s ease-in-out infinite;
+}
 /* caption sits narrower than the plate above it — a whisper beneath the image,
    not a second column of text */
 .plate-caption{

@@ -102,27 +102,16 @@
 .moon-shadow{ animation:moondrift 16s ease-in-out infinite alternate; }
 @keyframes moondrift{ from{ transform:translateX(-24px) } to{ transform:translateX(24px) } }
 
-/* EXPERIMENTAL — every other entry on this page animates an SVG (§10 of
-   DESIGN-CONVENTIONS.md: "animate SVG only, never a raster plate"). This
-   one rides a plain <img> instead, testing whether a very slow vertical
-   drift sells "a loose piece of parchment, hovering" for one specific
-   plate (universal-principles.html) — paired there with a clip-path torn
-   edge and a soft glow (pages.css: .torn-edge, .heavenly-plate). Turned
-   down again after the second pass read as too much: smaller drift,
-   slower clock. Two animations in one shorthand, not one class each —
+/* Every other entry on this page animates an SVG (§10 of DESIGN-
+   CONVENTIONS.md: "animate SVG only, never a raster plate") — these two
+   ride a plain <img> instead, a deliberate exception for the book-wide
+   default raster-plate treatment (typography.css: .plate-frame img).
    plate-float only ever touches `transform`, glow-pulse only ever
-   touches `filter`, so they run independently on the same element
-   without fighting over a property. Disabled under prefers-reduced-
-   motion like all the others (see responsive.css): setting
-   `animation:none` on .plate-float cancels both at once, since both are
-   declared through this one property. glow-pulse's resting keyframe
-   matches .heavenly-plate's own static filter value exactly, so the
-   fallback (motion off) shows the same glow, just not pulsing. */
-.plate-float{
-  animation:
-    plate-float 9s ease-in-out infinite,
-    glow-pulse 5s ease-in-out infinite;
-}
+   touches `filter`, applied together there via one `animation`
+   shorthand so they run independently without fighting over a
+   property. glow-pulse's resting keyframe matches .plate-frame img's
+   own static filter value exactly, so turning motion off (responsive.css)
+   still shows the same glow, just not pulsing. */
 @keyframes plate-float{
   0%,100%{ transform:translateY(0) scale(1); }
   50%{ transform:translateY(-1.2%) scale(1.005); }
@@ -138,6 +127,13 @@
       drop-shadow(0 10px 16px rgba(20,12,4,.28))
       drop-shadow(0 0 30px rgba(255,248,222,.7));
   }
+}
+/* the plate-frame's candlelight wash (typography.css: .plate-frame::after) */
+@keyframes plate-candlelight{
+  0%,100%{ opacity:.55 }
+  40%{ opacity:1 }
+  60%{ opacity:.3 }
+  80%{ opacity:.8 }
 }
 
 /* the living chart: the curve draws itself across the years in 3s, rests

@@ -100,10 +100,17 @@
 <!-- ---------- RASTER PLATE (painted / photographic) -----------
      Export on WHITE — .plate-img multiplies into the parchment.
      No width: plates fill the measure. A width only NARROWS one,
-     in % only, never px. Costs ~50 words if roughly square. -->
+     in % only, never px — and goes on the .plate-frame, not the <img>.
+     Costs ~50 words if roughly square.
+     .plate-frame is the default wrapper: gives the plate a torn edge,
+     misty corners, a glow, a slow float, a vignette, and a flickering
+     candlelight wash automatically. Skip it only for a page that wants
+     the plain flat look on purpose (rare — see DESIGN-CONVENTIONS §9). -->
 
-  <img class="plate-img" src="assets/images/entry-03-plate-1.webp"
-       alt="Full literal description of what is drawn. This is read aloud.">
+  <div class="plate-frame">
+    <img class="plate-img" src="assets/images/entry-03-plate-1.webp"
+         alt="Full literal description of what is drawn. This is read aloud.">
+  </div>
   <p class="plate-caption">What the image shows, stated plainly — never the word "Plate".</p>
 
 

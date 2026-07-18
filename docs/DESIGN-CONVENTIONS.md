@@ -238,14 +238,29 @@ Two kinds, and picking wrong is a real error:
 raster and vector alike. A width only ever makes a plate *narrower*, in `%`, never
 `px`. A full-width plate is roughly 1.5× the height of the old 64% one: budget it.
 
-**Raster plates** — painted/photographic. `assets/images/*.webp`.
+**Raster plates** — painted/photographic. `assets/images/*.webp`. The default,
+arrived at over several rejected attempts (a spotlight, a shimmer band, sparkle
+glints): wrap the `<img>` in a `.plate-frame`. That's what actually carries the
+look — a soft torn edge, a corners-only misty fade, a warm glow, a slow float, a
+darkening vignette, a flickering candlelight wash — automatically, no other
+classes to remember:
 ```html
-<img class="plate-img" src="assets/images/entry-03-plate-1.webp"
-     alt="Describe what is drawn, fully — this is read aloud.">
+<div class="plate-frame">
+  <img class="plate-img" src="assets/images/entry-03-plate-1.webp"
+       alt="Describe what is drawn, fully — this is read aloud.">
+</div>
 <p class="plate-caption">What it shows, stated plainly.</p>
 ```
-`.plate-img` is `mix-blend-mode:multiply` — it prints *into* the parchment instead
-of pasting a white box onto it. **Export on white.**
+Narrow it the usual way — `style="width:64%"` on the `.plate-frame`, not the
+`<img>` — and reach for `.plate-frame-loose` instead of the plain `.plate-frame`
+when body text follows the plate directly rather than a caption (more room below).
+
+A bare `<img class="plate-img">` with **no** `.plate-frame` wrapper still exists —
+flat, `mix-blend-mode:multiply`, printed straight into the parchment, no torn
+edge or glow. That's the exception now, not the default: reach for it only when a
+page deliberately wants the plain look (the chapter-opening plate's own full-bleed
+`.chapter-bleed` is one, and predates this convention besides), not out of habit.
+**Export on white** either way — multiply needs it.
 
 **Vector plates** — line art. `assets/svg/*.svg`, pulled in with `{{> svg/sigil.svg }}`.
 Use a partial (not `<img>`) whenever the art animates: our CSS drives the sigil's
