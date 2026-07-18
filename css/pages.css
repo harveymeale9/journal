@@ -121,74 +121,17 @@
    nothing else about it (margins, pull quote, etc.) applies here. */
 .chapter-continued .body-text{ font-size:calc(var(--page-w) * .028); line-height:1.44; }
 
-/* a-clear-answer's alchemical plate: sits between two body-text blocks
-   (typography.css: "never nest .body-text", so the plate is a sibling,
-   not inside either one) — the book-wide .plate-img margin-bottom (.3em)
-   was tuned for a plate that's the LAST thing on its page, with nothing
-   hugging its foot; here a paragraph follows immediately, so it reads as
-   crowded. More room below only — top/sides keep the book default. A
-   soft ink-brown hairline (not rubric, not brass — neither reads as
-   ornament or structure here) grounds the plate's own edges against the
-   parchment, the way old book illustrations were often outlined in a
-   faint ink frame. */
-.alchemical-plate, .mount-a{
-  margin-bottom:1.3em;
-  border:1px solid rgba(60,40,20,.25);
-}
+/* EXPERIMENTAL — a "floating leaf of parchment" treatment: a soft torn
+   edge, a corners-only misty fade, and a glow (further below), tried
+   first on universal-principles.html's plate and now also on
+   a-clear-answer.html's alchemical plate — that page's earlier ink-frame
+   border and mount-style comparison are both gone; this is the style
+   that won. Percentages throughout (not px), so it scales with whichever
+   plate it's on at every page-w.
 
-/* TEMP — mount-style comparison for the alchemical plate
-   (alchemical-book-plate.html), side by side so they can be judged
-   against each other. Remove this whole block, .plate-compare's markup,
-   and go back to a single .alchemical-plate <img> once one is picked. */
-.plate-compare{
-  display:flex; flex-wrap:wrap;
-  gap:4%;
-  justify-content:center;
-  margin:.6em 0 1em;
-}
-.plate-compare figure{
-  width:46%; margin:0;
-}
-.plate-compare img{ display:block; width:100%; margin:0; }
-.plate-compare figcaption{
-  font-family:'Cormorant Garamond', serif; font-style:italic;
-  font-size:calc(var(--page-w) * .016); color:var(--ink-faint);
-  text-align:center; margin-top:.35em;
-}
-/* B — a "mounted plate" look: a hairline plus a soft cast shadow, as if
-   the illustration were laid onto the page rather than printed into it. */
-.mount-b{
-  box-shadow:
-    0 0 0 1px rgba(80,50,20,.18),
-    0 2px 6px rgba(0,0,0,.12);
-}
-/* C — inset vignette: the wrapping <figure> (not the <img> — replaced
-   elements don't support pseudo-elements) gets an inset shadow across
-   its own box, darkening the plate's edges inward. */
-.mount-c-wrap{ position:relative; }
-.mount-c-wrap::after{
-  content:"";
-  position:absolute; inset:0;
-  box-shadow:inset 0 0 20px rgba(40,25,10,.5);
-  pointer-events:none;
-}
-/* D — mask vignette: the image itself fades out toward its corners
-   instead of ending on a hard rectangle. mask-image's default mode reads
-   alpha, not colour, so the black/transparent choice here only encodes
-   opacity — not a colour tint. */
-.mount-d{
-  mask-image:radial-gradient(ellipse at center, rgba(0,0,0,1) 55%, rgba(0,0,0,0) 100%);
-  -webkit-mask-image:radial-gradient(ellipse at center, rgba(0,0,0,1) 55%, rgba(0,0,0,0) 100%);
-}
-
-/* EXPERIMENTAL — universal-principles.html's plate, testing whether it
-   can read as a loose leaf of parchment rather than a printed
-   rectangle. Percentages (not px), so everything below scales with the
-   plate itself at every page-w.
-
-   Waviness on TOP and BOTTOM both (sides stay straight) — halved again
-   from the second pass's ~1.6% amplitude to ~0.8%, same uneven-point
-   shape, just a fainter ripple. */
+   Waviness on TOP and BOTTOM both (sides stay straight) — halved twice
+   over from an initial ~3% amplitude down to ~0.8%, same uneven-point
+   shape, just a fainter ripple each time. */
 .torn-edge{
   clip-path:polygon(
     0% .2%, 10% .65%, 20% .3%, 30% .8%, 40% .25%, 50% .6%,
@@ -197,11 +140,12 @@
     40% 99.9%, 30% 99.25%, 20% 99.8%, 10% 99.35%, 0% 99.75%
   );
 }
-/* Back to a corners-only fade (the all-round intersected-mask version
-   didn't read right) — a single centred radial, same recipe as .mount-d
-   above: reaches the corners first, leaves each edge's midpoint closer
-   to full strength. mask-image reads alpha here, not colour — the
-   black/transparent stops only encode opacity. */
+/* A corners-only fade — a single centred radial reaches the corners
+   first and leaves each edge's midpoint closer to full strength (an
+   all-round version, feathering every edge evenly via two intersected
+   linear gradients, was tried and reverted — it didn't read right).
+   mask-image reads alpha here, not colour — the black/transparent stops
+   only encode opacity. */
 .misty-edge{
   mask-image:radial-gradient(ellipse at center, black 55%, transparent 100%);
   -webkit-mask-image:radial-gradient(ellipse at center, black 55%, transparent 100%);
