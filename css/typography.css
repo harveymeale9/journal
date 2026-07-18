@@ -273,6 +273,25 @@ h2.entry-title{
 /* For a plate with body text before AND after it instead of a caption —
    the tighter default above reads as crowded there. */
 .plate-frame-loose{ margin:calc(var(--page-w) * .045) auto; }
+/* A real, if unusual, exception to "plates fill the measure": a tall
+   plate that would otherwise need more vertical room than the page has
+   to spare renders in full instead of clipping, by letting body text
+   wrap in the narrower column beside it rather than stacking below it.
+   Plain CSS float — whichever side, text wraps on the other three sides
+   automatically; nothing here needs to know how tall the plate actually
+   is. margin only on the side away from the text (not the book-wide
+   .plate-frame's own symmetric auto-centred margin), which is what
+   opens the gap between the plate and the wrapped text. Used twice now
+   (this and the alchemical plate on an earlier page), so promoted here
+   from a one-off in pages.css. */
+.plate-frame-float{
+  float:left;
+  margin:0 calc(var(--page-w) * .035) calc(var(--page-w) * .02) 0;
+}
+.plate-frame-float-right{
+  float:right;
+  margin:0 0 calc(var(--page-w) * .02) calc(var(--page-w) * .035);
+}
 /* A vignette — darkens toward the edges, the opposite job from the
    mask-image above (which fades toward TRANSPARENT, not dark, and only
    at the corners). Plain normal blend, no special compositing needed: a
