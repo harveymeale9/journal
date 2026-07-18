@@ -227,7 +227,7 @@ raster and vector alike. A width only ever makes a plate *narrower*, in `%`, nev
 ```html
 <img class="plate-img" src="assets/images/entry-03-plate-1.webp"
      alt="Describe what is drawn, fully — this is read aloud.">
-<p class="plate-caption">Plate — What it shows, stated plainly.</p>
+<p class="plate-caption">What it shows, stated plainly.</p>
 ```
 `.plate-img` is `mix-blend-mode:multiply` — it prints *into* the parchment instead
 of pasting a white box onto it. **Export on white.**
@@ -241,14 +241,16 @@ leaf. Never open a page with a plate above its running head. Full-page plates ar
 a real option and often the better one — see the aperture and chart pages.
 
 **Captions.** `.plate-caption`, italic Cormorant, `--ink-faint`, centred.
-Convention is `Plate — ` then a statement, not a label:
+**Never use the word "Plate" in a caption.** Just describe what the image above it
+is — a plain statement, not a label:
 
-> Plate — The aperture turns; the centre holds.
-> Plate — One life, taken second by second across the years.
+> The aperture turns; the centre holds.
+> One life, taken second by second across the years.
 
-Present tense, no full stop unless it's two clauses. A caption says what the plate
-*means*, never "Figure 1" or "Diagram of X". `alt` carries the literal description;
-the caption carries the sense.
+Present tense, no full stop unless it's two clauses. `alt` carries the literal,
+exhaustive description (read aloud); the caption is shorter and reads at a glance.
+Never "Figure 1" or "Diagram of X". If a plate doesn't need one to make sense on
+the page, skip the caption entirely rather than forcing one.
 
 The caption sits at **70% of the measure**, centred — deliberately narrower than
 the plate above it, so it reads as a whisper beneath the image rather than a second
