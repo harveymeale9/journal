@@ -111,3 +111,18 @@
    these pages don't share the opening's cramped, multi-element layout, so
    nothing else about it (margins, pull quote, etc.) applies here. */
 .chapter-continued .body-text{ font-size:calc(var(--page-w) * .028); line-height:1.44; }
+
+/* a-clear-answer's alchemical plate: sits between two body-text blocks
+   (typography.css: "never nest .body-text", so the plate is a sibling,
+   not inside either one) — the book-wide .plate-img margin-bottom (.3em)
+   was tuned for a plate that's the LAST thing on its page, with nothing
+   hugging its foot; here a paragraph follows immediately, so it reads as
+   crowded. More room below only — top/sides keep the book default. A
+   soft ink-brown hairline (not rubric, not brass — neither reads as
+   ornament or structure here) grounds the plate's own edges against the
+   parchment, the way old book illustrations were often outlined in a
+   faint ink frame. */
+.alchemical-plate{
+  margin-bottom:1.3em;
+  border:1px solid rgba(60,40,20,.25);
+}
