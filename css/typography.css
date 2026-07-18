@@ -292,6 +292,17 @@ h2.entry-title{
   float:right;
   margin:0 0 calc(var(--page-w) * .02) calc(var(--page-w) * .035);
 }
+/* Add alongside .plate-frame-float to push it past .page-inner's own
+   left padding, toward the spine, instead of sitting flush at the start
+   of the text column like an ordinary float would — a partial bleed,
+   not the full one .chapter-bleed does. Widens the wrapped-text column
+   on the right as a side effect (the plate's right edge moves left by
+   the same amount its left edge does), which is the point as much as
+   the bleed itself: the two columns read as a deliberate two-column
+   layout rather than "an image with some room made for it." */
+.plate-frame-float-bleed{
+  margin-left:calc(var(--page-w) * -.09);
+}
 /* A vignette — darkens toward the edges, the opposite job from the
    mask-image above (which fades toward TRANSPARENT, not dark, and only
    at the corners). Plain normal blend, no special compositing needed: a
