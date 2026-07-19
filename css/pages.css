@@ -120,6 +120,19 @@
    these pages don't share the opening's cramped, multi-element layout, so
    nothing else about it (margins, pull quote, etc.) applies here. */
 .chapter-continued .body-text{ font-size:calc(var(--page-w) * .028); line-height:1.44; }
+/* A pull quote embedded mid-chapter (body text above AND below it, same
+   page — chapter-2-pullquote-effectiveness is the first of these) reuses
+   the CHAPTER-OPENING pull quote's own size/line-height exactly, rather
+   than the much louder base .pullquote (components.css, .05/1.35, meant
+   for a quote that's the ONLY thing on its page). This book has exactly
+   one pull quote treatment a reader has already seen — Chapter I's own,
+   on its opening page — so a second one elsewhere reads as the same kind
+   of moment only if it looks the same. No q-mark and no .pullquote-attr
+   either, for the same reason: Chapter I's pull quote uses neither. */
+.chapter-continued .pullquote{
+  font-size:calc(var(--page-w) * .029);
+  line-height:1.4;
+}
 
 /* The book-wide default raster-plate treatment (.plate-frame, the
    "floating leaf of parchment" look) now lives in typography.css, next

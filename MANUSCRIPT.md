@@ -131,13 +131,16 @@ What qualities distinguish a game from every other form of experience? Two chara
 [/PAGE 10]
 
 [PAGE 11 · pages/chapter-2-two-characteristics.html — built]
-[ILLUSTRATION https://realitymanual.com/assets/images/GameVenDiagramDigital.webp]
 [BODY]
 The first is interactivity.
+[/BODY]
+[ILLUSTRATION https://realitymanual.com/assets/images/GameVenDiagramDigital.webp]
+[BODY]
 A spectator watching a film possesses no meaningful influence over the events unfolding before him. The story proceeds according to a predetermined sequence regardless of his wishes, preferences, or intentions. A game is fundamentally different. A game responds to the actions of the participant. Inputs supplied by the player influence the outcomes that follow.
 Reality plainly exhibits this characteristic. Every moment presents myriad possible actions. One may speak or remain silent. Advance or retreat. Create or destroy. Act or refrain from acting altogether. Different choices produce different outcomes. Reality is therefore very clearly interactive.
 [/BODY]
 [/PAGE 11]
+(image moved off the very top of the page — house rule now is every plate needs body text both before AND after it on the same page, see CLAUDE.md)
 
 [PAGE 12 · pages/chapter-2-outcome-asymmetry.html — built]
 [BODY]
@@ -147,38 +150,43 @@ In the game of football, however, scoring a goal is generally considered more fa
 The game of life most certainly contains asymmetrical outcomes. In a vacuum, health is more favorable than illness. Freedom is more favorable than imprisonment. Prosperity is more favorable to destitution. Joy is more favorable than misery.
 Reality therefore satisfies both requirements. It is interactive, and it possesses outcome asymmetry. Any person of sound mind is left with little alternative but to conclude that reality possesses the structure of a game.
 Once this conclusion has been reached, he who has a taste for that which is most favorable might then ask: How are games won?
-There is only a single answer to this question.
 [/BODY]
 [/PAGE 12]
+(this page overflowed once at 7 paragraphs/213 words, including the next line below — moved that line onto PAGE 13 instead, where it now leads into the pull quote it was already setting up)
 
 [PAGE 13 · pages/chapter-2-pullquote-effectiveness.html — built]
+[BODY]
+There is only a single answer to this question.
+[/BODY]
 [PULLQUOTE]
 One's probability of winning any game is a function of the effectiveness of the strategy one employs.
 [/PULLQUOTE]
-[/PAGE 13]
-
-[PAGE 14 · pages/chapter-2-two-pieces-of-information.html — built]
 [BODY]
 Naturally, the most effective strategy can only be described as the optimal strategy.
 The curious player then asks a further question: How might one go about developing the most optimal strategy for the game of life?
 The answer is remarkably simple. Only two pieces of information must be known before an optimal strategy can be derived: the objective of the game and the rules which govern it.
+The objective defines what constitutes success, while the rules define the boundaries within which success must be pursued. Once these two elements are understood, strategy ceases to be a matter of speculation and becomes a matter of deduction.
+[/BODY]
+[/PAGE 13]
+(this is no longer a quote-only page — a standalone pull-quote page in this book left too much empty parchment below it, so it now carries lead-in and follow-on body text like every other page. The quote itself is styled to match Chapter I's own pull quote — same size, no decorative quote-mark, no attribution line underneath, since Chapter I's doesn't use either)
+
+[PAGE 14 · pages/chapter-2-threefold-purpose.html — built]
+[BODY]
+The purpose of the Reality Manual is therefore threefold: to reveal the objective of the game, to reveal the rules by which the game operates, and to reveal the optimal strategy that may be derived from an understanding of both. The present volume concerns itself principally with these foundational matters. The practical deployment of that strategy across the various domains of life shall be reserved for the second volume.
 [/BODY]
 [ILLUSTRATION https://realitymanual.com/assets/images/OptimalStrategyInfographicDigital.webp]
+[BODY]
+Most manuals concern themselves only with the first two tasks, explaining the objective and describing the rules while leaving the reader to determine strategy for himself.
+[/BODY]
 [/PAGE 14]
 
-[PAGE 15 · pages/chapter-2-objective-and-rules.html — built]
+[PAGE 15 · pages/chapter-2-the-rules-of-reality.html — built]
 [BODY]
-The objective defines what constitutes success, while the rules define the boundaries within which success must be pursued. Once these two elements are understood, strategy ceases to be a matter of speculation and becomes a matter of deduction.
-The purpose of the Reality Manual is therefore threefold: to reveal the objective of the game, to reveal the rules by which the game operates, and to reveal the optimal strategy that may be derived from an understanding of both. The present volume concerns itself principally with these foundational matters. The practical deployment of that strategy across the various domains of life shall be reserved for the second volume.
-Most manuals concern themselves only with the first two tasks, explaining the objective and describing the rules while leaving the reader to determine strategy for himself. This Manual relieves the reader of that burden by deriving the optimal strategy directly from the objective and the rules themselves. Having established that strategy, the second volume shall concern itself with its practical application throughout the ordinary circumstances of life.
-[/BODY]
-[/PAGE 15]
-
-[PAGE 16 · pages/chapter-2-first-volumes-task.html — built]
-[BODY]
+This Manual relieves the reader of that burden by deriving the optimal strategy directly from the objective and the rules themselves. Having established that strategy, the second volume shall concern itself with its practical application throughout the ordinary circumstances of life.
 Throughout the pages that follow, the rules of reality shall be revealed: the underlying principles that govern the structure of the playing field itself. These are the metaphysical principles which define the boundaries within which the player operates, determine which actions advance him toward victory, and establish the consequences attached to his conduct. Only once these principles have been understood can an optimal strategy be deduced with confidence.
 The objective of the game shall be presented in the forthcoming chapters, but not until the most foundational principle of reality has first been established. For without this foundation, the objective appears far less self-evident than it truly is, and the optimal strategy cannot be recognized for what it truly is. Once the objective, the rules, and the strategy derived from them have all been established, the first volume shall have completed its task. The second volume shall then concern itself with the practical question that naturally follows: how such a strategy is to be implemented within the realities of everyday life.
 [/BODY]
-[/PAGE 16]
+[/PAGE 15]
+(one sentence of the manuscript's own paragraph here — "Most manuals concern themselves ... determine strategy for himself. This Manual relieves ..." — is deliberately split mid-paragraph across PAGE 14 and PAGE 15: the first half fills out PAGE 14 next to its plate, the second half opens PAGE 15, which was otherwise sitting well under budget. See CLAUDE.md's word-budget note — mid-paragraph splits are fine when a page needs filling and the next natural paragraph break doesn't land soon enough.)
 
 [Chapters I-II above are built and live on /dev (dev/book.json). Chapter I is also promoted to the public book.json; Chapter II is not — it goes live only when told to promote it. See CLAUDE.md's "Public book vs. dev book" section.]

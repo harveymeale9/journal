@@ -204,7 +204,19 @@ export function render(){
   updateStacks(state.maxSpread > 0 ? state.spread / state.maxSpread : 0);
   if (document.activeElement !== el.jumpInput) el.jumpInput.value = state.spread*2 + 1;
   savePos(state.spread*2);   /* remember the (left) page of this spread */
-  preloadAround(state.pages, state.spread);
+  /* Deferred via setTimeout, not called inline: render() runs synchronously
+     inside page-turn.js's land() immediately after settleFromLeaf() has
+     just read and rewritten each animated element's currentTime — this
+     whole book (see settleFromLeaf's own comment above) depends on that
+     read-move-restore happening with nothing else interleaved in the same
+     tick. preloadAround() only touches page.html strings and off-DOM
+     Image() objects, never the animated elements themselves, but it does
+     real regex work across up to five pages right in that same tick;
+     pushing it to its own macrotask keeps render()'s critical path exactly
+     as cheap as it was before preloading existed, so there is no chance of
+     it being the thing that reintroduces the animation-restart bug this
+     file was already fixed for once. */
+  setTimeout(() => preloadAround(state.pages, state.spread), 0);
 }
 
 /* build the scrollable page stack once; CSS decides when it's shown.

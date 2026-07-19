@@ -165,6 +165,23 @@ python3 tools/check.py
 
 This catches: a slug in `order`/`drafts` with no matching file, a page file nobody lists (invisible), a slug listed twice, a slug in both `order` and `drafts`, a missing image or partial reference, leftover `${...}` template syntax, and a missing `.page-inner` wrapper. There is no other automated check in this repo — this script is it. `tools/check.py` validates **both** `book.json` and `dev/book.json` in one run, against the same shared `/pages`.
 
+`tools/check.py` cannot see any of the following — it checks structure, not fullness or layout. These four are things a human catches by looking at the rendered page, and Claude has caught wrong in the past (twice, on Chapter II) by skipping this pass. **Before considering any new page built, run through all four:**
+
+1. **Is it over budget / does it cut off?** For a plain `.chapter-continued` page (font `.028`, no image), **~210 words across 6 paragraphs is the confirmed ceiling** — this was found by an actual overflow: 204 words/6 paragraphs rendered fully, adding one more short paragraph (213 words/7 paragraphs) clipped the last line. The extra *paragraph* is what did it, not just the extra words — `.body-text p + p` (typography.css) adds `.85em` of gap after the first paragraph, so a 7th paragraph costs a full extra gap on top of its own text. **Stay at or under ~210 words AND 6 paragraphs on a plain page.** More content than that means a new page, not a 7th paragraph.
+2. **Is there a lot of empty space at the bottom?** Treat this as seriously as an overflow, not a lesser issue — a page sitting at 90-130 words with no image and no pull quote is under-filled and needs more text pulled onto it. Pull forward from the next page's paragraphs, in reading order. **Splitting a paragraph mid-sentence across the page boundary is fine** if the next natural paragraph break is too far away — do it rather than leave a gap.
+3. **Is every image couched in text — never the first or last element on the page?** Every `.plate-frame` (floated or not) needs real body text both above AND below it on the same page. The one exception is the chapter-opening full-bleed plate (`.chapter-bleed`) — title/entry-no sit below it by design, nothing above; that's a different, established convention, not a violation.
+4. **Is the plate sized safely, not just eyeballed?** Get the image's real pixel dimensions first — don't guess from the filename or a vague sense of "roughly square":
+   ```bash
+   python3 -c "
+   data = open('assets/images/X.webp','rb').read(60)
+   w = data[26] | ((data[27]&0x3f)<<8); h = data[28] | ((data[29]&0x3f)<<8)
+   print(w, h, w/h)
+   "
+   ```
+   (That's the common lossy-VP8 header layout; VP8X/VP8L differ — see this file's own commit history for the fuller parser if a webp doesn't match.) Then compute, don't guess: content column ≈ `0.78 * --page-w`; `.plate-frame` costs `0.09 * --page-w` in margin alone; a plate at width W% of that column with aspect ratio r (width/height) renders at height ≈ `W% * 0.78 * --page-w / r`. A page's remaining image budget is roughly `(210 - words_on_page) / 210` of the ~1.05×`--page-w` total content budget (running-head already excluded). Solve for W%, then **size noticeably under the computed maximum, not right at it** — 58-65% has been the safe range for a roughly-square plate sharing a page with 65-100 words of text; narrower still if the page carries more text than that.
+
+Pull quotes NOT on the chapter-opening page get body text before and after them too (a standalone quote-only page leaves too much bare parchment in this book) — style the quote itself with `.chapter-continued .pullquote` (pages.css: font `.029`, no `.q-mark`, no `.pullquote-attr`), matching Chapter I's actual pull quote exactly, not the louder base `.pullquote` size from docs/page-template.html's example, which was never actually used anywhere in the book before Chapter II and isn't canon just for being in the template file.
+
 ---
 
 ## Public book vs. dev book
