@@ -1,7 +1,21 @@
-<svg viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" font-family="serif">
+<svg class="sigil-root" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" font-family="serif">
   <defs>
+    <!-- Scoped to .sigil-root, NOT :root — this SVG is inlined directly
+         into a page's HTML ({{> svg/sigil.svg }}, loader.js), so its
+         <style> tag becomes a real, live <style> element in the document,
+         not something sandboxed to the SVG's own subtree. :root always
+         means the document root regardless of where the rule is
+         physically nested, so a :root{--ink:...} declared HERE overrode
+         css/tokens.css's own --ink globally, for every page, the moment
+         this SVG was in the DOM (which is always: main.js's
+         buildScrollBook() inlines every page — this one included — into
+         the DOM on every load, mobile or not). That's what turned the
+         whole book's body text a burgundy red. --ink/--bronze/--gold
+         are plain custom properties, not SVG presentation attributes, so
+         they inherit fine down to every .ink/.gold/.bronze* usage below
+         once declared on this root element instead. -->
     <style>
-      :root {
+      .sigil-root {
         --ink: #55211c;
         --bronze: #8a6a3a;
         --gold: #b9903f;
