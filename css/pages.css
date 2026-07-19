@@ -133,6 +133,13 @@
   font-size:calc(var(--page-w) * .029);
   line-height:1.4;
 }
+/* The .rule-orn pair bracketing a mid-chapter pull quote reuses the
+   CHAPTER-OPENING .rule-orn's own tighter margin/font-size too (same
+   reasoning as .pullquote just above) — left at the base .rule-orn
+   values (components.css: 1.1em margin, .024 font-size, sized for a
+   rule used as a general section break) it read with visibly more air
+   around it than Chapter I's own pull quote does. */
+.chapter-continued .rule-orn{ margin:.62em 0; font-size:calc(var(--page-w) * .018); }
 
 /* The book-wide default raster-plate treatment (.plate-frame, the
    "floating leaf of parchment" look) now lives in typography.css, next
