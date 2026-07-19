@@ -136,6 +136,15 @@ export function settleFromLeaf(id, leafFaceId){
   source.querySelectorAll('*').forEach(child => {
     child.getAnimations().forEach(anim => carried.push({ child, currentTime: anim.currentTime }));
   });
+  /* SMIL clocks (primeLeafFace's own comment explains why these need
+     separate handling from the getAnimations() loop above) read the
+     same way: capture before the move, in case reparenting resets a
+     time container in some engine even though it's a live-node move,
+     not a fresh parse. */
+  const carriedSmil = [];
+  source.querySelectorAll('svg').forEach(svg => {
+    if (typeof svg.getCurrentTime === 'function') carriedSmil.push({ svg, time: svg.getCurrentTime() });
+  });
 
   const stale = node.parentElement && node.parentElement.querySelector(':scope > .folio');
   if (stale) stale.remove();
@@ -146,6 +155,9 @@ export function settleFromLeaf(id, leafFaceId){
 
   carried.forEach(({ child, currentTime }) => {
     child.getAnimations().forEach(anim => { anim.currentTime = currentTime; });
+  });
+  carriedSmil.forEach(({ svg, time }) => {
+    if (typeof svg.setCurrentTime === 'function') svg.setCurrentTime(time);
   });
 
   /* the folio for this page was already lifted out of `source` into
@@ -192,6 +204,33 @@ export function primeLeafFace(sourceId, leafFaceId){
     if (!leafEl) return;
     const currentTime = anims[0].currentTime;
     leafEl.getAnimations().forEach(anim => { anim.currentTime = currentTime; });
+  });
+  primeSmilClocks(source, leafFace);
+}
+
+/* Everything above (and settleFromLeaf, below) carries CSS/Web-Animations
+   clocks via getAnimations() — but an inlined SVG partial built from
+   native SMIL (<animate>/<animateTransform>/<animateMotion>, no <style>
+   block, no CSS `animation` property — assets/svg/eye-orbiting-globe.svg
+   and assets/svg/sigil.svg are both like this) is invisible to
+   getAnimations() entirely; it only ever sees CSS Animations/Transitions
+   and WAAPI ones. That's a separate animation system with its own clock:
+   an <svg> root is a SMIL time container, readable/settable as a whole
+   via SVGSVGElement.getCurrentTime()/setCurrentTime() — the SMIL
+   equivalent of Animation.currentTime, just one clock for the whole
+   subtree rather than per-element. Matched positionally (querySelectorAll
+   ordering), same approach as the CSS loop above and for the same
+   reason: leafFace was just built from source's own HTML string, so both
+   trees have identical shape and the Nth <svg> in one is the Nth <svg>
+   in the other. */
+function primeSmilClocks(source, leafFace){
+  const sourceSvgs = source.querySelectorAll('svg');
+  const leafSvgs = leafFace.querySelectorAll('svg');
+  sourceSvgs.forEach((svg, i) => {
+    if (typeof svg.getCurrentTime !== 'function') return;
+    const leafSvg = leafSvgs[i];
+    if (!leafSvg || typeof leafSvg.setCurrentTime !== 'function') return;
+    leafSvg.setCurrentTime(svg.getCurrentTime());
   });
 }
 
