@@ -166,16 +166,16 @@ h2.entry-title{
    earlier, larger size let the middle clause ("the objective toward
    which successful participation is directed,") run past one line's
    width and spill "directed," onto an orphaned fourth line; a later
-   correction (.017) fixed that but ran noticeably too small. .0195 is
+   correction (.017, then .0195) fixed that but still read a bit
+   small. .0205 is a small further nudge up, still meant to stay under
    the computed near-threshold for the longest clause at this column
-   width, nudged fractionally under it rather than exactly on it.
-   Deliberately kept as three hard breaks rather than left to wrap on
-   its own: that's what guarantees exactly three lines regardless of
-   viewport, rather than trusting natural reflow not to overrun by a
-   word at some width. */
+   width. Deliberately kept as three hard breaks rather than left to
+   wrap on its own: that's what guarantees exactly three lines
+   regardless of viewport, rather than trusting natural reflow not to
+   overrun by a word at some width. */
 .title-page .tp-edition{
   font-family:'Cormorant Garamond', serif; font-style:italic;
-  font-size:calc(var(--page-w) * .0195); color:var(--ink-faint); line-height:1.7;
+  font-size:calc(var(--page-w) * .0205); color:var(--ink-faint); line-height:1.7;
   width:60%; margin:0 auto;
 }
 
