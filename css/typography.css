@@ -102,6 +102,13 @@ h2.entry-title{
   line-height:1.62;
   text-align:justify;
   hyphens:auto;
+  /* explicit, not left to inherit from .page-inner (book.css) — reported
+     rendering as a burgundy/rubric tone rather than ink; couldn't find a
+     rule anywhere in this codebase that would cause that (verified: no
+     other selector touches .body-text's color, and --ink itself has never
+     changed in the project's history), but pinning it here removes any
+     possible ambiguity regardless of the actual cause. */
+  color:var(--ink);
 }
 /* Convention: paragraphs are never indented. A new paragraph is marked by
    a real vertical gap instead, so every paragraph starts and ends at the
@@ -142,6 +149,9 @@ h2.entry-title{
   font-family:'IM Fell English SC', serif; font-weight:400;
   font-size:calc(var(--page-w) * .091); letter-spacing:.14em;
   margin:.7em 0 .3em; line-height:1.2;
+  /* explicit, not left to inherit from .page-inner (book.css) — same
+     reasoning as .body-text's own explicit color just above. */
+  color:var(--ink);
 }
 /* the "Volume I: First Principles" subtitle beneath the h1 — same
    small-caps face and tracked-out treatment as .entry-no, and the

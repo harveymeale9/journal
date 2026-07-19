@@ -132,6 +132,14 @@
 .chapter-continued .pullquote{
   font-size:calc(var(--page-w) * .029);
   line-height:1.4;
+  /* base .pullquote (components.css) carries its own margin:1.2em 0 .4em
+     — left in place, that stacked with the surrounding .rule-orn's own
+     margin below (flex items don't margin-collapse: book.css, .page-inner
+     is display:flex), producing a visibly bigger gap than Chapter I's
+     opening pull quote has. Chapter I's own .chapter-opening .pullquote
+     (pages.css) zeroes this for the same reason — spacing there comes
+     entirely from the rule-orn pair, not the quote's own margin. */
+  margin:0;
 }
 /* The .rule-orn pair bracketing a mid-chapter pull quote reuses the
    CHAPTER-OPENING .rule-orn's own tighter margin/font-size too (same
