@@ -48,12 +48,19 @@ function numberFolios(pages){
    whoever opens the file, not something to ship into the DOM. */
 const stripNote = (s) => s.replace(/^\s*<!--[\s\S]*?-->\s*/, '');
 
-export async function loadBook(){
+/* bookPath: which running order to load — "/book.json" (the public
+   book) or "/dev/book.json" (the working copy, ahead of it, chosen by
+   main.js off location.pathname). Both are always root-relative:
+   with <base href="/"> in effect (index.html), a bare "book.json"
+   here would only ever resolve to the PUBLIC book even when this
+   loader is running inside /dev/index.html, since fetch() resolves a
+   relative URL against the document's base, not its own caller. */
+export async function loadBook(bookPath){
   /* no-store, not just no-cache — while caching is fully off (see
      index.html's <head> note), skip the HTTP cache outright rather than
      merely revalidating against it */
-  const res = await fetch('book.json', { cache: 'no-store' });
-  if (!res.ok) throw new Error('book.json could not be read');
+  const res = await fetch(bookPath, { cache: 'no-store' });
+  if (!res.ok) throw new Error(`${bookPath} could not be read`);
   const book = await res.json();
 
   const order = book.order || [];

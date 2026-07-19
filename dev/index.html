@@ -5,17 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Reality Manual — Digital Grimoire</title>
 
-<!-- Every relative path in this book (this file's own CSS links and
-     module bootstrap below, loader.js's fetch()es of book.json/pages/
-     assets, and every <img src="assets/..."> inside a page fragment
-     injected via innerHTML at render time) is written relative to the
-     SITE ROOT, not to whichever HTML document happens to load it —
-     the same /pages, /css, /js, /assets are shared between this file
-     and /dev/index.html, which serves the same book with a longer,
-     not-yet-public running order (dev/book.json). Without this tag, a
-     page fetched or an image inserted while /dev/index.html is the
-     active document would resolve "assets/x.webp" as "/dev/assets/
-     x.webp" and 404 — <base> pins resolution to "/" for both. -->
+<!-- This file is an intentional duplicate of the root /index.html, not
+     a fork of it — same markup, same scripts, same shared /pages,
+     /css, /js, /assets. The ONLY thing that makes this "the dev
+     book" is js/main.js reading location.pathname and fetching
+     /dev/book.json instead of /book.json; everything else here must
+     stay identical to the root copy, including <base href="/">
+     itself (see its own comment there for why it's required). If you
+     edit one of these two files, mirror the edit into the other. -->
 <base href="/">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">

@@ -75,10 +75,16 @@ initFullscreen();
 /* no reason for a reader to right-click their way into "Inspect" */
 document.addEventListener('contextmenu', e => e.preventDefault());
 
+/* /dev serves the SAME index.html (this file included) as the public
+   site — it's the running order that differs, not the code — so the
+   only place "which book" is decided is here, off the URL, rather
+   than by /dev having its own copy of anything. */
+const bookPath = location.pathname.startsWith('/dev') ? '/dev/book.json' : '/book.json';
+
 (async function open(){
   try{
     cacheDom();
-    const { title, pages } = await loadBook();
+    const { title, pages } = await loadBook(bookPath);
 
     state.pages = pages;
     state.maxSpread = Math.ceil(pages.length / 2) - 1;

@@ -163,7 +163,19 @@ After editing `book.json` or any page file, validate before committing:
 python3 tools/check.py
 ```
 
-This catches: a slug in `order`/`drafts` with no matching file, a page file nobody lists (invisible), a slug listed twice, a slug in both `order` and `drafts`, a missing image or partial reference, leftover `${...}` template syntax, and a missing `.page-inner` wrapper. There is no other automated check in this repo — this script is it.
+This catches: a slug in `order`/`drafts` with no matching file, a page file nobody lists (invisible), a slug listed twice, a slug in both `order` and `drafts`, a missing image or partial reference, leftover `${...}` template syntax, and a missing `.page-inner` wrapper. There is no other automated check in this repo — this script is it. `tools/check.py` validates **both** `book.json` and `dev/book.json` in one run, against the same shared `/pages`.
+
+---
+
+## Public book vs. dev book
+
+There are two running orders sharing one `/pages` directory: **`book.json`** (served at `/`, the public, locked-down book) and **`dev/book.json`** (served at `/dev`, where new chapters get drafted, reordered, and checked before anyone outside the project sees them).
+
+- Both are read by the exact same code (`index.html`, `dev/index.html`, and every file in `/js` and `/css` are shared) — `js/main.js` is the only place that decides which `book.json` to fetch, based on whether `location.pathname` starts with `/dev`.
+- **New/unfinished chapter work goes into `dev/book.json`'s `order` only.** Create the page file in `/pages` as usual, then add its slug to `dev/book.json` — it appears on `/dev` and nowhere else.
+- **Never add a slug to the public `book.json` unless told to.** Moving a chapter from dev to public ("promoting" it) means copying its slug(s) from `dev/book.json`'s `order` into `book.json`'s `order`, in the right spot — a deliberate, explicit action taken only when instructed, not a side effect of other work.
+- `dev/book.json` should always be a superset of (or equal to) `book.json` — it's fine for dev to be ahead, never for public to contain something dev doesn't.
+- `index.html` and `dev/index.html` must stay identical apart from nothing — literally the same markup, same `<base href="/">` (this is what makes every relative `fetch()`/`src=` in a shared page fragment resolve correctly regardless of which of the two loaded it). If you edit one, mirror the edit into the other in the same change.
 
 ---
 
