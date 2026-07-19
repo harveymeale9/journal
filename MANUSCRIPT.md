@@ -51,6 +51,7 @@ https://realitymanual.com/assets/images/AlchemicalBookIllustrationDigital.webp
 The Reality Manual concerns itself only with that which is universal.
 It was written to be timeless, yet also practical and immediately applicable to the experience of everyday life. Its concern is not with the customs, beliefs, or circumstances of any particular culture, nation, religion, or historical period, but with those aspects of reality that remain true for every human being, in every place, at every time.
 Every principle contained within these pages is intended to be useful to any individual who happens to find themselves incarnate in this physical reality. Its purpose is to help the reader understand the nature of the game in which they find themselves, the objective they are here to accomplish, and the optimal strategy for doing so.
+This first volume concerns itself primarily with foundations. It establishes the first principles which govern reality, reveals the objective toward which successful participation in reality is directed, and derives from those principles the optimal strategy by which the game ought to be played.
 [/BODY]
 
 [INLINE IMAGE]
@@ -81,6 +82,8 @@ Having established the objective, it then supplies the reader with the optimal s
 The result is something far more valuable than a collection of ideas.
 It is a personal philosophy. A coherent way of acting inside reality on a daily basis. A way of showing up in the world that can be carried into every decision, every challenge, every relationship, and every moment for the remainder of one's life.
 And it is precisely here that the true value of the Reality Manual begins to reveal itself.
+For this volume is concerned not merely with what reality is, but with how reality works. It seeks to provide the reader with the map, the rules of the game, and the strategic principles from which intelligent action may be derived.
+The Manual's second volume, yet to be published, concerns itself with the application of those principles. Where this volume establishes the strategy, the second demonstrates its use. Where this volume explains the game, the second explores the countless situations in which that understanding may be employed. It examines the practical problems, dilemmas, uncertainties, and decisions that confront every human being and demonstrates how an individual equipped with the Manual's principles is able to navigate them with clarity.
 Most people accept suffering as an unavoidable feature of existence.
 The Manual does not.
 It advances a different proposition: that suffering is not an intrinsic property of reality, but a consequence of ignorance regarding the nature of reality itself. That ignorance generates confusion, that confusion generates a sense of futility, and that futility is the source of all human suffering.
