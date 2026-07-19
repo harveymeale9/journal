@@ -53,8 +53,15 @@ header.site h1{
   letter-spacing:.35em;
   text-indent:.35em;
   color:var(--brass);
-  transition:opacity .35s ease;
+  opacity:0;
+  transition:opacity .7s ease;
 }
+/* fades in together with .book-wrap/.scroll-book (book.css) and .candle
+   (below) — all three gated by the same body.ready flip and duration.
+   Must sit before the fs-mode rule further down: same specificity
+   (body.X header.site h1), so source order is what lets fs-mode's
+   opacity:0 still win once both classes are on body at once. */
+body.ready header.site h1{ opacity:1; }
 header.site p{
   font-style:italic;
   font-size:.78rem;
@@ -94,6 +101,35 @@ header.site p{
   transition:color .2s, border-color .2s;
 }
 .fs-toggle:hover, .fs-toggle:focus-visible{ color:var(--paper); border-color:var(--paper); }
+
+/* ============ LOADING INDICATOR ============
+   Shown dead centre of the true viewport (position:fixed, like .jump —
+   see index.html's own note on why fixed elements must live outside
+   .book-wrap's perspective) while the book fetches and fonts settle.
+   Same face as .fs-toggle just above, for the same reason: chrome, not
+   book typography. Fades out the instant body.ready lands (same flip
+   that fades the book/candle/title IN, book.css), so the two states
+   never overlap on screen. */
+.loading-indicator{
+  position:fixed;
+  top:50%; left:50%;
+  transform:translate(-50%, -50%);
+  z-index:55;
+  font-family:'IM Fell English SC', Georgia, serif;
+  font-size:clamp(.85rem, .65rem + .5vw, 1.3rem);
+  letter-spacing:.15em;
+  text-indent:.15em;
+  color:var(--brass);
+  pointer-events:none;
+  transition:opacity .5s ease;
+}
+body.ready .loading-indicator{ opacity:0; }
+.loading-indicator .dot{
+  display:inline-block;
+  animation:dot-pulse 1.4s ease-in-out infinite;
+}
+.loading-indicator .dot:nth-child(2){ animation-delay:.2s; }
+.loading-indicator .dot:nth-child(3){ animation-delay:.4s; }
 
 /* the title fades AND the header shrinks to a deliberate band in fs-mode.
    Fading alone isn't enough: opacity doesn't remove an element from flow,
@@ -191,7 +227,13 @@ body.fs-mode header.site{
   pointer-events:none;   /* the gutter is a page-turn button; keep it clickable */
   z-index:1;
   container-type:inline-size;   /* lets the query below read the true gutter width */
+  /* fades in with the book and title (body.ready, book.css) rather than
+     painting immediately on page load — plain markup with no load gate
+     of its own otherwise beats them both onto the screen. */
+  opacity:0;
+  transition:opacity .7s ease;
 }
+body.ready .candle{ opacity:1; }
 /* Fullscreen drops the candle outright rather than repositioning it — the
    book is centred and grown to fill the screen instead (tokens.css), which
    leaves no gutter worth standing furniture in even on the left alone. */

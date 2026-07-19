@@ -7,6 +7,11 @@
   0%,100%{opacity:.85} 40%{opacity:1} 60%{opacity:.75} 80%{opacity:.95}
 }
 
+/* ---- loading indicator dots (base.css: .loading-indicator .dot) ----
+   Staggered by animation-delay on each dot, not three separate
+   keyframes: one wave, three offsets. */
+@keyframes dot-pulse{ 0%,80%,100%{opacity:.25} 40%{opacity:1} }
+
 /* ---- the candle on the desk (classes in base.css) ----
    A real flame is mostly steady and occasionally guts. So this is NOT a
    loop of constant wobble: 0-24% and 38-64% are near-still, and the motion

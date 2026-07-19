@@ -4,8 +4,12 @@
    ========================================================== */
 
 /* ============ THE BOOK ============ */
-/* the book reveals as one piece once fonts and layout are ready,
-   so no element (gutter, shadows, type) pops in after the rest */
+/* the book reveals as one piece once fonts and layout are ready, so no
+   element (gutter, shadows, type) pops in after the rest — the candle
+   (base.css) and the page title (base.css, header.site h1) ride this
+   exact same body.ready flip and .7s duration so all three fade in
+   together instead of the candle (plain markup, no load gate of its
+   own) painting first. */
 .book-wrap, .scroll-book{ opacity:0; transition:opacity .7s ease; }
 body.ready .book-wrap, body.ready .scroll-book{ opacity:1; }
 

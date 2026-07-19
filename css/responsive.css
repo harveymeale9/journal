@@ -122,4 +122,7 @@
   /* the candlelight wash (typography.css: .plate-frame::after) — same
      treatment as .glow itself just above */
   .plate-frame::after{ animation:none !important; }
+  /* the loading dots stop pulsing but stay visible at full strength,
+     same "still lit, not still moving" treatment as the candle flame */
+  .loading-indicator .dot{ animation:none !important; opacity:1; }
 }

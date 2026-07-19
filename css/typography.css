@@ -127,21 +127,42 @@ h2.entry-title{
 
 .xref{ font-variant:small-caps; letter-spacing:.06em; color:var(--rubric); font-style:normal; }
 
-/* title page */
+/* title page — sized up ~30% across the board from the original pass
+   (h1 .07->.091, tp-edition .029->.038 etc.) so the page reads as a
+   fuller title leaf rather than a small block adrift in a lot of
+   parchment. tp-small got more than its share of that bump on top —
+   at the old .0155 it was flagged as genuinely hard to read, not just
+   small by design. */
 .title-page{ text-align:center; justify-content:center; }
 .title-page .tp-small{
-  font-family:'IM Fell English SC', serif; font-size:calc(var(--page-w) * .0155);
+  font-family:'IM Fell English SC', serif; font-size:calc(var(--page-w) * .026);
   letter-spacing:.4em; text-indent:.4em; color:var(--ink-faint);
 }
 .title-page h1{
   font-family:'IM Fell English SC', serif; font-weight:400;
-  font-size:calc(var(--page-w) * .07); letter-spacing:.14em;
+  font-size:calc(var(--page-w) * .091); letter-spacing:.14em;
   margin:.7em 0 .3em; line-height:1.2;
 }
-.title-page .tp-rule{ color:var(--brass); margin:1em 0; letter-spacing:.5em; text-indent:.5em; }
+/* the "Volume I: First Principles" subtitle beneath the h1 — same
+   small-caps face and tracked-out treatment as .entry-no, but sized
+   for a subtitle's weight relative to the h1 above it, and in brass
+   to tie visually into .tp-rule just below. */
+.title-page .tp-volume{
+  font-family:'IM Fell English SC', serif;
+  font-size:calc(var(--page-w) * .034); letter-spacing:.25em; text-indent:.25em;
+  color:var(--brass); margin-bottom:.3em;
+}
+/* font-size was previously unset here, so its 1em margin resolved
+   against the browser's fixed default rather than the page — the
+   exact bug described in CLAUDE.md's page-w-relative-sizing note,
+   just never visible until the type around it got bigger. */
+.title-page .tp-rule{
+  font-size:calc(var(--page-w) * .034); color:var(--brass);
+  margin:1em 0; letter-spacing:.5em; text-indent:.5em;
+}
 .title-page .tp-edition{
   font-family:'Cormorant Garamond', serif; font-style:italic;
-  font-size:calc(var(--page-w) * .029); color:var(--ink-faint); line-height:1.7;
+  font-size:calc(var(--page-w) * .038); color:var(--ink-faint); line-height:1.7;
 }
 
 /* contents */
