@@ -274,6 +274,13 @@ it had to be remembered and re-applied by hand every time a page's caption was
 added or removed, and it drifted on a real page as a result. Nothing to choose
 here any more: add or remove a `.plate-caption`, the spacing follows on its own.
 
+A captioned plate's margin is also **asymmetric**, not just tighter: less than a
+standalone plate on both sides, but not equally so. Top (`.025 × --page-w`) stays
+noticeably more open than bottom (`.012 × --page-w`) — the caption sits close to
+what it captions (that gap wants to stay tight), but the plate itself still wants
+a beat of separation from the prose above it, which the original equal-tight
+version didn't give it and read as cramped.
+
 A bare `<img class="plate-img">` with **no** `.plate-frame` wrapper still exists —
 flat, `mix-blend-mode:multiply`, printed straight into the parchment, no torn
 edge or glow. That's the exception now, not the default: reach for it only when a

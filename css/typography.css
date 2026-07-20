@@ -233,8 +233,18 @@ h2.entry-title{
   display:block;
   flex:none;
 }
+/* Captioned plates get LESS top/bottom margin than a standalone plate
+   (.045 above) — the caption itself already reads as the page's own
+   "this is a unit" framing, so the plate doesn't need as much air around
+   it as one sitting bare between paragraphs. But not as tight as the
+   original .012 either: that made the TOP gap (between the preceding
+   paragraph and the plate) read as too cramped, even though the same
+   .012 on the BOTTOM (between the plate and its caption) was correct —
+   a caption belongs close to what it's captioning, but the plate itself
+   still wants a beat of separation from the prose above it. Asymmetric
+   on purpose: more air above, the original tight spacing below. */
 .plate:has(+ .plate-caption){
-  margin:calc(var(--page-w) * .012) auto;
+  margin:calc(var(--page-w) * .025) auto calc(var(--page-w) * .012);
 }
 /* raster plates (AI-painted illustrations): multiply blend prints them
    into the parchment rather than pasting them onto it. Margin: see
@@ -278,8 +288,13 @@ h2.entry-title{
   display:block;
   margin:calc(var(--page-w) * .045) auto;
 }
+/* Same asymmetric-margin reasoning as .plate:has(+ .plate-caption) just
+   above (typography.css §9's vector-plate rule) — more air above the
+   plate than below it, since the caption sits close to what it
+   captions but the plate itself still wants separation from the prose
+   before it. */
 .plate-frame:has(+ .plate-caption){
-  margin:calc(var(--page-w) * .012) auto;
+  margin:calc(var(--page-w) * .025) auto calc(var(--page-w) * .012);
 }
 /* Waviness on all four sides — traced clockwise from the top-left: top
    edge, right edge, bottom edge (right to left), left edge (bottom to
