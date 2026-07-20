@@ -189,7 +189,7 @@ The purpose of the Reality Manual is therefore threefold: to reveal the objectiv
 The present volume concerns itself principally with these foundational matters. The practical deployment of that strategy across the various domains of life shall be reserved for the second volume.
 [/BODY]
 [/PAGE 14]
-(the infographic briefly lived on its own dedicated page (see PAGE 14.5's retirement note below) but was asked to move back here instead, directly under the "...understanding of both." paragraph, with "The present volume..." moved to sit beneath it rather than above — per explicit request. That reunites this page's full original prose (107w/3p) around the plate. Went through two widths: 52% first (computed conservatively, "size noticeably under the max"), then called out as visibly too small against a screenshot showing real headroom at the bottom — resized to 58%, the actual computed max given this page's 107 words, not a cautious step below it. New standing rule from this: solve for the true max width and USE it, don't default to under-sizing "for safety" — see CLAUDE.md's per-page checklist, updated to match.)
+(the infographic briefly lived on its own dedicated page (see PAGE 14.5's retirement note below) but was asked to move back here instead, directly under the "...understanding of both." paragraph, with "The present volume..." moved to sit beneath it rather than above — per explicit request. That reunites this page's full original prose (107w/3p) around the plate. Went through three widths: 52% (computed conservatively, "size noticeably under the max") -> 58% (the formula's actual computed max) -> 73%, called out AGAIN as too small against a two-page spread screenshot showing real headroom below the last paragraph. This last resize used the screenshot's own proportions directly (image height vs. the visible gap above the folio), not the word/image-budget formula — the formula and the real render have now disagreed enough times this chapter that the screenshot wins by default whenever one is available. Not re-verified beyond that single screenshot.)
 
 [PAGE 14.5 · pages/chapter-2-relieving-the-reader.html — built]
 [BODY]
@@ -197,17 +197,18 @@ Most manuals concern themselves only with the first two tasks, explaining the ob
 This Manual relieves the reader of that burden by deriving the optimal strategy directly from the objective and the rules themselves.
 Having established that strategy, the second volume shall concern itself with its practical application throughout the ordinary circumstances of life.
 Throughout the pages that follow, the rules of reality shall be revealed: the underlying principles that govern the structure of the playing field itself. These are the metaphysical principles which define the boundaries within which the player operates, determine which actions advance him toward victory, and establish the consequences attached to his conduct. Only once these principles have been understood can an optimal strategy be deduced with confidence.
+The objective of the game shall be presented in the forthcoming chapters, but not until the most foundational principle of reality has first been established.
 [/BODY]
 [/PAGE 14.5]
-(this page used to be pages/chapter-2-deriving-the-optimal-strategy.html and carried the infographic itself — now retired/renamed to chapter-2-relieving-the-reader.html. At 47w/2p (just the two paragraphs that used to follow the plate) it read as "completely empty almost" per the user's own screenshot, so the next two paragraphs from PAGE 15 ("Having established..." and "Throughout the pages...") moved forward onto it — 135w/4p now, a normal-looking page. No image on this page.)
+(this page used to be pages/chapter-2-deriving-the-optimal-strategy.html and carried the infographic itself — now retired/renamed to chapter-2-relieving-the-reader.html. Even after pulling PAGE 15's first two paragraphs forward last pass (135w/4p), the same two-page-spread screenshot showed this page STILL visibly lighter than its facing page, with real space left above the folio. Pulled the first sentence of what was PAGE 15's opening paragraph ("The objective of the game shall be presented... first been established.") forward too — 160w/5p now.)
 
 [PAGE 15 · pages/chapter-2-the-rules-of-reality.html — built]
 [BODY]
-The objective of the game shall be presented in the forthcoming chapters, but not until the most foundational principle of reality has first been established. For without this foundation, the objective appears far less self-evident than it truly is, and the optimal strategy cannot be recognized for what it truly is.
+For without this foundation, the objective appears far less self-evident than it truly is, and the optimal strategy cannot be recognized for what it truly is.
 Once the objective, the rules, and the strategy derived from them have all been established, the first volume shall have completed its task. The second volume shall then concern itself with the practical question that naturally follows: how such a strategy is to be implemented within the realities of everyday life.
 [/BODY]
 [/PAGE 15]
-(lost its first two paragraphs to PAGE 14.5 per the note above — 102w/2p now, lighter than most pages in this chapter but a large improvement over PAGE 14.5's prior 47w, and not so light it reads as empty on its own. Last page in the chapter's current run, so this is also the natural stopping point for this rebalance — nothing further to push forward into.)
+(lost its opening sentence to PAGE 14.5 on top of the two paragraphs it lost last pass — 77w/2p now, quite light, but this is the last page in the chapter's current run with nothing further to push into, and a light final page is a smaller problem than a visibly half-empty one two pages running.)
 
 Running-head note: page count and positions are unchanged from the last pass (still 19 dev pages) — PAGE 14 and PAGE 14.5 swapped which content they hold, not their position in the order, so no running-head parity changes this time.
 
