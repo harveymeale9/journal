@@ -212,4 +212,4 @@ Once the objective, the rules, and the strategy derived from them have all been 
 
 Running-head note: page count and positions are unchanged from the last pass (still 19 dev pages) — PAGE 14 and PAGE 14.5 swapped which content they hold, not their position in the order, so no running-head parity changes this time.
 
-[Chapters I-II above are built and live on /dev (dev/book.json). Chapter I is also promoted to the public book.json; Chapter II is not — it goes live only when told to promote it. See CLAUDE.md's "Public book vs. dev book" section.]
+[Chapters I-II above are built and live on both /dev (dev/book.json) and the public book.json — Chapter II was promoted to public per explicit request, alongside afterword-more-to-come as the book's closing page (20th). dev/book.json and book.json now share the same "contents" page (contents-dev.html retired, no longer needed now that both books show Chapter II as live) and the same full running order. See CLAUDE.md's "Public book vs. dev book" section.]
