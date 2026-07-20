@@ -167,38 +167,39 @@ Once this conclusion has been reached, he who has a taste for that which is most
 [BODY]
 There is only a single answer to this question.
 [/BODY]
-[PULLQUOTE]
+[ILLUSTRATION https://realitymanual.com/assets/images/ProbabiltiyOfVictoryDigital.webp]
+[CAPTION]
 One's probability of winning any game is a function of the effectiveness of the strategy one employs.
-[/PULLQUOTE]
+[/CAPTION]
 [BODY]
 Naturally, the most effective strategy can only be described as the optimal strategy.
 The curious player then asks a further question: How might one go about developing the most optimal strategy for the game of life?
 The answer is remarkably simple. Only two pieces of information must be known before an optimal strategy can be derived: the objective of the game and the rules which govern it.
 The objective defines what constitutes success, while the rules define the boundaries within which success must be pursued. Once these two elements are understood, strategy ceases to be a matter of speculation and becomes a matter of deduction.
-The purpose of the Reality Manual is therefore threefold: to reveal the objective of the game, to reveal the rules by which the game operates, and to reveal the optimal strategy that may be derived from an understanding of both.
-The present volume concerns itself principally with these foundational matters.
 [/BODY]
 [/PAGE 13]
-(this is no longer a quote-only page — a standalone pull-quote page in this book left too much empty parchment below it, so it now carries lead-in and follow-on body text like every other page. The quote itself is styled to match Chapter I's own pull quote — same size, no decorative quote-mark, no attribution line underneath, since Chapter I's doesn't use either. Even after the p12-15 rebalance below, this page still rendered with a large empty gap at the bottom — 154w/6p turned out to be well short of what the page could actually hold, pull quote and rule-orns included. Pulled just the first sentence of PAGE 14's opening paragraph ("The present volume concerns itself principally with these foundational matters.") onto the end of this page as its own paragraph, per the sentence-level (not whole-paragraph) filling rule in CLAUDE.md.)
+(the pull quote that used to live here — styled to match Chapter I's own, no decorative quote-mark, no attribution — is retired. Replaced with the P(Victory) = f(E_s) illuminated banner plate, and the quote itself demoted to that plate's caption, per explicit request; same raster-plate/plate-caption treatment as the Venn diagram on PAGE 11. Losing the compact rule-orn/pullquote block in favor of a full plate is a big net gain in vertical cost, so this triggered a full reflow of PAGE 13-15's whole shared word pool (250 words: this page's PAGE-13 prose plus PAGE 14's) rather than a same-page fix — see the note after PAGE 15.)
 
 [PAGE 14 · pages/chapter-2-threefold-purpose.html — built]
 [BODY]
-The practical deployment of that strategy across the various domains of life shall be reserved for the second volume.
+The purpose of the Reality Manual is therefore threefold: to reveal the objective of the game, to reveal the rules by which the game operates, and to reveal the optimal strategy that may be derived from an understanding of both.
+The present volume concerns itself principally with these foundational matters. The practical deployment of that strategy across the various domains of life shall be reserved for the second volume.
 [/BODY]
 [ILLUSTRATION https://realitymanual.com/assets/images/OptimalStrategyInfographicDigital.webp]
 [BODY]
 Most manuals concern themselves only with the first two tasks, explaining the objective and describing the rules while leaving the reader to determine strategy for himself.
-This Manual relieves the reader of that burden by deriving the optimal strategy directly from the objective and the rules themselves. Having established that strategy, the second volume shall concern itself with its practical application throughout the ordinary circumstances of life.
+This Manual relieves the reader of that burden by deriving the optimal strategy directly from the objective and the rules themselves.
 [/BODY]
 [/PAGE 14]
-(losing its first sentence to PAGE 13 left this page with only 86 words against its infographic's original 58% width — noticeably text-light. Widened the plate to 68% rather than pulling PAGE 15's first sentence forward too, since PAGE 15's own budget (170w/2p) leaves too little margin to donate a sentence without risking overflow there next — sizing the image up instead is the correct lever per CLAUDE.md's §6 note on text-light pages after a cascade.)
+(the "present volume / practical deployment" paragraph is reunited here as it originally stood — the earlier PAGE 13/14 sentence-split that separated it is no longer needed now that PAGE 13 has its own plate to fill the page. "Having established that strategy, the second volume shall concern itself with its practical application throughout the ordinary circumstances of life." — the second sentence of what used to close this page — moved on to PAGE 15 instead; see the note below for why.)
 
 [PAGE 15 · pages/chapter-2-the-rules-of-reality.html — built]
 [BODY]
+Having established that strategy, the second volume shall concern itself with its practical application throughout the ordinary circumstances of life.
 Throughout the pages that follow, the rules of reality shall be revealed: the underlying principles that govern the structure of the playing field itself. These are the metaphysical principles which define the boundaries within which the player operates, determine which actions advance him toward victory, and establish the consequences attached to his conduct. Only once these principles have been understood can an optimal strategy be deduced with confidence.
 The objective of the game shall be presented in the forthcoming chapters, but not until the most foundational principle of reality has first been established. For without this foundation, the objective appears far less self-evident than it truly is, and the optimal strategy cannot be recognized for what it truly is. Once the objective, the rules, and the strategy derived from them have all been established, the first volume shall have completed its task. The second volume shall then concern itself with the practical question that naturally follows: how such a strategy is to be implemented within the realities of everyday life.
 [/BODY]
 [/PAGE 15]
-(pages 12-15 were rebalanced as a group: p12 was full (210w/6p, at the confirmed-safe ceiling), p13 (the pull quote page) still had a lot of visible slack even after the first fix, and p14 had a large empty gap at the bottom while p15 sat packed right at the ceiling with nothing pulled forward from it despite having room to give. Moved "The purpose of the Reality Manual is therefore threefold..." (first sentence only) from p14 onto the end of p13, and p15's first paragraph ("This Manual relieves the reader...") onto the end of p14, after its plate. Net: p13 154w/6p, p14 96w/3p, p15 170w/2p — none at the exact edge, none with a large visible gap, image on p14 left at its original 58% width since text (not a bigger plate) was the right lever this time.)
+(PAGE 13-15 reflowed as one pool once the pull quote became a full plate: PAGE 13 keeps its first sentence plus PAGE 12's original four "Naturally... deduction" paragraphs whole (114w/5p) against its new plate at 53% width. PAGE 14 gets the "purpose is threefold" and reunited "present volume/practical deployment" paragraphs back in front of its own infographic — now sized down to 47% (from 68%) since this page carries more surrounding text than before (116w/4p) and a wide plate no longer fits alongside it. The infographic's second follow-on sentence ("Having established that strategy...") moved on to PAGE 15 to keep PAGE 14 inside budget; PAGE 15 had ample room to receive it (190w/3p, well clear of the 210-word ceiling). All three land in the 90-97% fill range with no page at the exact edge — sized by the same word/image-budget formula as every other plate in this chapter, not verified against an actual render this session.)
 
 [Chapters I-II above are built and live on /dev (dev/book.json). Chapter I is also promoted to the public book.json; Chapter II is not — it goes live only when told to promote it. See CLAUDE.md's "Public book vs. dev book" section.]
