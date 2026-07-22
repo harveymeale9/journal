@@ -14,6 +14,19 @@ below reflect book.json as of 2026-07-22 — re-derive them from book.json's ord
 after any reorder/promotion before trusting a number here for a new script. Per explicit
 instruction, this whole exercise only needs to track the LIVE public book (book.json),
 not /dev — dev and public currently carry the identical order for Chapters I-II anyway.
+Numbering rule (js/loader.js, numberFolios()): folio N = 1-based position of a slug in
+book.json's "order" array, straight through, front matter included, no exclusions — this
+was confirmed both by reading that source directly and by fetching the actual deployed
+book.json (https://harveymeale9.github.io/RealityManual/book.json) on 2026-07-22, which
+was byte-identical in "order" to the repo's book.json at that time. It also matches
+pages/contents.html's own hardcoded folio numbers (4 for Ch. I, 13 for Ch. II). If a
+number in this file ever looks wrong against what you see on-screen, re-check book.json's
+CURRENT order first — it's the single source of truth these numbers are derived from —
+before assuming the note is stale.
+Chapter-opening full-bleed plates (Chapter1IllustrationDigitral.webp,
+Chapter2IllustrationDigital.webp, and any later chapter's own opening plate) are
+deliberately NOT annotated in detail below — atmosphere only, never used to explain a
+concept, per explicit instruction.
 A "STAGED / NOT YET PLACED" section at the end of this file covers image assets that
 exist under assets/images and assets/svg but aren't in any built page yet (Chapter III
 material) — no live page number is possible for those until they're placed.
@@ -26,19 +39,9 @@ material) — no live page number is possible for those until they're placed.
 http://realitymanual.com/assets/images/Chapter1IllustrationDigitral.webp
 [/PLATE]
 [CLAUDE NOTES]
-Image: Chapter1IllustrationDigitral.webp — LIVE PAGE 4, chapter-opening full-bleed plate.
-Type: atmosphere/character illustration (no diagram, no text/labels).
-Depicts: a hooded, cloaked scholar seen from behind/above, hunched over a massive open
-handwritten grimoire on a cluttered desk, lit by a single candle. Surrounding clutter:
-shelves of old bound books, an astrolabe/orrery, glass alchemical vials, spectacles, a
-magnifying glass, loose annotated papers, a stone fireplace burning in the background.
-Warm chiaroscuro, ink-and-wash "occult manuscript" rendering style.
-Explains/sets up: this is the book's cold open — establishes the Manual itself as an
-ancient, serious object of study, and casts the reader into the role of the hooded
-scholar poring over hidden knowledge by candlelight.
-Larger concept: the book-as-grimoire framing that recurs everywhere in Chapter I/II —
-"a text that establishes a clear, practical, satisfactory answer" studied like an
-alchemical secret. Good cold-open visual for any reel introducing what the Manual is.
+Image: Chapter1IllustrationDigitral.webp — LIVE PAGE 4, chapter-opening full-bleed plate
+(atmosphere only, not used to explain anything — skipped per explicit instruction; see
+all other chapter-opening plates too).
 [/CLAUDE NOTES]
 [TITLE]
 Concerning the Nature of the Manual
@@ -247,21 +250,8 @@ For until one understands the rules and the objective of the game, the optimal s
 https://realitymanual.com/assets/images/Chapter2IllustrationDigital.webp
 [/PLATE]
 [CLAUDE NOTES]
-Image: Chapter2IllustrationDigital.webp — LIVE PAGE 13, chapter-opening full-bleed plate.
-Type: atmosphere/character illustration (no diagram, no text/labels).
-Depicts: a lone hooded robed figure seen from behind, standing at the near edge of a vast
-checkerboard-tiled plaza/bridge inlaid with astrological/geometric sigils, stretching to
-the horizon toward a golden sunset over a sprawling landscape of towers, domes, rivers,
-bridges, and mountains. Pawn-topped pillars line the board's edges. The figure holds an
-open book covered in astronomical/geometric diagrams. Foreground: an open annotated
-manuscript, quill and inkwell, a telescope, an armillary sphere on stone ledges.
-Explains: sets the tone for Chapter II, "The Structure of Reality: A Game" — the giant
-chessboard stretching to the horizon IS the chapter's central visual thesis (reality
-rendered literally as a game board); the lone traveler with the book = the reader about
-to step onto the board equipped with the Manual's understanding.
-Larger concept: the most direct "reality = game" image in the book so far. Strong
-candidate for a Chapter II cold-open reel, or any reel introducing the "life is a game"
-thesis.
+Image: Chapter2IllustrationDigital.webp — LIVE PAGE 13, chapter-opening full-bleed plate
+(atmosphere only, not used to explain anything — skipped per explicit instruction).
 [/CLAUDE NOTES]
 [TITLE]
 The Structure of Reality: A Game
